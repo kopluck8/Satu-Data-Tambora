@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard TN Tambora</title>
+<meta name="description" content="Dashboard Perlindungan dan Pengamanan Taman Nasional Tambora: satu pintu untuk semua data dan aplikasi.">
+<link rel="icon" href="assets/img/logo-tntambora.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#isi">Langsung ke isi</a>
+<div class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Menu utama">
+    <a class="brand" href="#/">
+      <img src="assets/img/logo.png" alt="Logo KLHK dan TN Tambora" width="96" height="49">
+      <span><strong>Dashboard TN Tambora</strong><small>Perlindungan &amp; Pengamanan</small></span>
+    </a>
+    <label class="search">
+      <span class="sr">Cari halaman atau aplikasi</span>
+      <input id="cari" type="search" placeholder="Cari halaman atau aplikasi…" autocomplete="off">
+    </label>
+    <nav id="nav"></nav>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+  <div class="main-col">
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-controls="sidebar" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="sr">Buka menu</span>
+      </button>
+      <a href="#/" class="topbar-title">Dashboard TN Tambora</a>
+    </header>
+    <main id="isi" tabindex="-1"></main>
+    <footer class="footer" id="footer"></footer>
+  </div>
+</div>
+<script src="data/aplikasi.js"></script>
+<script src="data/menu.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
