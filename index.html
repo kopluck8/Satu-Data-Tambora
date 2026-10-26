@@ -3,42 +3,92 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#04060b">
+<meta name="color-scheme" content="dark">
 <title>Satu Data Tambora</title>
-<meta name="description" content="Satu Data Tambora: satu pintu untuk data dan aplikasi Balai Taman Nasional Tambora.">
+<meta name="description" content="Satu Data Tambora: data, peta, dan aplikasi kerja Balai Taman Nasional Tambora dalam satu layar.">
 <link rel="icon" href="assets/img/logo-tntambora.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
-<a class="skip" href="#isi">Langsung ke isi</a>
-<div class="shell">
-  <aside class="sidebar" id="sidebar" aria-label="Menu utama">
-    <a class="brand" href="#/">
-      <img src="assets/img/logo.png" alt="Logo KLHK dan TN Tambora" width="96" height="49">
-      <span><strong>Satu Data Tambora</strong><small>Balai Taman Nasional Tambora</small></span>
-    </a>
-    <label class="search">
-      <span class="sr">Cari halaman atau aplikasi</span>
-      <input id="cari" type="search" placeholder="Cari halaman atau aplikasi…" autocomplete="off">
-    </label>
-    <nav id="nav"></nav>
-  </aside>
-  <div class="scrim" id="scrim" hidden></div>
-  <div class="main-col">
-    <header class="topbar">
-      <button class="menu-btn" id="menuBtn" aria-controls="sidebar" aria-expanded="false">
-        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-        <span class="sr">Buka menu</span>
-      </button>
-      <a href="#/" class="topbar-title">Satu Data Tambora</a>
-    </header>
-    <main id="isi" tabindex="-1"></main>
-    <footer class="footer" id="footer"></footer>
+<div class="mulai" id="mulai" aria-hidden="true">
+  <img src="assets/img/logo-tntambora.png" alt="" width="92" height="92">
+  <span>Satu Data Tambora</span>
+</div>
+
+<div class="latar" aria-hidden="true">
+  <div class="latar-lapis" id="lapisA"></div>
+  <div class="latar-lapis" id="lapisB"></div>
+  <div class="latar-redup"></div>
+  <div class="latar-gulir"></div>
+</div>
+
+<div class="halaman" id="halaman">
+  <button type="button" class="lompat" id="lompat">Langsung ke isi</button>
+  <header class="atas">
+    <nav class="tab-utama" aria-label="Bagian utama">
+      <a href="#/" id="tabBeranda" aria-current="page">Beranda</a>
+      <a href="#/pustaka" id="tabPustaka" aria-current="false">Pustaka</a>
+    </nav>
+    <div class="atas-kanan">
+      <button type="button" class="ikon-tombol" id="tombolCari" data-ikon="cari" aria-label="Cari (tombol /)" title="Cari (tombol /)"></button>
+      <span class="jam"><time id="jam">--.--</time><small>WITA</small></span>
+      <a class="avatar" href="#/" aria-label="Satu Data Tambora, kembali ke beranda"><img src="assets/img/logo-tntambora.png" alt="" width="40" height="40"></a>
+    </div>
+  </header>
+
+  <main id="utama">
+    <section class="beranda" id="beranda" aria-label="Tema">
+      <div class="deret" id="deret" role="tablist" aria-label="Tema" aria-orientation="horizontal"></div>
+      <div class="sorot" id="sorot" role="tabpanel"></div>
+      <div class="isi" id="isi"></div>
+    </section>
+
+    <section class="pustaka" id="pustaka" aria-labelledby="judulPustaka" hidden>
+      <div class="pustaka-kepala">
+        <h1 id="judulPustaka">Pustaka</h1>
+        <p id="pustakaHitung"></p>
+      </div>
+      <div class="cari">
+        <label for="cari" class="sr">Cari isi</label>
+        <span class="cari-ikon" data-ikon="cari"></span>
+        <input id="cari" type="search" placeholder="Cari aplikasi, peta, grafik, data…" autocomplete="off" enterkeyhint="search" data-nav="cari">
+      </div>
+      <div class="saring" id="saringJenis" role="group" aria-label="Saring menurut jenis"></div>
+      <div class="saring" id="saringTema" role="group" aria-label="Saring menurut tema"></div>
+      <ul class="grid" id="gridPustaka"></ul>
+      <p class="kosong" id="pustakaKosong" hidden>Tidak ada isi yang cocok. Coba kata lain atau hapus saringan.</p>
+    </section>
+
+    <footer class="kaki" id="kaki"></footer>
+  </main>
+</div>
+
+<div class="penampil" id="penampil" role="dialog" aria-modal="true" aria-labelledby="penampilJudul" hidden>
+  <div class="penampil-bar">
+    <button type="button" class="ikon-tombol" id="penampilTutup" data-ikon="kembali" aria-label="Kembali (Esc)" title="Kembali (Esc)"></button>
+    <div class="penampil-judul"><small id="penampilTema"></small><strong id="penampilJudul"></strong></div>
+    <a class="tombol tombol--kaca tombol--kecil" id="penampilBaru" href="#/" target="_blank" rel="noopener" data-ikon="luar"><span>Buka di tab baru</span></a>
+  </div>
+  <div class="penampil-isi" id="penampilIsi">
+    <div class="memuat" id="penampilMemuat">
+      <span class="pemutar" aria-hidden="true"></span>
+      <p>Memuat…</p>
+      <p class="petunjuk" id="penampilPetunjuk" hidden>Belum tampil? Beberapa file Google hanya bisa dibuka akun yang diberi akses. Pakai tombol <strong>Buka di tab baru</strong>.</p>
+    </div>
   </div>
 </div>
+
+<div class="menu-lain" id="menuLain" role="menu" aria-label="Pilihan lain" hidden></div>
+<div class="kabar" id="kabar" role="status" aria-live="polite"></div>
+
+<noscript><p class="tanpa-js">Satu Data Tambora membutuhkan JavaScript. Aktifkan JavaScript lalu muat ulang halaman.</p></noscript>
 <script src="data/sumber.js"></script>
+<script src="assets/seni.js"></script>
+<script src="assets/pantauan.js"></script>
 <script src="assets/app.js"></script>
 </body>
 </html>

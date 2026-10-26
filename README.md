@@ -1,57 +1,99 @@
 # Satu Data Tambora
 
-Satu pintu untuk data dan aplikasi Balai Taman Nasional Tambora. Kerangka dan isinya meneruskan Google Site lama ([sites.google.com/view/dashboardtntambora](https://sites.google.com/view/dashboardtntambora)).
+Satu layar untuk data, peta, dan aplikasi kerja Balai Taman Nasional Tambora.
 
 Alamat: **https://kopluck8.github.io/Satu-Data-Tambora/**
 
-## Isi diubah lewat Google Sheets, bukan lewat kode
+## Tampilan
 
-Seluruh isi dashboard (menu, halaman, teks, gambar, peta, grafik, tautan, dan daftar aplikasi) dibaca dari satu spreadsheet: **Isi Satu Data Tambora**. Ubah spreadsheet, lalu buka ulang dashboard. Perubahan tampil dalam beberapa menit.
+Tampilannya meniru layar utama konsol PS5:
+
+- **Deretan ubin** di atas: Beranda, satu ubin per tema (Profil Kawasan, SMART Patrol, RBM, Kebakaran Hutan, Perlindungan Kawasan, Wisata & Pelayanan, Aset BMN), dan Pustaka. Memilih ubin mengganti foto latar, sorotan, dan baris kartu di bawahnya.
+- **Sorotan tema**: judul, ringkasan, tombol **Buka** untuk isi utama tema, dan menu **⋯** (buka di tab baru, lihat kode di GitHub, salin tautan).
+- **Angka langsung** dari aplikasi lain: capaian RBM, observasi SMART Patrol, dan estimasi bekas terbakar.
+- **Pustaka**: semua isi dalam satu daftar, dengan pencarian dan saringan jenis/tema.
+- **Penampil layar penuh**: aplikasi, peta, grafik, slide, dan file Drive dibuka di dalam dashboard. Setiap isi punya alamat sendiri (misalnya `#/smart/dashboard-data-smart-patrol`) yang bisa dibagikan.
+
+Bisa dipakai dengan papan ketik seperti stik konsol: tombol panah untuk berpindah, Enter untuk membuka, `/` untuk mencari, Esc untuk kembali.
+
+## Isi diubah lewat Google Sheets
+
+Semua isi (tema, kartu, teks, foto, link) dibaca dari satu spreadsheet dengan tiga tab:
 
 | Tab | Isi |
 |---|---|
 | `Pengaturan` | Nama dashboard, sambutan, teks pengelola |
-| `Halaman` | Daftar menu dan halaman (urutan baris = urutan menu) |
-| `Isi` | Isi setiap halaman, satu baris per elemen: judul, teks, gambar, sematan (grafik/peta/slides/aplikasi), tautan, kartu |
-| `Aplikasi` | Daftar repo/aplikasi GitHub |
-| `Panduan` | Penjelasan setiap kolom dan jenis isi |
+| `Tema` | Satu baris per ubin tema: judul, ringkasan, ikon, warna, foto latar |
+| `Item` | Satu baris per kartu: tema, kelompok, judul, jenis, link, keterangan |
 
-### Pemasangan pertama (sekali saja)
+Tab `Panduan` di spreadsheet menjelaskan setiap kolom. Arahkan kursor ke judul kolom untuk melihat catatannya.
 
-1. Unduh [`data/Isi_Satu_Data_Tambora.xlsx`](data/Isi_Satu_Data_Tambora.xlsx). Isinya sudah sama dengan Google Site lama.
+### Menyambungkan spreadsheet (sekali saja)
+
+1. Unduh [`data/Konten_Satu_Data_Tambora.xlsx`](data/Konten_Satu_Data_Tambora.xlsx).
 2. Unggah ke Google Drive, buka, lalu **File → Simpan sebagai Google Spreadsheet**.
-3. **Bagikan → Akses umum: Siapa saja yang memiliki link → Pelihat**. Dashboard tidak perlu login atau izin Google lain; cukup ini.
-4. Salin link spreadsheet, tempel ke `GOOGLE_SHEETS` di [`data/sumber.js`](data/sumber.js), lalu commit.
+3. Di file baru itu: **Bagikan → Akses umum: Siapa saja yang memiliki link → Pelihat**. Hanya ini izin Google yang dibutuhkan; dashboard tidak perlu login.
+4. Tempel link spreadsheet ke `GOOGLE_SHEETS` di [`data/sumber.js`](data/sumber.js), lalu commit.
 
-Selama link belum diisi, atau bila spreadsheet tidak bisa dibaca, dashboard memakai salinan cadangan di `data/isi/*.csv`. Baris bawah (footer) dashboard menunjukkan sumber mana yang sedang dipakai.
+Sebelum link diisi, atau bila spreadsheet tidak terbaca, dashboard memakai salinan cadangan `data/konten/*.csv`. Kaki halaman menunjukkan sumber yang sedang dipakai. Kunjungan berikutnya langsung tampil dari salinan terakhir di perangkat, lalu diperbarui dari Google Sheets di belakang layar.
 
-> Isi spreadsheet bisa dibaca siapa saja yang tahu link-nya, sama seperti Google Site yang publik. Jangan menaruh data rahasia di spreadsheet ini.
+> Spreadsheet bisa dibaca siapa saja yang tahu link-nya. Jangan menaruh data rahasia di sana.
 
-### Gambar
+### Pekerjaan yang sering dilakukan
 
-Kolom `gambar` menerima link gambar biasa atau link file Google Drive. Untuk gambar baru: unggah ke satu folder Drive (misalnya *Gambar Satu Data Tambora*), bagikan folder sebagai **Siapa saja yang memiliki link: Pelihat**, lalu tempel link file-nya. Gambar-gambar dari Google Site lama saat ini masih memakai alamat gambar Google Site; bila Google Site dihapus, ganti dengan link Drive.
+- **Menambah repo atau aplikasi baru**: tambah baris di tab `Item` dengan `jenis` = `aplikasi`, `url` = alamat GitHub Pages-nya, dan `repo` = `kopluck8/nama-repo`. Kartunya muncul di tema itu, di baris *Aplikasi kerja* beranda, dan di Pustaka.
+- **Menyembunyikan isi**: tulis `tidak` di kolom `tampil`.
+- **Mengganti isi utama tema** (yang dibuka tombol Buka): pindahkan `ya` di kolom `utama`.
+- **Menambah tema**: tambah baris di tab `Tema` dengan `id` singkat tanpa spasi, lalu pakai `id` itu di kolom `tema` tab `Item`.
 
-### Menambah repo/aplikasi baru
+### Jenis isi
 
-Tambah satu baris di tab `Aplikasi`: `id`, `nama`, `ringkas`, `kelompok` (id menu, misalnya `smart`, `rbm`, `karhut`, `manajemen`), `repo`, `url` GitHub Pages, `status` (aktif / uji coba / pengembangan). Aplikasi otomatis muncul di halaman utama menu tersebut, di Katalog Aplikasi, dan di pencarian. Bila ingin ditampilkan langsung di dalam dashboard, tambahkan halaman di tab `Halaman` dan satu baris `sematan` di tab `Isi`.
+| `jenis` | Untuk | Dibuka |
+|---|---|---|
+| `aplikasi` | Aplikasi web (GitHub Pages dan lainnya) | di dalam dashboard |
+| `peta` | Google My Maps, WebGIS | di dalam dashboard |
+| `grafik` | Grafik terbitan Google Sheets | di dalam dashboard |
+| `presentasi` | Google Slides | di dalam dashboard |
+| `data` | Google Sheets | di dalam dashboard (pratinjau) |
+| `dokumen` | PDF, Google Docs, file Drive | di dalam dashboard (pratinjau) |
+| `folder` | Folder Google Drive | di dalam dashboard |
+| `tautan` | Situs lain | tab baru |
+
+Link `github.com` selalu dibuka di tab baru. File Google yang tidak dibagikan ke publik hanya tampil bagi akun yang punya akses; tombol **Buka di tab baru** selalu tersedia.
+
+## Angka langsung
+
+Tema dengan `id` berikut menampilkan angka terkini. Jangan ganti ketiga `id` ini.
+
+| `id` | Angka | Sumber |
+|---|---|---|
+| `rbm` | Capaian kegiatan resor tahun berjalan dan per resor | [RBM_TNGunungTambora](https://github.com/kopluck8/RBM_TNGunungTambora), dihitung dengan kode yang sama dengan Dashboard Capaian RBM |
+| `smart` | Jumlah observasi patroli tahun berjalan dan kategori terbanyak | [Dashboard_SMART_TNGunungTambora](https://github.com/kopluck8/Dashboard_SMART_TNGunungTambora) |
+| `karhut` | Estimasi bekas terbakar musim ini, per resor | [Simulasi-API-Tambora](https://github.com/kopluck8/Simulasi-API-Tambora) (`status/landscape_terbaru.json`) |
+
+Bila salah satu sumber tidak terbaca, kartunya menulis *Belum bisa dimuat* dan bagian lain tetap jalan.
+
+## Foto
+
+Foto latar ada di `assets/foto/` (versi besar 1920 px dan versi `-kecil` 720 px untuk ubin dan kartu). Data EXIF, termasuk lokasi GPS, sudah dihapus. Kredit tampil di pojok sorotan dan diatur di kolom `kredit` tab `Tema`.
+
+Untuk foto baru, cara termudah: unggah ke Google Drive, bagikan **Siapa saja yang memiliki link: Pelihat**, lalu tempel link file-nya di kolom `gambar`. Kolom `fokus` (misalnya `50% 45%`) mengatur bagian foto yang tetap terlihat saat dipotong layar. Bila `gambar` kosong, dashboard membuat ilustrasi otomatis sesuai warna tema dan jenis isi.
 
 ## Struktur repo
 
 ```
-index.html                  kerangka halaman
-assets/app.js               memuat isi dari Google Sheets dan menyusun halaman
-assets/style.css            tampilan (mode terang & gelap)
-assets/img/                 logo
-data/sumber.js              link Google Sheets
-data/isi/*.csv              salinan cadangan isi (format sama dengan tab spreadsheet)
-data/Isi_Satu_Data_Tambora.xlsx   spreadsheet awal untuk diunggah ke Google Drive
+index.html                         kerangka halaman
+assets/app.js                      memuat isi dan menyusun tampilan
+assets/style.css                   tampilan
+assets/seni.js                     ikon dan ilustrasi otomatis (SVG)
+assets/pantauan.js                 angka langsung dari RBM, SMART, dan Simulasi API
+assets/foto/                       foto latar
+assets/img/                        logo
+data/sumber.js                     link Google Sheets
+data/konten/*.csv                  salinan cadangan isi (sama dengan tab spreadsheet)
+data/Konten_Satu_Data_Tambora.xlsx spreadsheet awal untuk diunggah ke Google Drive
 ```
 
-Untuk memperbarui salinan cadangan: di Google Sheets, **File → Download → CSV** untuk tiap tab, lalu ganti file di `data/isi/` dengan nama yang sama (`Pengaturan.csv`, `Halaman.csv`, `Isi.csv`, `Aplikasi.csv`).
+Situs statis tanpa proses build: GitHub Pages langsung menyajikan isi cabang `main`. Untuk mencoba di komputer sendiri, jalankan `python3 -m http.server` di folder repo lalu buka `http://localhost:8000`.
 
-## Catatan pemindahan dari Google Site
-
-- Grafik Google Sheets, peta Google My Maps, Google Slides, dan tautan Sheets/Drive memakai sumber aslinya, jadi tetap terbarui otomatis.
-- Empat sematan kode khusus di Google Site (SMART Patrol → Rangkuman dan halaman Grafik, Resor Base Management → Dashboard Capaian, Kebakaran Hutan → Informasi Hotspot) tidak bisa dibaca isinya dari luar. Diisi dengan halaman GitHub Pages yang sesuai (Dashboard SMART, Dashboard RBM, WebGIS Hotspot). Ubah kolom `url` bila berbeda.
-- Dua PDF di halaman Geomorfologi (`bf01073515.pdf`, `0091-761329123Avsotgt3B2.pdf`) belum punya link; isi kolom `url`-nya.
-- Halaman Kebakaran Hutan → Grafik dan profil lima resor memang masih kosong di Google Site.
+Untuk memperbarui salinan cadangan: di Google Sheets, **File → Download → CSV** untuk tab `Pengaturan`, `Tema`, dan `Item`, lalu ganti file di `data/konten/` dengan nama yang sama.
