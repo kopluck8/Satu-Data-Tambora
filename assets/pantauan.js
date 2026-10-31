@@ -131,13 +131,35 @@
     });
   }
 
-  /* ---------- Karhut: status landscape dari Simulasi API Tambora ---------- */
-  function karhut() {
+  /* ---------- Karhut: delineasi manual areal terbakar (bila ada), kalau tidak estimasi Sentinel-2 ---------- */
+  function namaResor(n) { return String(n).replace(/^Resor?t?\s+/i, ''); }
+
+  function karhutDelineasi() {
+    return ambil(ALAMAT.karhut + 'status/areal_terbakar.json', 12000).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.jumlah_delineasi) throw new Error('Belum ada delineasi');
+      return {
+        sumber: 'delineasi',
+        tanggal: d.tanggal,
+        awalMusim: d.awal_musim || null,
+        terbakar: Number(d.terbakar_ha),
+        cakupan: 'kawasan',
+        luasKawasan: Number(d.luas_kawasan_ha) || null,
+        jumlah: d.jumlah_delineasi,
+        riwayat: (d.riwayat || []).map(function (x) { return { tanggal: x.tanggal, baru: Number(x.baru_ha) || 0, kumulatif: Number(x.kumulatif_ha) || 0 }; }),
+        perResor: (d.resort || []).map(function (r) {
+          return { nama: namaResor(r.nama), nilai: Number(r.terbakar_ha) || 0, luas: Number(r.luas_ha) || 0 };
+        })
+      };
+    });
+  }
+
+  function karhutSentinel() {
     return ambil(ALAMAT.karhut + 'status/landscape_terbaru.json', 12000).then(function (r) { return r.json(); }).then(function (d) {
       var kw = d.kawasan && d.kawasan.total;
       var luas = kw ? Number(kw.terbakar_musim_ha) : Number(d.bekas_terbakar_musim_ha);
       if (!isFinite(luas)) throw new Error('Angka bekas terbakar tidak ada');
       return {
+        sumber: 'sentinel',
         tanggal: d.tanggal,
         citra: d.citra_terakhir || null,
         awalMusim: d.awal_musim || null,
@@ -145,11 +167,13 @@
         cakupan: kw ? 'kawasan' : 'aoi',
         luasKawasan: kw ? Number(kw.luas_ha) : null,
         perResor: ((d.kawasan && d.kawasan.resort) || []).map(function (r) {
-          return { nama: String(r.nama).replace(/^Resor?t?\s+/i, ''), nilai: Number(r.terbakar_musim_ha) || 0, luas: Number(r.luas_ha) || 0 };
+          return { nama: namaResor(r.nama), nilai: Number(r.terbakar_musim_ha) || 0, luas: Number(r.luas_ha) || 0 };
         })
       };
     });
   }
+
+  function karhut() { return karhutDelineasi().catch(karhutSentinel); }
 
   var SUMBER = { rbm: rbm, smart: smart, karhut: karhut };
   var janji = {};

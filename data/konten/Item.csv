@@ -35,7 +35,7 @@ karhut,Pantau dan simulasi,Simulasi API Tambora,aplikasi,https://kopluck8.github
 karhut,Pantau dan simulasi,Pembuat WXS,aplikasi,https://kopluck8.github.io/Simulasi-API-Tambora/pembuat_wxs.html,Membuat file angin/cuaca .WXS untuk simulasi.,,kopluck8/Simulasi-API-Tambora,,ya
 karhut,Pantau dan simulasi,Work Page FlamMap Tambora,aplikasi,https://kopluck8.github.io/ModelAPI/,"Progres pemodelan arah rambatan api: tugas, input plot lapangan, rekap strata, dan fuel model.",,kopluck8/ModelAPI,,ya
 karhut,Peta dan rekap,Peta Kerawanan Kebakaran Hutan,peta,https://www.google.com/maps/d/embed?mid=1ivtMxwFx5T4t6S699NZ_Y1pSn-TJd4Q,Peta tingkat kerawanan kebakaran hutan.,,,,ya
-karhut,Peta dan rekap,Sebaran Areal Terbakar,peta,https://www.google.com/maps/d/embed?mid=1mOK7vlcmfg8DN8Wr0OhR3Q_VK4ajzY4,Peta sebaran areal bekas terbakar (burn area).,,,,ya
+karhut,Peta dan rekap,Sebaran Areal Terbakar,peta,https://kopluck8.github.io/Simulasi-API-Tambora/peta_terbakar.html,"Peta areal terbakar dari delineasi manual tiap 5 hari, dengan rekap per resor; diperbarui otomatis dari Google Drive.",,kopluck8/Simulasi-API-Tambora,,ya
 karhut,Peta dan rekap,Rekap Kejadian Kebakaran Hutan,data,https://drive.google.com/open?id=1J0Ys2ccDlIkI8PgLmeTgkfBcpHWz8bWX77mBEXyCCr4,Rekapitulasi data kejadian kebakaran hutan.,assets/foto/pemadaman.jpg,,,ya
 polhut,Laporan dan data,Rekap Laporan Kejadian 2026,data,https://drive.google.com/open?id=18qc30ZrKAgXeiqRzeqXh2Vqqhscq1kqVKEL_6mBA6Wc,Rekap laporan kejadian (LK) tahun 2026.,,,ya,ya
 polhut,Laporan dan data,Database Polhut (DaPolTam),data,https://drive.google.com/open?id=17O0M1sCb8oUHnNcCWMiPc1gNNSRthOfDw6zhjAP21KA,Database Polisi Kehutanan Balai TN Tambora.,,,,ya

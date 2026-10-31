@@ -332,7 +332,7 @@
 
   /* ---------- angka terkini ---------- */
   var tokenPantau = 0;
-  var LABEL_RINGKAS = { rbm: 'Capaian RBM', smart: 'Observasi SMART', karhut: 'Bekas terbakar' };
+  var LABEL_RINGKAS = { rbm: 'Capaian RBM', smart: 'Observasi SMART', karhut: 'Areal terbakar' };
 
   function daftarBatang(judul, list, teks, maks) {
     var m = maks || Math.max.apply(null, list.map(function (r) { return r.nilai; }).concat([1]));
@@ -341,6 +341,17 @@
       return '<li title="' + esc((r.penuh || r.nama) + ': ' + teks(r)) + '"><span class="batang-nama">' + esc(r.nama) + '</span>' +
         '<span class="batang-jalur"><i style="width:' + p.toFixed(1) + '%"></i></span><span class="batang-nilai">' + esc(teks(r)) + '</span></li>';
     }).join('') + '</ul>';
+  }
+
+  // Areal baru per delineasi: kolom tipis satu warna, delineasi terakhir paling tegas.
+  function kolomRiwayat(r) {
+    var akhir = r.slice(-12), m = Math.max.apply(null, akhir.map(function (x) { return x.baru; }).concat([1]));
+    return '<p class="stat-kecil">Areal baru per delineasi</p><div class="kolom" role="img" aria-label="Areal baru per delineasi, ' +
+      akhir.length + ' delineasi terakhir">' + akhir.map(function (x, i) {
+        return '<span title="' + esc(tanggal(x.tanggal)) + ': +' + fmt(x.baru) + ' ha"' + (i === akhir.length - 1 ? ' class="kini"' : '') + '>' +
+          '<i style="height:' + Math.max(3, x.baru / m * 100).toFixed(1) + '%"></i></span>';
+      }).join('') + '</div><div class="kolom-sumbu"><span>' + esc(tanggal(akhir[0].tanggal)) + '</span><span>' +
+      esc(tanggal(akhir[akhir.length - 1].tanggal)) + '</span></div>';
   }
 
   var PANEL = {
@@ -361,12 +372,21 @@
         '<p class="stat-catatan">Dihitung dari data Dashboard SMART Patrol</p></div>';
     },
     karhut: function (d) {
+      var manual = d.sumber === 'delineasi';
       var persen = d.luasKawasan ? fmt(d.terbakar / d.luasKawasan * 100, 1) + '% luas kawasan' : '';
-      return '<div class="panel-kaca"><p class="stat-label">Bekas terbakar musim ini' + (d.cakupan === 'kawasan' ? ' di kawasan TN' : '') + '</p>' +
+      var akhir = manual && d.riwayat.length ? d.riwayat[d.riwayat.length - 1] : null;
+      var peta = M.item.filter(function (x) { return /peta_terbakar\.html/.test(x.url); })[0];
+      return '<div class="panel-kaca"><p class="stat-label">' + (manual ? 'Areal terbakar' : 'Bekas terbakar') + ' musim ini' +
+        (d.cakupan === 'kawasan' ? ' di kawasan TN' : '') + '</p>' +
         '<p class="stat-nilai">' + fmt(d.terbakar) + '<small> ha</small></p>' +
-        '<p class="stat-sub">' + [d.awalMusim ? 'Sejak ' + esc(tanggal(d.awalMusim)) : '', persen].filter(Boolean).join(' · ') + '</p>' +
+        '<p class="stat-sub">' + [d.awalMusim ? 'Sejak ' + esc(tanggal(d.awalMusim)) : '', persen,
+          akhir ? '+' + fmt(akhir.baru) + ' ha pada delineasi ' + esc(tanggal(akhir.tanggal)) : ''].filter(Boolean).join(' · ') + '</p>' +
         (d.perResor.length ? daftarBatang('Per resor', d.perResor, function (r) { return fmt(r.nilai) + ' ha'; }) : '') +
-        '<p class="stat-catatan">Estimasi otomatis dari citra Sentinel-2 (uji coba) · citra terakhir ' + esc(tanggal(d.citra || d.tanggal)) + '</p></div>';
+        (manual && d.riwayat.length > 1 ? kolomRiwayat(d.riwayat) : '') +
+        '<p class="stat-catatan">' + (manual
+          ? 'Delineasi manual, ' + d.jumlah + ' kali sejak awal musim · terakhir ' + esc(tanggal(d.tanggal))
+          : 'Estimasi otomatis dari citra Sentinel-2 (uji coba) · citra terakhir ' + esc(tanggal(d.citra || d.tanggal))) +
+        (peta ? ' · <a href="' + esc(hrefItem(peta, 'karhut')) + '"' + atributLuar(peta) + '>Lihat peta</a>' : '') + '</p></div>';
     }
   };
 
@@ -374,7 +394,10 @@
     var t = M.temaById[id], label = LABEL_RINGKAS[id], nilai = '', sub = '';
     if (d && id === 'rbm') { nilai = fmt(d.capaian) + '<small>%</small>'; sub = d.tahun + ' · ' + d.tercapai + ' dari ' + d.kegiatan + ' kegiatan tercapai'; }
     if (d && id === 'smart') { nilai = fmt(d.observasi); sub = d.tahun + ' · ' + fmt(d.titik) + ' titik temuan'; }
-    if (d && id === 'karhut') { nilai = fmt(d.terbakar) + '<small> ha</small>'; sub = 'Musim ini' + (d.cakupan === 'kawasan' ? ' di kawasan TN' : '') + ' (estimasi)'; }
+    if (d && id === 'karhut') {
+      nilai = fmt(d.terbakar) + '<small> ha</small>';
+      sub = d.sumber === 'delineasi' ? 'Delineasi ' + tanggal(d.tanggal) : 'Musim ini' + (d.cakupan === 'kawasan' ? ' di kawasan TN' : '') + ' (estimasi)';
+    }
     return '<span class="stat-ikon" style="--warna-ikon:' + t.warna + '">' + ikon(t.ikon) + '</span>' +
       '<span class="stat-label">' + esc(label) + '</span>' +
       (d ? '<span class="stat-nilai stat-nilai--sedang">' + nilai + '</span><span class="stat-sub">' + esc(sub) + '</span>'

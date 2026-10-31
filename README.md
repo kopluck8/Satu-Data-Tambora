@@ -69,9 +69,11 @@ Tema dengan `id` berikut menampilkan angka terkini. Jangan ganti ketiga `id` ini
 |---|---|---|
 | `rbm` | Capaian kegiatan resor tahun berjalan dan per resor | [RBM_TNGunungTambora](https://github.com/kopluck8/RBM_TNGunungTambora), dihitung dengan kode yang sama dengan Dashboard Capaian RBM |
 | `smart` | Jumlah observasi patroli tahun berjalan dan kategori terbanyak | [Dashboard_SMART_TNGunungTambora](https://github.com/kopluck8/Dashboard_SMART_TNGunungTambora) |
-| `karhut` | Estimasi bekas terbakar musim ini, per resor | [Simulasi-API-Tambora](https://github.com/kopluck8/Simulasi-API-Tambora) (`status/landscape_terbaru.json`) |
+| `karhut` | Areal terbakar musim ini dari delineasi manual, per resor dan per delineasi; bila belum ada delineasi, estimasi Sentinel-2 | [Simulasi-API-Tambora](https://github.com/kopluck8/Simulasi-API-Tambora) (`status/areal_terbakar.json`, cadangan `status/landscape_terbaru.json`) |
 
 Bila salah satu sumber tidak terbaca, kartunya menulis *Belum bisa dimuat* dan bagian lain tetap jalan.
+
+Delineasi areal terbakar cukup diunggah sebagai zip SHP ke folder Drive `Simulasi API Tambora/delineasi`, dengan tanggal di nama file. Rekap dan [peta areal terbakar](https://kopluck8.github.io/Simulasi-API-Tambora/peta_terbakar.html) diperbarui otomatis paling lama satu jam kemudian. Panduan: [PANDUAN_DELINEASI.md](https://github.com/kopluck8/Simulasi-API-Tambora/blob/main/docs/PANDUAN_DELINEASI.md).
 
 ## Foto
 
