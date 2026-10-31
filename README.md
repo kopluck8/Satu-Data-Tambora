@@ -89,6 +89,14 @@ Tab **Resor Pengelolaan** membuka halaman [`resor/`](resor/index.html): ikhtisar
 
 Foto profil resor diatur di [`data/resor/foto.json`](data/resor/foto.json). Setiap resor punya enam tempat foto bertema; foto pertama yang bertanda `utama` menjadi sampul. Isi `src` dengan path di repo (misalnya `assets/foto/resor/piong-savana.jpg`) atau link file Google Drive yang dibagikan **Siapa saja yang memiliki link: Pelihat**. Tempat yang masih kosong tampil sebagai bingkai bertuliskan temanya.
 
+## Penanganan Konflik Tenurial
+
+Tab **Perlindungan Kawasan** memuat kartu *Penanganan Konflik Tenurial Karya Sari dan So Tompo* yang membuka halaman [`tenurial/`](tenurial/index.html): rangkuman hasil pengumpulan bahan keterangan (pulbaket) penggunaan lahan dalam SMART Patrol berdasarkan Surat Tugas Nomor ST.1452/T.41/TU/DIPA/10/2026 (14–18 Oktober 2026). Isinya peta 146 bidang garapan, status identifikasi pengguna per blok dan lokasi, asal pengguna, sewa dan jual beli lahan, pembukaan baru 2026, irisan dengan areal terbakar 2026, rekomendasi tindak lanjut, dan metode.
+
+- **Data** ada di `data/tenurial/`: `ringkasan.json` (angka agregat), `bidang.geojson` (bidang L001–L146 dengan blok, resor, lokasi, zona, luas, status identifikasi, jumlah pengguna, dan luas irisan areal terbakar), `terbakar.geojson` (poligon areal terbakar 2026 yang beririsan dengan atau berjarak hingga 1 km dari bidang), dan `zonasi.geojson` (zonasi di sekitar kedua blok). Batas resor diambil dari `data/resor/batas_resor_2026.geojson`.
+- **Tanpa identitas pribadi**: nama pengguna lahan, pihak yang menyewakan atau menjual, dan nilai transaksi tidak disimpan di repo ini. Rinciannya hanya ada di Laporan Pelaksanaan Kegiatan ST.1452.
+- **Pembaruan**: setelah pulbaket lanjutan, olah ulang isian pulbaket dan SHP bidang, lalu ganti keempat file di `data/tenurial/`. Halaman langsung memakai angka baru tanpa perubahan kode.
+
 ## Foto
 
 Foto latar ada di `assets/foto/` (versi besar 1920 px dan versi `-kecil` 720 px untuk ubin dan kartu). Data EXIF, termasuk lokasi GPS, sudah dihapus. Kredit tampil di pojok sorotan dan diatur di kolom `kredit` tab `Tema`.
@@ -111,6 +119,8 @@ data/Konten_Satu_Data_Tambora.xlsx spreadsheet awal untuk diunggah ke Google Dri
 resor/                             halaman Resor Pengelolaan (ikhtisar, profil per resor, metode)
 data/resor/                        batas resor 2026, isi Laporan Kajian, hasil analisis, tempat foto
 tools/resor/                       skrip analisis potensi dan ancaman per resor beserta ujinya
+tenurial/                          halaman Penanganan Konflik Tenurial Karya Sari dan So Tompo
+data/tenurial/                     rangkuman pulbaket ST.1452 tanpa identitas pribadi, peta bidang, areal terbakar, zonasi
 .github/workflows/resor.yml        pembaruan analisis resor harian
 ```
 

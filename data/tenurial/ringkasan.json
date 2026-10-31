@@ -1,0 +1,365 @@
+{
+ "judul": "Penanganan Konflik Tenurial Karya Sari dan So Tompo",
+ "dibuat": "2026-10-31",
+ "kegiatan": {
+  "st": "ST.1452/T.41/TU/DIPA/10/2026",
+  "mulai": "2026-10-14",
+  "selesai": "2026-10-18",
+  "laporan": "2026-10-23",
+  "judul": "SMART Patrol dalam Rangka Identifikasi Gangguan Karhutla dan Potensi Kawasan melalui Pengumpulan Bahan Keterangan Penggunaan Lahan di Karya Sari dan So Tompo",
+  "tim": "5 petugas Balai TN Tambora didampingi 5 anggota MMP/MPA SPTN Wilayah II Pekat",
+  "sptn": "SPTN Wilayah II Pekat"
+ },
+ "total": {
+  "n": 146,
+  "ha": 329.1,
+  "n_id": 101,
+  "ha_id": 254.54
+ },
+ "status": {
+  "buka": {
+   "nama": "Buka sendiri",
+   "n": 76,
+   "ha": 218.11
+  },
+  "sewa": {
+   "nama": "Sewa/beli",
+   "n": 22,
+   "ha": 25.13,
+   "rinci": "19 bidang sewa/beli dan 3 bidang campuran buka sendiri dan sewa/beli"
+  },
+  "kosong": {
+   "nama": "Riwayat kosong",
+   "n": 3,
+   "ha": 11.3
+  },
+  "belum": {
+   "nama": "Belum teridentifikasi",
+   "n": 45,
+   "ha": 74.56
+  }
+ },
+ "blok": [
+  {
+   "n": 90,
+   "ha": 136.74,
+   "status": {
+    "buka": {
+     "n": 46,
+     "ha": 89.63
+    },
+    "sewa": {
+     "n": 21,
+     "ha": 22.29
+    },
+    "kosong": {
+     "n": 3,
+     "ha": 11.3
+    },
+    "belum": {
+     "n": 20,
+     "ha": 13.52
+    }
+   },
+   "id": "karya-sari",
+   "nama": "Karya Sari",
+   "resor": "Doropeti",
+   "n_id": 70,
+   "ha_id": 123.22,
+   "terbakar": {
+    "n": 0,
+    "ha": 0.0
+   }
+  },
+  {
+   "n": 56,
+   "ha": 192.36,
+   "status": {
+    "buka": {
+     "n": 30,
+     "ha": 128.49
+    },
+    "sewa": {
+     "n": 1,
+     "ha": 2.84
+    },
+    "belum": {
+     "n": 25,
+     "ha": 61.04
+    }
+   },
+   "id": "so-tompo",
+   "nama": "So Tompo",
+   "resor": "Doro Tabe",
+   "n_id": 31,
+   "ha_id": 131.32,
+   "terbakar": {
+    "n": 53,
+    "ha": 119.84
+   }
+  }
+ ],
+ "lokasi": [
+  {
+   "n": 31,
+   "ha": 131.32,
+   "status": {
+    "buka": {
+     "n": 30,
+     "ha": 128.49
+    },
+    "sewa": {
+     "n": 1,
+     "ha": 2.84
+    }
+   },
+   "nama": "Sotompo",
+   "blok": [
+    "So Tompo"
+   ]
+  },
+  {
+   "n": 26,
+   "ha": 59.68,
+   "status": {
+    "buka": {
+     "n": 23,
+     "ha": 48.91
+    },
+    "sewa": {
+     "n": 1,
+     "ha": 0.54
+    },
+    "kosong": {
+     "n": 2,
+     "ha": 10.23
+    }
+   },
+   "nama": "Karya Sari",
+   "blok": [
+    "Karya Sari"
+   ]
+  },
+  {
+   "n": 27,
+   "ha": 22.24,
+   "status": {
+    "buka": {
+     "n": 12,
+     "ha": 13.56
+    },
+    "sewa": {
+     "n": 15,
+     "ha": 8.67
+    }
+   },
+   "nama": "Jalur Trans",
+   "blok": [
+    "Karya Sari"
+   ]
+  },
+  {
+   "n": 10,
+   "ha": 19.61,
+   "status": {
+    "buka": {
+     "n": 6,
+     "ha": 8.21
+    },
+    "sewa": {
+     "n": 4,
+     "ha": 11.4
+    }
+   },
+   "nama": "Ngguwu Nggaa",
+   "blok": [
+    "Karya Sari"
+   ]
+  },
+  {
+   "n": 10,
+   "ha": 16.67,
+   "status": {
+    "buka": {
+     "n": 3,
+     "ha": 9.98
+    },
+    "sewa": {
+     "n": 1,
+     "ha": 1.68
+    },
+    "kosong": {
+     "n": 1,
+     "ha": 1.07
+    },
+    "belum": {
+     "n": 5,
+     "ha": 3.94
+    }
+   },
+   "nama": "Doro Songke",
+   "blok": [
+    "Karya Sari"
+   ]
+  },
+  {
+   "n": 2,
+   "ha": 8.96,
+   "status": {
+    "buka": {
+     "n": 2,
+     "ha": 8.96
+    }
+   },
+   "nama": "Doro Willa",
+   "blok": [
+    "Karya Sari"
+   ]
+  },
+  {
+   "n": 40,
+   "ha": 70.63,
+   "status": {
+    "belum": {
+     "n": 40,
+     "ha": 70.63
+    }
+   },
+   "nama": "Lokasi tidak tercatat",
+   "blok": [
+    "Karya Sari",
+    "So Tompo"
+   ]
+  }
+ ],
+ "zona": [
+  {
+   "nama": "Tradisional",
+   "n": 140,
+   "ha": 313.2
+  },
+  {
+   "nama": "Rehabilitasi",
+   "n": 3,
+   "ha": 9.96
+  },
+  {
+   "nama": "Pemanfaatan",
+   "n": 3,
+   "ha": 5.95
+  }
+ ],
+ "asal": [
+  {
+   "nama": "Soritatanga",
+   "n": 28,
+   "ha": 47.35
+  },
+  {
+   "nama": "Donggo",
+   "n": 26,
+   "ha": 35.45
+  },
+  {
+   "nama": "Sotompo",
+   "n": 25,
+   "ha": 115.57
+  },
+  {
+   "nama": "Sori Mangge",
+   "n": 12,
+   "ha": 36.28
+  },
+  {
+   "nama": "Karya Sari",
+   "n": 6,
+   "ha": 6.32
+  },
+  {
+   "nama": "Ta'a (Kempo)",
+   "n": 6,
+   "ha": 15.75
+  },
+  {
+   "nama": "O'o (Dompu)",
+   "n": 1,
+   "ha": 1.94
+  }
+ ],
+ "pengguna": {
+  "nama": 62,
+  "buka_sendiri": 57,
+  "pihak_menyewakan": 10,
+  "baris_isian": 87,
+  "kode_tercatat": 107
+ },
+ "peralihan": {
+  "n": 22,
+  "ha": 25.13,
+  "musim_tanam": 14
+ },
+ "ganda": 6,
+ "klaim": {
+  "n": 21,
+  "klaim_ha": 39.01,
+  "peta_ha": 87.47
+ },
+ "terbakar": {
+  "n": 53,
+  "ha": 119.84,
+  "n90": 16,
+  "blok_n": 56,
+  "blok_ha": 192.36,
+  "persen": 62.3,
+  "pembaruan": "2026-10-30",
+  "sejak": "2026-02-20"
+ },
+ "baru": [
+  {
+   "kode": [
+    "L006",
+    "L068",
+    "L070"
+   ],
+   "ket": "Pembersihan lahan baru tercatat pada SMART Mobile tanggal 14 Oktober 2026; pengguna menyatakan menyewa lahan tersebut pada 2026."
+  },
+  {
+   "kode": [
+    "L003",
+    "L043"
+   ],
+   "ket": "Lahan sedang dibuka pada 2026 di Doro Songke."
+  },
+  {
+   "kode": [
+    "L007"
+   ],
+   "ket": "Perambahan baru seluas ±80 m² di sebelah barat bidang menurut keterangan pengguna."
+  }
+ ],
+ "smart": {
+  "km": 110.61,
+  "catatan": 2,
+  "bidang_dekat_jalur": 46
+ },
+ "tindak_lanjut": [
+  "Melanjutkan pulbaket pada 45 bidang yang belum teridentifikasi dengan prioritas blok So Tompo, sekaligus memverifikasi areal terbakar 2026 dan dugaan penggunaan api untuk penyiapan lahan.",
+  "Mengklarifikasi dan mengukur batas garapan bersama pengguna pada 6 bidang dengan keterangan ganda serta bidang dengan selisih luas besar, dan mencatat kode lahan secara konsisten pada SMART Mobile.",
+  "Mencegah pembukaan baru dan perluasan garapan melalui imbauan dan patroli rutin pada lokasi pembukaan 2026, terutama menjelang musim tanam.",
+  "Menindaklanjuti keterangan sewa-menyewa dan jual beli lahan kawasan melalui klarifikasi kepada pihak yang disebutkan dan koordinasi dengan pemerintah desa dan kecamatan.",
+  "Menyiapkan opsi penyelesaian sesuai zonasi: kemitraan konservasi bagi pengguna di zona tradisional yang memenuhi ketentuan dan pemulihan ekosistem pada bidang di zona rehabilitasi dan zona pemanfaatan.",
+  "Melaksanakan dialog ngopi bareng dengan pengguna lahan, tokoh masyarakat, dan perangkat desa untuk menghimpun usulan solusi masyarakat yang belum tercatat.",
+  "Memutakhirkan peta bidang dan rekap pulbaket di halaman ini setelah setiap kegiatan lanjutan."
+ ],
+ "catatan": {
+  "privasi": "Nama pengguna lahan, pihak yang menyewakan atau menjual, dan nilai transaksi tidak ditampilkan. Rinciannya ada di Laporan Pelaksanaan Kegiatan ST.1452 (dokumen internal).",
+  "verifikasi": "Riwayat penggunaan dan asal pengguna merupakan keterangan masyarakat yang belum seluruhnya diverifikasi; batas bidang adalah delineasi lahan terbuka dari citra (angka indikatif).",
+  "dasbor": "Angka berbeda sedikit dari dasbor paparan tim (98 bidang teridentifikasi; 253,55 ha) karena tiga bidang Jalur Trans (L022, L027, L036) ditambahkan pada baris terakhir isian dan belum masuk dasbor. Halaman ini memakai seluruh 87 baris isian."
+ },
+ "sumber": [
+  "Isian tabel pulbaket (87 baris) dan rekaman SMART Mobile model Pengumpulan Bahan Keterangan, 14–18 Oktober 2026",
+  "Peta bidang garapan hasil aktualisasi (SHP Pulbaket, 146 kode lahan L001–L146) dan analisis NDVI 2015–2026",
+  "Zonasi TN Tambora dan batas resor 2026 (Laporan Hasil Kajian Wilayah Kerja Resor)",
+  "Delineasi manual areal terbakar musim 2026, pembaruan 30 Oktober 2026 (Simulasi API Tambora)"
+ ]
+}

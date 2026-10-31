@@ -1,0 +1,124 @@
+/* Konflik Tenurial Karya Sari dan So Tompo · memakai dasar tampilan resor/resor.css, tambahan khusus halaman ini. */
+:root {
+  /* status bidang: tiga warna kategori (biru, jingga, hijau toska) dan abu-abu untuk yang belum teridentifikasi */
+  --s-buka: #3987e5;
+  --s-sewa: #d95926;
+  --s-kosong: #199e70;
+  --s-belum: #6f746a;
+  --s-baru: #f0cf7e;
+  --s-api: #ff7a6b;
+}
+
+/* ---------- sampul tanpa foto ---------- */
+.sampul--polos { min-height: 0; background: radial-gradient(900px 420px at 88% 0%, rgba(217, 169, 68, .12), transparent 62%),
+  radial-gradient(700px 380px at 0% 100%, rgba(57, 135, 229, .08), transparent 60%), linear-gradient(180deg, #0f2018, #0a140f); }
+.sampul--polos::after { display: none; }
+.sampul--polos .sampul-isi { padding-top: 56px; }
+.sampul--polos h1 { max-width: 22ch; }
+.sampul-motif { position: absolute; right: max(24px, calc((100vw - var(--lebar)) / 2 + 24px)); top: 40px; width: min(36vw, 420px); opacity: .55; pointer-events: none; z-index: -1; }
+.sampul-motif path { stroke-width: .6; vector-effect: non-scaling-stroke; }
+
+/* ---------- penyaring blok di atas peta ---------- */
+.saring { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.saring .label { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--teks-3); margin-right: 4px; }
+.saring button { border: 1px solid var(--garis-2); background: var(--panel-2); color: var(--teks-2); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.saring button:hover { color: #fff; border-color: var(--emas); }
+.saring button[aria-pressed="true"] { background: var(--emas-2); border-color: transparent; color: #1a1406; }
+
+/* ---------- legenda status ---------- */
+.legenda i.s-buka { background: var(--s-buka); }
+.legenda i.s-sewa { background: var(--s-sewa); }
+.legenda i.s-kosong { background: var(--s-kosong); }
+.legenda i.s-belum { background: var(--s-belum); }
+.peta-legenda i.s-belum { border-style: dashed; }
+.peta-legenda i.baru { background: transparent !important; border: 2.5px solid var(--s-baru); border-radius: 2px; }
+.peta-legenda i.api { border-radius: 2px; border: 1.5px solid var(--s-api); background: repeating-linear-gradient(-45deg, var(--s-api) 0 1.5px, transparent 1.5px 4px) !important; }
+.peta-legenda i.resor { border-radius: 2px; background: transparent !important; border: 2px dashed #e8e2c8; }
+.peta-legenda i.zona { border-radius: 2px; background: transparent !important; border: 1.5px solid #9fd3a8; }
+
+/* ---------- batang bertumpuk ---------- */
+.tumpuk-daftar { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.tumpuk-baris { display: grid; grid-template-columns: minmax(110px, 30%) 1fr auto; gap: 12px; align-items: center; }
+.tumpuk-baris .nm { font-size: 13.5px; font-weight: 600; color: var(--teks); line-height: 1.3; min-width: 0; }
+.tumpuk-baris .nm small { display: block; font-size: 12px; font-weight: 500; color: var(--teks-3); }
+.tumpuk-jalur { position: relative; height: 18px; }
+.tumpuk { display: flex; gap: 2px; height: 100%; min-width: 2px; }
+.tumpuk i { display: block; height: 100%; min-width: 2px; flex-basis: 0; cursor: default; transition: filter .15s; }
+.tumpuk i:last-child { border-radius: 0 4px 4px 0; }
+.tumpuk i:hover { filter: brightness(1.25); }
+.tumpuk i.s-buka { background: var(--s-buka); }
+.tumpuk i.s-sewa { background: var(--s-sewa); }
+.tumpuk i.s-kosong { background: var(--s-kosong); }
+.tumpuk i.s-belum { background: repeating-linear-gradient(135deg, var(--s-belum) 0 5px, #5a5f56 5px 8px); }
+.tumpuk-baris .nl { font-size: 13px; font-weight: 700; white-space: nowrap; text-align: right; min-width: 72px; }
+.tumpuk-baris .nl small { display: block; font-size: 11.5px; font-weight: 600; color: var(--teks-3); }
+.tumpuk-daftar--padat { gap: 8px; }
+.tumpuk-daftar--padat .tumpuk-jalur { height: 14px; }
+
+/* ---------- tabel lipat ---------- */
+.lipat { margin-top: 14px; }
+.lipat summary { cursor: pointer; font-size: 12.5px; color: var(--teks-3); font-weight: 600; list-style: none; display: inline-flex; gap: 6px; align-items: center; }
+.lipat summary::-webkit-details-marker { display: none; }
+.lipat summary::before { content: "+"; font-weight: 800; color: var(--emas); }
+.lipat[open] summary::before { content: "–"; }
+.lipat .tabel-wadah { margin-top: 10px; }
+.lipat table { font-size: 12.5px; }
+.lipat th, .lipat td { padding: 7px 9px; }
+.tabel-status thead th { white-space: normal; line-height: 1.25; vertical-align: bottom; }
+.tabel-status tbody th, .tabel-status tfoot th { white-space: normal; min-width: 86px; }
+.tabel-status td small { display: block; font-size: 11px; font-weight: 500; color: var(--teks-3); }
+
+/* ---------- daftar temuan dan tindak lanjut ---------- */
+.temuan { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.temuan li { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; padding: 12px 0; border-top: 1px solid var(--garis); align-items: start; }
+.temuan li:first-child { border-top: 0; padding-top: 4px; }
+.temuan .kode-deret { display: flex; flex-wrap: wrap; gap: 6px; max-width: 220px; }
+.temuan p { font-size: 13.5px; color: var(--teks-2); }
+button.kode { cursor: pointer; font: 700 12px/1.4 var(--sans); letter-spacing: .02em; padding: 3px 9px; border-radius: 7px; border: 1.5px solid var(--s-baru); background: rgba(240, 207, 126, .1); color: var(--emas-2); }
+button.kode:hover { background: var(--s-baru); color: #1a1406; }
+.langkah { margin: 0; padding: 0; list-style: none; counter-reset: lk; display: grid; gap: 10px; }
+.langkah li { counter-increment: lk; display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; padding: 14px 16px; border: 1px solid var(--garis); border-radius: 12px; background: var(--panel); font-size: 14px; color: var(--teks-2); }
+.langkah li::before { content: counter(lk); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 13px; color: #1a1406; background: var(--emas-2); }
+.fokus-deret { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 14px; }
+.angka-nilai .pecahan { font-size: .6em; font-weight: 600; color: var(--teks-2); }
+.persen-batang { height: 10px; border-radius: 0 4px 4px 0; background: rgba(232, 226, 200, .08); position: relative; margin-top: 10px; overflow: hidden; }
+.persen-batang i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 4px 4px 0; background: repeating-linear-gradient(-45deg, var(--s-api) 0 3px, rgba(255, 122, 107, .55) 3px 6px); }
+
+/* ---------- tooltip peta (Leaflet) ---------- */
+.leaflet-tooltip.tip-peta { background: #0f1f17; color: var(--teks); border: 1px solid var(--garis-2); border-radius: 10px; padding: 8px 11px; font: 12.5px/1.45 var(--sans); box-shadow: var(--bayang); width: max-content; max-width: 270px; white-space: normal; }
+.leaflet-tooltip.tip-peta::before { display: none; }
+.tip-peta b { display: block; font-size: 13.5px; }
+.tip-peta .baru { display: block; margin-top: 4px; color: var(--emas-2); font-weight: 600; }
+.st { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.st i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; flex: none; }
+/* label blok di peta */
+.leaflet-tooltip.label-blok { background: rgba(10, 20, 15, .82); color: var(--teks); border: 1px solid var(--garis-2); border-radius: 8px; padding: 5px 9px;
+  font: 600 11.5px/1.35 var(--sans); color: var(--teks-2); box-shadow: none; white-space: nowrap; }
+.leaflet-tooltip.label-blok::before { display: none; }
+.label-blok b { display: block; font-size: 13px; color: var(--emas-2); letter-spacing: .01em; }
+
+@media (max-width: 900px) {
+  .sampul-motif { display: none; }
+}
+@media (max-width: 600px) {
+  .peta-wadah--isi #petaBidang { min-height: 340px; height: 340px; }
+  .leaflet-tooltip.label-blok { padding: 3px 7px; }
+  .label-blok b { font-size: 11.5px; }
+  .label-blok span { display: none; }
+  .fokus-deret .chip { white-space: normal; border-radius: 10px; }
+  .tumpuk-baris { grid-template-columns: 1fr auto; gap: 4px 10px; }
+  .tumpuk-baris .nm { grid-column: 1 / -1; }
+  .temuan li { grid-template-columns: 1fr; }
+  .temuan .kode-deret { max-width: none; }
+  .langkah li { grid-template-columns: 28px 1fr; padding: 12px; }
+  .langkah li::before { width: 26px; height: 26px; font-size: 12px; }
+}
+@media print {
+  .sampul--polos { background: none !important; }
+  .sampul--polos .sampul-isi { padding-top: 0; }
+  #peta { display: none !important; }  /* peta interaktif tidak ikut dicetak */
+  .saring, .lipat summary { display: none !important; }
+  .lipat { display: block; }
+  .lipat > * { display: block; }
+  .langkah li { background: #fff; }
+}
