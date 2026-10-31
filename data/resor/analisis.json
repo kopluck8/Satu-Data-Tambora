@@ -1,20 +1,20 @@
 {
  "versi": 1,
- "diperbarui": "2026-10-31T19:33+08:00",
+ "diperbarui": "2026-10-31T19:52+08:00",
  "periode": {
-  "awal": "2026-01-26",
+  "awal": "2026-02-03",
   "akhir": "2026-10-03",
   "tahun_awal": 2026
  },
  "sumber": {
   "smart": {
    "drive": 2219,
-   "sheet": 178,
-   "sheet_dari": "data/data.csv",
-   "observasi": 2397,
-   "dipakai": 2397,
-   "dalam_resor": 2326,
-   "luar_kawasan": 71,
+   "sheet": 5448,
+   "sheet_dari": "Google Sheets",
+   "observasi": 7667,
+   "dipakai": 3398,
+   "dalam_resor": 3346,
+   "luar_kawasan": 52,
    "tanpa_koordinat": 0
   },
   "jalur": {
@@ -88,12 +88,12 @@
  ],
  "tn": {
   "luas_ha": 78686.8,
-  "observasi": 2326,
-  "hari_patroli": 88,
+  "observasi": 3346,
+  "hari_patroli": 103,
   "km_jalur": 786.8,
   "sel": 861,
-  "sel_terjamah": 269,
-  "cakupan_pct": 31.2,
+  "sel_terjamah": 299,
+  "cakupan_pct": 34.7,
   "terbakar": {
    "ha": 24288.6,
    "pct": 30.9
@@ -103,37 +103,37 @@
     "id": "karhut",
     "peringkat": 3,
     "resor": 7,
-    "temuan": 29
+    "temuan": 50
    },
    {
     "id": "rambah",
     "peringkat": 2,
     "resor": 5,
-    "temuan": 11
+    "temuan": 43
    },
    {
     "id": "buru",
     "peringkat": 2,
     "resor": 7,
-    "temuan": 6
+    "temuan": 8
    },
    {
     "id": "kayu",
     "peringkat": 1,
-    "resor": 3,
-    "temuan": 3
+    "resor": 4,
+    "temuan": 21
    },
    {
     "id": "ternak",
     "peringkat": 1,
-    "resor": 4,
-    "temuan": 13
+    "resor": 5,
+    "temuan": 15
    },
    {
     "id": "invasif",
     "peringkat": 1,
-    "resor": 2,
-    "temuan": 3
+    "resor": 3,
+    "temuan": 6
    },
    {
     "id": "tanpaizin",
@@ -144,39 +144,39 @@
    {
     "id": "jalan",
     "peringkat": 1,
-    "resor": 1,
-    "temuan": 1
+    "resor": 2,
+    "temuan": 2
    }
   ],
   "status_ancaman": 2,
   "laju_rata": {
-   "karhut": 2.48,
-   "rambah": 0.94,
-   "buru": 0.51,
-   "kayu": 0.26,
-   "ternak": 1.11,
-   "invasif": 0.26,
-   "tanpaizin": 0.26,
-   "jalan": 0.09
+   "karhut": 2.72,
+   "rambah": 2.34,
+   "buru": 0.43,
+   "kayu": 1.14,
+   "ternak": 0.82,
+   "invasif": 0.33,
+   "tanpaizin": 0.16,
+   "jalan": 0.11
   },
   "satwa": {
-   "rekaman": 366,
-   "S": 60,
-   "H": 3.51,
-   "E": 0.86,
-   "dilindungi": 7,
-   "terancam": 3,
+   "rekaman": 681,
+   "S": 94,
+   "H": 3.65,
+   "E": 0.8,
+   "dilindungi": 14,
+   "terancam": 4,
    "kunci": [
     {
      "nama": "Rusa timor",
      "ilmiah": "Rusa timorensis",
-     "rekaman": 6,
-     "sel": 6
+     "rekaman": 15,
+     "sel": 11
     },
     {
      "nama": "Elang flores",
      "ilmiah": "Nisaetus floris",
-     "rekaman": 3,
+     "rekaman": 4,
      "sel": 3
     }
    ],
@@ -184,48 +184,90 @@
     {
      "nama": "Nuri Pipi Merah",
      "ilmiah": "Geoffroyus geoffroyi",
-     "n": 30,
+     "n": 74,
      "dilindungi": true,
      "iucn": "LC"
     },
     {
      "nama": "Rusa Timor",
      "ilmiah": "Rusa timorensis",
-     "n": 6,
+     "n": 15,
      "dilindungi": true,
      "iucn": "VU"
     },
     {
      "nama": "Monyet Ekor Panjang",
      "ilmiah": "Macaca fascicularis",
-     "n": 4,
+     "n": 11,
      "dilindungi": false,
      "iucn": "EN"
     },
     {
+     "nama": "Opior wallacea",
+     "ilmiah": "Heleia wallacei",
+     "n": 10,
+     "dilindungi": true,
+     "iucn": "LC"
+    },
+    {
+     "nama": "Cekakak Tunggir Putih",
+     "ilmiah": "Caridonax fulgidus",
+     "n": 9,
+     "dilindungi": true,
+     "iucn": "LC"
+    },
+    {
      "nama": "Elang Ular Jari Pendek",
      "ilmiah": "Circaetus gallicus",
-     "n": 3,
+     "n": 4,
      "dilindungi": true,
      "iucn": "LC"
     },
     {
      "nama": "Elang Flores",
      "ilmiah": "Nisaetus floris",
-     "n": 3,
+     "n": 4,
      "dilindungi": true,
      "iucn": "CR"
     },
     {
-     "nama": "Cekakak Tunggir Putih",
-     "ilmiah": "Caridonax fulgidus",
-     "n": 2,
+     "nama": "Alap-alap Sapi",
+     "ilmiah": "Falco moluccensis",
+     "n": 3,
      "dilindungi": true,
      "iucn": "LC"
     },
     {
      "nama": "Elang Bondol",
      "ilmiah": "Haliastur indus",
+     "n": 3,
+     "dilindungi": true,
+     "iucn": "LC"
+    },
+    {
+     "nama": "Sikep Madu Asia",
+     "ilmiah": "Pernis ptilorhynchus",
+     "n": 2,
+     "dilindungi": true,
+     "iucn": "LC"
+    },
+    {
+     "nama": "Paok laus-utara",
+     "ilmiah": "Pitta concinna",
+     "n": 2,
+     "dilindungi": true,
+     "iucn": "LC"
+    },
+    {
+     "nama": "Elang-alap nusatenggara",
+     "ilmiah": "Accipiter sylvestris",
+     "n": 1,
+     "dilindungi": true,
+     "iucn": "LC"
+    },
+    {
+     "nama": "Alap-alap Australia",
+     "ilmiah": "Falco longipennis",
      "n": 1,
      "dilindungi": true,
      "iucn": "LC"
@@ -236,6 +278,13 @@
      "n": 1,
      "dilindungi": true,
      "iucn": "LC"
+    },
+    {
+     "nama": "Perkici Dada Merah",
+     "ilmiah": "Trichoglossus forsteni",
+     "n": 1,
+     "dilindungi": true,
+     "iucn": "EN"
     }
    ]
   },
@@ -264,42 +313,37 @@
     "sel": 203,
     "sel_terjamah": 111,
     "cakupan_pct": 54.7,
-    "observasi": 999,
+    "observasi": 1050,
     "observasi_tepi": 33,
     "indikatif": false
    },
    "kategori": [
     [
      "Tumbuhan",
-     709
+     737
     ],
     [
      "Satwa Liar",
-     129
+     141
     ],
     [
      "Ground Check",
-     91
+     96
+    ],
+    [
+     "Aktivitas Manusia",
+     37
     ],
     [
      "Fitur",
      35
     ],
     [
-     "Aktivitas Manusia",
-     33
-    ],
-    [
      "Spesies invasif",
-     2
+     4
     ]
    ],
    "bulanan": [
-    [
-     "2026-01",
-     0,
-     0
-    ],
     [
      "2026-02",
      35,
@@ -307,42 +351,42 @@
     ],
     [
      "2026-03",
-     12,
+     13,
      0
     ],
     [
      "2026-04",
-     162,
-     6
+     178,
+     7
     ],
     [
      "2026-05",
-     250,
-     3
+     264,
+     5
     ],
     [
      "2026-06",
-     174,
+     194,
      2
     ],
     [
      "2026-07",
-     215,
+     210,
      3
     ],
     [
      "2026-08",
-     18,
+     19,
      0
     ],
     [
      "2026-09",
-     70,
-     14
+     73,
+     15
     ],
     [
      "2026-10",
-     63,
+     64,
      1
     ]
    ],
@@ -353,11 +397,11 @@
    "ancaman": [
     {
      "id": "karhut",
-     "temuan": 18,
+     "temuan": 20,
      "indikasi": 0,
-     "sel": 12,
-     "laju": 3.67,
-     "rasio": 1.48,
+     "sel": 13,
+     "laju": 4.08,
+     "rasio": 1.5,
      "lingkup": {
       "nilai": 3,
       "pct": 55.1,
@@ -368,7 +412,7 @@
       "alasan": [
        "api di savana umumnya membakar rumput dan lapisan bawah",
        "55% luas resor terbakar musim ini",
-       "api masuk ekosistem hutan/pegunungan (Ilalang, teride, cemara)"
+       "api masuk ekosistem hutan/pegunungan (Hutan Musim; Ilalang, teride, cemara)"
       ]
      },
      "ketakpulihan": {
@@ -383,9 +427,9 @@
       "Kajian"
      ],
      "aktif": 8,
-     "tindak_lanjut": 15,
+     "tindak_lanjut": 17,
      "terakhir": "2026-09-30",
-     "rincian": "8 kejadian masih menyala saat ditemukan; vegetasi: savana/padang rumput (12), hutan/pegunungan (1); 8 disebabkan manusia"
+     "rincian": "8 kejadian masih menyala saat ditemukan; vegetasi: savana/padang rumput (13), hutan/pegunungan (2); 9 disebabkan manusia"
     },
     {
      "id": "rambah",
@@ -457,7 +501,7 @@
      "indikasi": 0,
      "sel": 6,
      "laju": 1.43,
-     "rasio": 1.29,
+     "rasio": 1.75,
      "lingkup": {
       "nilai": 1,
       "pct": 5.4,
@@ -485,20 +529,21 @@
     },
     {
      "id": "invasif",
-     "temuan": 2,
+     "temuan": 4,
      "indikasi": 0,
      "sel": 1,
-     "laju": 0.41,
-     "rasio": 1.59,
+     "laju": 0.82,
+     "rasio": 2.5,
      "lingkup": {
       "nilai": 1,
       "pct": 0.9,
       "dasar": "temuan di 1 dari 111 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
-      "nilai": 2,
+      "nilai": 3,
       "alasan": [
-       "menekan tumbuhan asli di areal terbuka"
+       "menekan tumbuhan asli di areal terbuka",
+       "laju temuan 2,5× rata-rata TN"
       ]
      },
      "ketakpulihan": {
@@ -521,7 +566,7 @@
      "indikasi": 0,
      "sel": 2,
      "laju": 0.41,
-     "rasio": 1.59,
+     "rasio": 2.5,
      "lingkup": {
       "nilai": 1,
       "pct": 1.8,
@@ -576,7 +621,7 @@
      "jenis": "karhut",
      "tipe": "bekas kebakaran",
      "aktif": false,
-     "n": 2
+     "n": 3
     },
     {
      "tanggal": "2026-09-15",
@@ -600,16 +645,23 @@
     "gangguan": 0.816
    },
    "satwa": {
-    "rekaman": 129,
-    "teridentifikasi": 124,
-    "S": 34,
-    "H": 3.13,
-    "E": 0.89,
+    "rekaman": 141,
+    "teridentifikasi": 136,
+    "S": 36,
+    "H": 3.14,
+    "E": 0.88,
     "teratas": [
      {
       "nama": "Kirik-kirik australia",
       "ilmiah": "Merops ornatus",
-      "n": 15,
+      "n": 17,
+      "dilindungi": false,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Ayam Hutan Hijau",
+      "ilmiah": "Gallus varius",
+      "n": 11,
       "dilindungi": false,
       "iucn": "LC"
      },
@@ -621,23 +673,16 @@
       "iucn": "LC"
      },
      {
-      "nama": "Ayam Hutan Hijau",
-      "ilmiah": "Gallus varius",
-      "n": 9,
+      "nama": "Cucak kutilang",
+      "ilmiah": "Pycnonotus aurigaster",
+      "n": 11,
       "dilindungi": false,
       "iucn": "LC"
      },
      {
       "nama": "Walet tenggara",
       "ilmiah": "Collocalia sumbawae",
-      "n": 8,
-      "dilindungi": false,
-      "iucn": "LC"
-     },
-     {
-      "nama": "Cucak kutilang",
-      "ilmiah": "Pycnonotus aurigaster",
-      "n": 8,
+      "n": 10,
       "dilindungi": false,
       "iucn": "LC"
      },
@@ -667,7 +712,7 @@
      {
       "nama": "Elang Flores",
       "ilmiah": "Nisaetus floris",
-      "n": 2,
+      "n": 3,
       "dilindungi": true,
       "iucn": "CR"
      },
@@ -691,60 +736,60 @@
      {
       "nama": "Elang flores",
       "ilmiah": "Nisaetus floris",
-      "rekaman": 2,
+      "rekaman": 3,
       "sel": 2
      }
     ],
     "belum_tercatat_status": []
    },
    "tumbuhan": {
-    "rekaman": 709,
-    "S": 47,
+    "rekaman": 737,
+    "S": 48,
     "teratas": [
      {
       "nama": "Malaka",
       "ilmiah": "Phyllanthus emblica",
-      "n": 85
+      "n": 91
      },
      {
       "nama": "Kesambi",
       "ilmiah": "Schleichera oleosa",
-      "n": 74
+      "n": 76
      },
      {
       "nama": "Weru",
       "ilmiah": "Albizia procera",
-      "n": 57
+      "n": 56
      },
      {
       "nama": "Ketimunan",
       "ilmiah": "Timonius timon",
-      "n": 50
+      "n": 53
      },
      {
       "nama": "Legaran",
       "ilmiah": "Alstonia spectabilis",
-      "n": 39
+      "n": 41
      },
      {
       "nama": "Walikukun",
       "ilmiah": "Schoutenia ovata",
-      "n": 36
+      "n": 39
      }
     ]
    },
    "ekosistem": [
     [
      "Savana",
-     23
+     24
     ],
     [
      "Hutan pamah",
-     22
+     24
     ],
     [
      "Padang rumput",
-     3
+     2
     ],
     [
      "Hutan pegunungan atas",
@@ -754,15 +799,15 @@
    "tutupan": [
     [
      "Savana/padang rumput",
-     28
+     29
     ],
     [
      "Hutan monsun",
-     9
+     10
     ],
     [
      "Semak",
-     4
+     5
     ],
     [
      "Lahan terbuka",
@@ -784,15 +829,10 @@
     "Tembelekan"
    ],
    "hhbk": 2,
-   "indikasi": 4,
+   "indikasi": 6,
    "masyarakat": {
-    "kegiatan": 1,
-    "jenis": [
-     [
-      "Anjangsana",
-      1
-     ]
-    ]
+    "kegiatan": 0,
+    "jenis": []
    },
    "potensi": {
     "pengawetan": {
@@ -903,27 +943,27 @@
     ]
    ],
    "upaya": {
-    "hari_patroli": 33,
+    "hari_patroli": 32,
     "km_jalur": 137.7,
     "sel": 176,
     "sel_terjamah": 53,
     "cakupan_pct": 30.1,
-    "observasi": 545,
+    "observasi": 553,
     "observasi_tepi": 29,
     "indikatif": false
    },
    "kategori": [
     [
      "Tumbuhan",
-     377
+     381
     ],
     [
      "Satwa Liar",
-     73
+     77
     ],
     [
      "Ground Check",
-     55
+     54
     ],
     [
      "Fitur",
@@ -931,7 +971,7 @@
     ],
     [
      "Aktivitas Manusia",
-     17
+     18
     ],
     [
      "Spesies invasif",
@@ -940,28 +980,23 @@
    ],
    "bulanan": [
     [
-     "2026-01",
-     0,
+     "2026-02",
+     260,
      0
     ],
     [
-     "2026-02",
-     269,
-     1
-    ],
-    [
      "2026-03",
-     12,
+     16,
      0
     ],
     [
      "2026-04",
-     53,
-     2
+     54,
+     3
     ],
     [
      "2026-05",
-     72,
+     75,
      0
     ],
     [
@@ -971,7 +1006,7 @@
     ],
     [
      "2026-07",
-     13,
+     14,
      0
     ],
     [
@@ -981,8 +1016,8 @@
     ],
     [
      "2026-09",
-     53,
-     6
+     61,
+     7
     ],
     [
      "2026-10",
@@ -997,11 +1032,11 @@
    "ancaman": [
     {
      "id": "karhut",
-     "temuan": 8,
+     "temuan": 9,
      "indikasi": 0,
      "sel": 7,
-     "laju": 2.42,
-     "rasio": 0.98,
+     "laju": 2.81,
+     "rasio": 1.03,
      "lingkup": {
       "nilai": 3,
       "pct": 34.4,
@@ -1025,10 +1060,10 @@
       "delineasi",
       "Kajian"
      ],
-     "aktif": 3,
-     "tindak_lanjut": 6,
+     "aktif": 4,
+     "tindak_lanjut": 7,
      "terakhir": "2026-09-21",
-     "rincian": "3 kejadian masih menyala saat ditemukan; vegetasi: savana/padang rumput (6); 6 disebabkan manusia"
+     "rincian": "4 kejadian masih menyala saat ditemukan; vegetasi: savana/padang rumput (7); 7 disebabkan manusia"
     },
     {
      "id": "rambah",
@@ -1067,8 +1102,8 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 0.3,
-     "rasio": 0.59,
+     "laju": 0.31,
+     "rasio": 0.72,
      "lingkup": {
       "nilai": 2,
       "pct": 1.9,
@@ -1101,8 +1136,8 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 0.3,
-     "rasio": 1.18,
+     "laju": 0.31,
+     "rasio": 0.27,
      "lingkup": {
       "nilai": 1,
       "pct": 1.9,
@@ -1133,8 +1168,8 @@
      "temuan": 4,
      "indikasi": 0,
      "sel": 3,
-     "laju": 1.21,
-     "rasio": 1.09,
+     "laju": 1.25,
+     "rasio": 1.53,
      "lingkup": {
       "nilai": 1,
       "pct": 5.7,
@@ -1165,8 +1200,8 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 0.3,
-     "rasio": 1.18,
+     "laju": 0.31,
+     "rasio": 0.96,
      "lingkup": {
       "nilai": 1,
       "pct": 1.9,
@@ -1221,7 +1256,7 @@
      "jenis": "karhut",
      "tipe": "masih terbakar",
      "aktif": true,
-     "n": 1
+     "n": 2
     },
     {
      "tanggal": "2026-09-07",
@@ -1245,16 +1280,23 @@
     "gangguan": 1.095
    },
    "satwa": {
-    "rekaman": 73,
-    "teridentifikasi": 68,
-    "S": 25,
-    "H": 2.9,
-    "E": 0.9,
+    "rekaman": 77,
+    "teridentifikasi": 72,
+    "S": 26,
+    "H": 2.89,
+    "E": 0.89,
     "teratas": [
      {
       "nama": "Cikukua tanduk",
       "ilmiah": "Philemon buceroides",
-      "n": 9,
+      "n": 10,
+      "dilindungi": false,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Ayam Hutan Hijau",
+      "ilmiah": "Gallus varius",
+      "n": 7,
       "dilindungi": false,
       "iucn": "LC"
      },
@@ -1266,6 +1308,13 @@
       "iucn": "LC"
      },
      {
+      "nama": "Burung",
+      "ilmiah": "",
+      "n": 7,
+      "dilindungi": false,
+      "iucn": ""
+     },
+     {
       "nama": "Walet tenggara",
       "ilmiah": "Collocalia sumbawae",
       "n": 6,
@@ -1273,23 +1322,9 @@
       "iucn": "LC"
      },
      {
-      "nama": "Ayam Hutan Hijau",
-      "ilmiah": "Gallus varius",
-      "n": 6,
-      "dilindungi": false,
-      "iucn": "LC"
-     },
-     {
-      "nama": "Burung",
-      "ilmiah": "",
-      "n": 6,
-      "dilindungi": false,
-      "iucn": ""
-     },
-     {
       "nama": "Cucak kutilang",
       "ilmiah": "Pycnonotus aurigaster",
-      "n": 5,
+      "n": 6,
       "dilindungi": false,
       "iucn": "LC"
      }
@@ -1308,9 +1343,16 @@
       "n": 1,
       "dilindungi": false,
       "iucn": "EN"
+     },
+     {
+      "nama": "Sikep Madu Asia",
+      "ilmiah": "Pernis ptilorhynchus",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
      }
     ],
-    "dilindungi": 1,
+    "dilindungi": 2,
     "terancam": 1,
     "kunci": [
      {
@@ -1329,23 +1371,23 @@
     "belum_tercatat_status": []
    },
    "tumbuhan": {
-    "rekaman": 377,
+    "rekaman": 381,
     "S": 52,
     "teratas": [
      {
       "nama": "Malaka",
       "ilmiah": "Phyllanthus emblica",
-      "n": 58
+      "n": 56
      },
      {
       "nama": "Terisi",
       "ilmiah": "Albizia lebbekoides",
-      "n": 25
+      "n": 27
      },
      {
       "nama": "Rufe",
       "ilmiah": "Piliostigma malabaricum",
-      "n": 24
+      "n": 26
      },
      {
       "nama": "Salam",
@@ -1355,12 +1397,12 @@
      {
       "nama": "Kesambi",
       "ilmiah": "Schleichera oleosa",
-      "n": 16
+      "n": 17
      },
      {
       "nama": "Bidara",
       "ilmiah": "Ziziphus mauritiana",
-      "n": 16
+      "n": 15
      }
     ]
    },
@@ -1375,7 +1417,7 @@
     ],
     [
      "Padang rumput",
-     5
+     4
     ],
     [
      "Hutan pegunungan bawah",
@@ -1411,7 +1453,7 @@
    "fitur_alami": [
     [
      "alur sungai",
-     2
+     1
     ]
    ],
    "invasif": [
@@ -1430,8 +1472,8 @@
    },
    "potensi": {
     "pengawetan": {
-     "skor": 2.33,
-     "tingkat": 2,
+     "skor": 2.67,
+     "tingkat": 3,
      "indikator": [
       {
        "nama": "Indeks lokasi kehati (LQ)",
@@ -1447,8 +1489,8 @@
       },
       {
        "nama": "Jenis satwa dilindungi/terancam tercatat",
-       "nilai": 2,
-       "skor": 2,
+       "nilai": 3,
+       "skor": 3,
        "ket": "Permen LHK P.106/2018 atau IUCN CR/EN/VU, patroli SMART"
       }
      ]
@@ -1502,7 +1544,7 @@
      ]
     },
     "total": {
-     "skor": 2.66,
+     "skor": 2.78,
      "tingkat": 3
     }
    },
@@ -1512,7 +1554,8 @@
    "arahan": [
     "Siaga kebakaran sebelum puncak kemarau (Juli–September): patroli pencegahan dan pemadaman dini di savana, sekat bakar di jalur rawan, dan penguatan MPA desa penyangga.",
     "Verifikasi perambahan yang tercatat di Laporan Kajian dengan patroli terarah (belum ada temuan SMART tahun ini) dan tegaskan batas di titik rawan.",
-    "Sapu jerat terjadwal dan awasi jalur masuk pemburu (sasaran tercatat: Rusa Timor), termasuk patroli malam pada musim berburu."
+    "Sapu jerat terjadwal dan awasi jalur masuk pemburu (sasaran tercatat: Rusa Timor), termasuk patroli malam pada musim berburu.",
+    "Pantau populasi satwa kunci (Rusa timor, Elang flores) dengan metode baku, misalnya transek atau titik hitung, sebagai dasar tren."
    ]
   },
   {
@@ -1532,27 +1575,27 @@
     ]
    ],
    "upaya": {
-    "hari_patroli": 11,
+    "hari_patroli": 9,
     "km_jalur": 23.6,
     "sel": 109,
-    "sel_terjamah": 27,
-    "cakupan_pct": 24.8,
-    "observasi": 442,
+    "sel_terjamah": 26,
+    "cakupan_pct": 23.9,
+    "observasi": 323,
     "observasi_tepi": 30,
-    "indikatif": false
+    "indikatif": true
    },
    "kategori": [
     [
      "Tumbuhan",
-     348
+     251
     ],
     [
      "Satwa Liar",
-     65
+     45
     ],
     [
      "Ground Check",
-     15
+     14
     ],
     [
      "Fitur",
@@ -1561,18 +1604,9 @@
     [
      "Aktivitas Manusia",
      6
-    ],
-    [
-     "Pengelolaan",
-     1
     ]
    ],
    "bulanan": [
-    [
-     "2026-01",
-     0,
-     0
-    ],
     [
      "2026-02",
      0,
@@ -1585,7 +1619,7 @@
     ],
     [
      "2026-04",
-     167,
+     44,
      0
     ],
     [
@@ -1605,12 +1639,12 @@
     ],
     [
      "2026-08",
-     45,
+     47,
      0
     ],
     [
      "2026-09",
-     17,
+     19,
      1
     ],
     [
@@ -1629,8 +1663,8 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 0.91,
-     "rasio": 0.37,
+     "laju": 1.11,
+     "rasio": 0.41,
      "lingkup": {
       "nilai": 2,
       "pct": 26.7,
@@ -1663,19 +1697,19 @@
      "temuan": 4,
      "indikasi": 1,
      "sel": 3,
-     "laju": 3.64,
-     "rasio": 7.09,
+     "laju": 4.44,
+     "rasio": 10.22,
      "lingkup": {
       "nilai": 2,
-      "pct": 11.1,
-      "dasar": "temuan di 3 dari 27 sel grid 1 km yang dipatroli"
+      "pct": 11.5,
+      "dasar": "temuan di 3 dari 26 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
       "nilai": 4,
       "alasan": [
        "menurunkan populasi satwa sasaran",
        "menyasar satwa kunci/dilindungi (Rusa Timor)",
-       "laju temuan 7,1× rata-rata TN"
+       "laju temuan 10,2× rata-rata TN"
       ]
      },
      "ketakpulihan": {
@@ -1725,37 +1759,37 @@
     "gangguan": 1.168
    },
    "satwa": {
-    "rekaman": 65,
-    "teridentifikasi": 63,
-    "S": 28,
-    "H": 3.12,
-    "E": 0.94,
+    "rekaman": 45,
+    "teridentifikasi": 43,
+    "S": 20,
+    "H": 2.78,
+    "E": 0.93,
     "teratas": [
      {
       "nama": "Nuri Pipi Merah",
       "ilmiah": "Geoffroyus geoffroyi",
-      "n": 7,
+      "n": 6,
       "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Rusa Timor",
+      "ilmiah": "Rusa timorensis",
+      "n": 5,
+      "dilindungi": true,
+      "iucn": "VU"
+     },
+     {
+      "nama": "Cikukua tanduk",
+      "ilmiah": "Philemon buceroides",
+      "n": 4,
+      "dilindungi": false,
       "iucn": "LC"
      },
      {
       "nama": "Burung-madu sriganti",
       "ilmiah": "Cinnyris jugularis",
-      "n": 6,
-      "dilindungi": false,
-      "iucn": "LC"
-     },
-     {
-      "nama": "Cikukua tanduk",
-      "ilmiah": "Philemon buceroides",
-      "n": 5,
-      "dilindungi": false,
-      "iucn": "LC"
-     },
-     {
-      "nama": "Babi Hutan",
-      "ilmiah": "Sus scrofa",
-      "n": 4,
+      "n": 3,
       "dilindungi": false,
       "iucn": "LC"
      },
@@ -1778,46 +1812,32 @@
      {
       "nama": "Nuri Pipi Merah",
       "ilmiah": "Geoffroyus geoffroyi",
-      "n": 7,
+      "n": 6,
       "dilindungi": true,
       "iucn": "LC"
      },
      {
       "nama": "Rusa Timor",
       "ilmiah": "Rusa timorensis",
-      "n": 3,
+      "n": 5,
       "dilindungi": true,
       "iucn": "VU"
      },
      {
-      "nama": "Cekakak Tunggir Putih",
-      "ilmiah": "Caridonax fulgidus",
-      "n": 2,
-      "dilindungi": true,
-      "iucn": "LC"
-     },
-     {
       "nama": "Monyet Ekor Panjang",
       "ilmiah": "Macaca fascicularis",
-      "n": 2,
+      "n": 1,
       "dilindungi": false,
       "iucn": "EN"
-     },
-     {
-      "nama": "Gosong Kaki Merah",
-      "ilmiah": "Megapodius reinwardt",
-      "n": 1,
-      "dilindungi": true,
-      "iucn": "LC"
      }
     ],
-    "dilindungi": 4,
+    "dilindungi": 2,
     "terancam": 2,
     "kunci": [
      {
       "nama": "Rusa timor",
       "ilmiah": "Rusa timorensis",
-      "rekaman": 3,
+      "rekaman": 5,
       "sel": 3
      },
      {
@@ -1830,23 +1850,13 @@
     "belum_tercatat_status": []
    },
    "tumbuhan": {
-    "rekaman": 348,
-    "S": 62,
+    "rekaman": 251,
+    "S": 50,
     "teratas": [
      {
       "nama": "Tumbuhan Tambora",
       "ilmiah": "",
-      "n": 34
-     },
-     {
-      "nama": "Salam",
-      "ilmiah": "Syzygium polyanthum",
-      "n": 24
-     },
-     {
-      "nama": "Sarume ara",
-      "ilmiah": "Acronychia trifoliolata",
-      "n": 12
+      "n": 16
      },
      {
       "nama": "Legaran",
@@ -1854,14 +1864,24 @@
       "n": 12
      },
      {
-      "nama": "Kesambi",
-      "ilmiah": "Schleichera oleosa",
-      "n": 12
+      "nama": "Sarume ara",
+      "ilmiah": "Acronychia trifoliolata",
+      "n": 10
      },
      {
-      "nama": "Katowi",
-      "ilmiah": "Palaquium amboinense",
+      "nama": "Kesambi",
+      "ilmiah": "Schleichera oleosa",
       "n": 10
+     },
+     {
+      "nama": "Salam",
+      "ilmiah": "Syzygium polyanthum",
+      "n": 9
+     },
+     {
+      "nama": "Angrek",
+      "ilmiah": "",
+      "n": 9
      }
     ]
    },
@@ -1871,11 +1891,11 @@
      3
     ],
     [
-     "Hutan pegunungan atas",
-     3
+     "Savana",
+     2
     ],
     [
-     "Savana",
+     "Hutan pegunungan atas",
      2
     ],
     [
@@ -1912,8 +1932,8 @@
    },
    "potensi": {
     "pengawetan": {
-     "skor": 3.33,
-     "tingkat": 4,
+     "skor": 3.0,
+     "tingkat": 3,
      "indikator": [
       {
        "nama": "Indeks lokasi kehati (LQ)",
@@ -1929,8 +1949,8 @@
       },
       {
        "nama": "Jenis satwa dilindungi/terancam tercatat",
-       "nilai": 5,
-       "skor": 4,
+       "nilai": 3,
+       "skor": 3,
        "ket": "Permen LHK P.106/2018 atau IUCN CR/EN/VU, patroli SMART"
       }
      ]
@@ -1984,7 +2004,7 @@
      ]
     },
     "total": {
-     "skor": 3.22,
+     "skor": 3.11,
      "tingkat": 3
     }
    },
@@ -1993,10 +2013,10 @@
     "buru"
    ],
    "arahan": [
+    "Perluas cakupan patroli: baru 24% sel grid resor terjamah dalam 9 hari patroli. Utamakan sel yang belum pernah dikunjungi agar penilaian tidak lagi indikatif.",
     "Siaga kebakaran sebelum puncak kemarau (Juli–September), terutama di batas hutan pegunungan dan jalur pendakian: pemadaman dini, sekat bakar, dan penguatan MPA desa penyangga.",
     "Sapu jerat terjadwal dan awasi jalur masuk pemburu (sasaran tercatat: Rusa Timor), termasuk patroli malam pada musim berburu.",
-    "Pantau populasi satwa kunci (Rusa timor) dengan metode baku, misalnya transek atau titik hitung, sebagai dasar tren.",
-    "Kembangkan pemanfaatan lestari (wisata alam dan madu hutan) dengan pengaturan daya dukung dan keterlibatan desa penyangga."
+    "Pantau populasi satwa kunci (Rusa timor) dengan metode baku, misalnya transek atau titik hitung, sebagai dasar tren."
    ]
   },
   {
@@ -2012,47 +2032,42 @@
     ]
    ],
    "upaya": {
-    "hari_patroli": 10,
+    "hari_patroli": 37,
     "km_jalur": 53.3,
     "sel": 108,
-    "sel_terjamah": 33,
-    "cakupan_pct": 30.6,
-    "observasi": 168,
+    "sel_terjamah": 47,
+    "cakupan_pct": 43.5,
+    "observasi": 560,
     "observasi_tepi": 5,
     "indikatif": false
    },
    "kategori": [
     [
      "Tumbuhan",
-     77
+     279
     ],
     [
      "Satwa Liar",
-     49
+     154
     ],
     [
      "Ground Check",
-     20
+     56
     ],
     [
      "Aktivitas Manusia",
-     11
+     46
     ],
     [
      "Penyuluhan dan Pemberdayaan Masyarakat",
-     7
+     13
     ],
     [
      "Fitur",
-     4
+     12
     ]
    ],
    "bulanan": [
-    [
-     "2026-01",
-     0,
-     0
-    ],
     [
      "2026-02",
      71,
@@ -2065,38 +2080,38 @@
     ],
     [
      "2026-04",
-     75,
-     5
+     128,
+     10
     ],
     [
      "2026-05",
-     0,
-     0
+     118,
+     2
     ],
     [
      "2026-06",
-     0,
+     30,
      0
     ],
     [
      "2026-07",
-     0,
+     45,
      0
     ],
     [
      "2026-08",
-     0,
-     0
+     16,
+     7
     ],
     [
      "2026-09",
-     14,
-     1
+     110,
+     15
     ],
     [
      "2026-10",
-     0,
-     0
+     34,
+     3
     ]
    ],
    "terbakar": {
@@ -2106,11 +2121,11 @@
    "ancaman": [
     {
      "id": "karhut",
-     "temuan": 2,
+     "temuan": 19,
      "indikasi": 0,
-     "sel": 2,
-     "laju": 2.0,
-     "rasio": 0.81,
+     "sel": 10,
+     "laju": 5.14,
+     "rasio": 1.89,
      "lingkup": {
       "nilai": 3,
       "pct": 42.9,
@@ -2121,7 +2136,7 @@
       "alasan": [
        "api di savana umumnya membakar rumput dan lapisan bawah",
        "43% luas resor terbakar musim ini",
-       "api masuk ekosistem hutan/pegunungan (Ekosistem Hutan Musim Daratan Rendah)"
+       "api masuk ekosistem hutan/pegunungan (Areal perladangan dan pohon dibatas areal hutan; Ekosistem Hutan Musim Daratan Rendah)"
       ]
      },
      "ketakpulihan": {
@@ -2135,29 +2150,29 @@
       "delineasi",
       "Kajian"
      ],
-     "aktif": 2,
-     "tindak_lanjut": 1,
-     "terakhir": "2026-09-26",
-     "rincian": "2 kejadian masih menyala saat ditemukan; vegetasi: hutan/pegunungan (1); 2 disebabkan manusia"
+     "aktif": 15,
+     "tindak_lanjut": 11,
+     "terakhir": "2026-10-03",
+     "rincian": "15 kejadian masih menyala saat ditemukan; vegetasi: hutan/pegunungan (4); 15 disebabkan manusia"
     },
     {
      "id": "rambah",
-     "temuan": 5,
+     "temuan": 19,
      "indikasi": 0,
-     "sel": 2,
-     "laju": 5.0,
-     "rasio": 5.32,
+     "sel": 6,
+     "laju": 5.14,
+     "rasio": 2.2,
      "lingkup": {
       "nilai": 2,
-      "pct": 6.1,
-      "dasar": "temuan di 2 dari 33 sel grid 1 km yang dipatroli; dinaikkan ke Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
+      "pct": 12.8,
+      "dasar": "temuan di 6 dari 47 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
       "nilai": 4,
       "alasan": [
        "tutupan asli hilang seluruhnya di areal garapan",
-       "102,0 ha garapan aktif berstatus pelanggaran",
-       "laju temuan 5,3× rata-rata TN"
+       "327,0 ha garapan aktif berstatus pelanggaran",
+       "laju temuan 2,2× rata-rata TN"
       ]
      },
      "ketakpulihan": {
@@ -2170,22 +2185,22 @@
       "SMART",
       "Kajian"
      ],
-     "aktif": 4,
-     "tindak_lanjut": 4,
-     "terakhir": "2026-04-21",
-     "rincian": "102,0 ha garapan aktif; modus: ganti rugi, lainnya, membuka sendiri"
+     "aktif": 14,
+     "tindak_lanjut": 17,
+     "terakhir": "2026-09-15",
+     "rincian": "327,0 ha garapan aktif; modus: membuka sendiri, ganti rugi, lainnya"
     },
     {
      "id": "buru",
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 1.0,
-     "rasio": 1.95,
+     "laju": 0.27,
+     "rasio": 0.62,
      "lingkup": {
       "nilai": 2,
-      "pct": 3.0,
-      "dasar": "temuan di 1 dari 33 sel grid 1 km yang dipatroli; dinaikkan ke Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
+      "pct": 2.1,
+      "dasar": "temuan di 1 dari 47 sel grid 1 km yang dipatroli; dinaikkan ke Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
      },
      "keparahan": {
       "nilai": 2,
@@ -2213,12 +2228,12 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 1.0,
-     "rasio": 3.9,
+     "laju": 0.27,
+     "rasio": 0.24,
      "lingkup": {
       "nilai": 1,
-      "pct": 3.0,
-      "dasar": "temuan di 1 dari 33 sel grid 1 km yang dipatroli"
+      "pct": 2.1,
+      "dasar": "temuan di 1 dari 47 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
       "nilai": 2,
@@ -2245,12 +2260,12 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 1.0,
-     "rasio": 0.9,
+     "laju": 0.27,
+     "rasio": 0.33,
      "lingkup": {
       "nilai": 1,
-      "pct": 3.0,
-      "dasar": "temuan di 1 dari 33 sel grid 1 km yang dipatroli"
+      "pct": 2.1,
+      "dasar": "temuan di 1 dari 47 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
       "nilai": 2,
@@ -2277,12 +2292,12 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 1.0,
-     "rasio": 11.7,
+     "laju": 0.27,
+     "rasio": 2.49,
      "lingkup": {
       "nilai": 1,
-      "pct": 3.0,
-      "dasar": "temuan di 1 dari 33 sel grid 1 km yang dipatroli"
+      "pct": 2.1,
+      "dasar": "temuan di 1 dari 47 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
       "nilai": 1,
@@ -2308,45 +2323,45 @@
    "status_ancaman": 2,
    "temuan_terbaru": [
     {
-     "tanggal": "2026-09-26",
+     "tanggal": "2026-10-03",
      "jenis": "karhut",
      "tipe": "masih terbakar",
      "aktif": true,
      "n": 1
     },
     {
-     "tanggal": "2026-04-21",
-     "jenis": "rambah",
-     "tipe": "ladang",
-     "aktif": false,
-     "n": 1
-    },
-    {
-     "tanggal": "2026-04-21",
+     "tanggal": "2026-10-02",
      "jenis": "karhut",
      "tipe": "masih terbakar",
      "aktif": true,
      "n": 1
     },
     {
-     "tanggal": "2026-04-21",
-     "jenis": "rambah",
-     "tipe": "ladang",
+     "tanggal": "2026-10-01",
+     "jenis": "karhut",
+     "tipe": "masih terbakar",
      "aktif": true,
      "n": 1
     },
     {
-     "tanggal": "2026-04-07",
-     "jenis": "rambah",
-     "tipe": "pelaku pembukaan lahan",
+     "tanggal": "2026-09-30",
+     "jenis": "karhut",
+     "tipe": "masih terbakar",
      "aktif": true,
      "n": 1
     },
     {
-     "tanggal": "2026-04-07",
-     "jenis": "ternak",
-     "tipe": "Pengembalaan Ternak",
-     "aktif": false,
+     "tanggal": "2026-09-28",
+     "jenis": "karhut",
+     "tipe": "masih terbakar",
+     "aktif": true,
+     "n": 1
+    },
+    {
+     "tanggal": "2026-09-27",
+     "jenis": "karhut",
+     "tipe": "masih terbakar",
+     "aktif": true,
      "n": 1
     }
    ],
@@ -2357,76 +2372,111 @@
     "gangguan": 0.63
    },
    "satwa": {
-    "rekaman": 49,
-    "teridentifikasi": 45,
-    "S": 24,
-    "H": 2.88,
-    "E": 0.91,
+    "rekaman": 154,
+    "teridentifikasi": 147,
+    "S": 46,
+    "H": 3.32,
+    "E": 0.87,
     "teratas": [
-     {
-      "nama": "Ayam Hutan Hijau",
-      "ilmiah": "Gallus varius",
-      "n": 7,
-      "dilindungi": false,
-      "iucn": "LC"
-     },
      {
       "nama": "Nuri Pipi Merah",
       "ilmiah": "Geoffroyus geoffroyi",
-      "n": 7,
+      "n": 22,
       "dilindungi": true,
       "iucn": "LC"
      },
      {
-      "nama": "macanabuabusayuideopsisjuventa",
-      "ilmiah": "",
-      "n": 4,
+      "nama": "Ayam Hutan Hijau",
+      "ilmiah": "Gallus varius",
+      "n": 13,
       "dilindungi": false,
-      "iucn": ""
+      "iucn": "LC"
      },
      {
       "nama": "Kirik-kirik australia",
       "ilmiah": "Merops ornatus",
-      "n": 3,
+      "n": 13,
       "dilindungi": false,
       "iucn": "LC"
      },
      {
-      "nama": "Isap-madu australia",
-      "ilmiah": "Lichmera indistincta",
-      "n": 2,
+      "nama": "Cucak kutilang",
+      "ilmiah": "Pycnonotus aurigaster",
+      "n": 11,
       "dilindungi": false,
       "iucn": "LC"
      },
      {
-      "nama": "Rusa Timor",
-      "ilmiah": "Rusa timorensis",
-      "n": 2,
-      "dilindungi": true,
-      "iucn": "VU"
+      "nama": "Burung-madu sriganti",
+      "ilmiah": "Cinnyris jugularis",
+      "n": 6,
+      "dilindungi": false,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Walet tenggara",
+      "ilmiah": "Collocalia sumbawae",
+      "n": 6,
+      "dilindungi": false,
+      "iucn": "LC"
      }
     ],
     "penting": [
      {
       "nama": "Nuri Pipi Merah",
       "ilmiah": "Geoffroyus geoffroyi",
-      "n": 7,
+      "n": 22,
       "dilindungi": true,
       "iucn": "LC"
      },
      {
       "nama": "Rusa Timor",
       "ilmiah": "Rusa timorensis",
-      "n": 2,
+      "n": 5,
       "dilindungi": true,
       "iucn": "VU"
      },
      {
       "nama": "Monyet Ekor Panjang",
       "ilmiah": "Macaca fascicularis",
-      "n": 1,
+      "n": 3,
       "dilindungi": false,
       "iucn": "EN"
+     },
+     {
+      "nama": "Cekakak Tunggir Putih",
+      "ilmiah": "Caridonax fulgidus",
+      "n": 2,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Opior wallacea",
+      "ilmiah": "Heleia wallacei",
+      "n": 2,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Elang-alap nusatenggara",
+      "ilmiah": "Accipiter sylvestris",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Alap-alap Sapi",
+      "ilmiah": "Falco moluccensis",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Elang Bondol",
+      "ilmiah": "Haliastur indus",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
      },
      {
       "nama": "Elang Flores",
@@ -2434,16 +2484,23 @@
       "n": 1,
       "dilindungi": true,
       "iucn": "CR"
+     },
+     {
+      "nama": "Paok laus-utara",
+      "ilmiah": "Pitta concinna",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
      }
     ],
-    "dilindungi": 3,
+    "dilindungi": 9,
     "terancam": 3,
     "kunci": [
      {
       "nama": "Rusa timor",
       "ilmiah": "Rusa timorensis",
-      "rekaman": 2,
-      "sel": 2
+      "rekaman": 5,
+      "sel": 4
      },
      {
       "nama": "Elang flores",
@@ -2455,101 +2512,105 @@
     "belum_tercatat_status": []
    },
    "tumbuhan": {
-    "rekaman": 77,
-    "S": 19,
+    "rekaman": 279,
+    "S": 44,
     "teratas": [
-     {
-      "nama": "Weru",
-      "ilmiah": "Albizia procera",
-      "n": 8
-     },
      {
       "nama": "Kesambi",
       "ilmiah": "Schleichera oleosa",
-      "n": 8
-     },
-     {
-      "nama": "Walikukun",
-      "ilmiah": "Schoutenia ovata",
-      "n": 8
+      "n": 28
      },
      {
       "nama": "Malaka",
       "ilmiah": "Phyllanthus emblica",
-      "n": 7
+      "n": 23
+     },
+     {
+      "nama": "Sonokeling",
+      "ilmiah": "Dalbergia latifolia",
+      "n": 18
+     },
+     {
+      "nama": "Duwet",
+      "ilmiah": "Syzygium cumini",
+      "n": 18
+     },
+     {
+      "nama": "Weru",
+      "ilmiah": "Albizia procera",
+      "n": 16
      },
      {
       "nama": "Legaran",
       "ilmiah": "Alstonia spectabilis",
-      "n": 6
-     },
-     {
-      "nama": "Ketimunan",
-      "ilmiah": "Timonius timon",
-      "n": 5
+      "n": 16
      }
     ]
    },
    "ekosistem": [
     [
      "Hutan pamah",
-     6
+     16
     ],
     [
      "Savana",
-     1
+     6
+    ],
+    [
+     "Ladang",
+     5
     ],
     [
      "Hutan pegunungan bawah",
      1
     ],
     [
-     "Ladang",
+     "Padang rumput",
      1
     ]
    ],
    "tutupan": [
     [
      "Semak",
-     4
-    ],
-    [
-     "Hutan monsun",
-     3
-    ],
-    [
-     "Tanaman campuran",
-     1
+     8
     ],
     [
      "Savana/padang rumput",
-     1
+     7
+    ],
+    [
+     "Hutan monsun",
+     6
+    ],
+    [
+     "Tanaman campuran",
+     2
     ],
     [
      "Ladang",
-     1
+     2
     ]
    ],
    "fitur_alami": [],
    "invasif": [],
-   "hhbk": 0,
-   "indikasi": 0,
+   "hhbk": 2,
+   "indikasi": 2,
    "masyarakat": {
-    "kegiatan": 7,
+    "kegiatan": 13,
     "jenis": [
      [
-      "Sosialisasi",
-      4
+      "Anjangsana",
+      8
      ],
      [
-      "Anjangsana",
-      3
+      "Sosialisasi",
+      5
      ]
     ]
    },
    "potensi": {
     "pengawetan": {
-     "skor": 3.67,
+     "skor": 4.0,
      "tingkat": 4,
      "indikator": [
       {
@@ -2566,8 +2627,8 @@
       },
       {
        "nama": "Jenis satwa dilindungi/terancam tercatat",
-       "nilai": 4,
-       "skor": 3,
+       "nilai": 10,
+       "skor": 4,
        "ket": "Permen LHK P.106/2018 atau IUCN CR/EN/VU, patroli SMART"
       }
      ]
@@ -2597,8 +2658,8 @@
      ]
     },
     "pemanfaatan": {
-     "skor": 1.33,
-     "tingkat": 1,
+     "skor": 2.0,
+     "tingkat": 2,
      "indikator": [
       {
        "nama": "Indeks lokasi pelayanan wisata (LQ)",
@@ -2614,15 +2675,15 @@
       },
       {
        "nama": "HHBK dan jasa lingkungan",
-       "nilai": "belum tercatat",
-       "skor": 1,
+       "nilai": "ada",
+       "skor": 3,
        "ket": "madu hutan (Laporan Kajian) dan temuan pengambilan HHBK (SMART)"
       }
      ]
     },
     "total": {
-     "skor": 2.22,
-     "tingkat": 2
+     "skor": 2.56,
+     "tingkat": 3
     }
    },
    "ancaman_utama": [
@@ -2630,7 +2691,7 @@
    ],
    "arahan": [
     "Siaga kebakaran sebelum puncak kemarau (Juli–September), terutama di batas hutan pegunungan dan jalur pendakian: pemadaman dini, sekat bakar, dan penguatan MPA desa penyangga.",
-    "Tuntaskan garapan aktif (102,0 ha) lewat patroli gabungan, penegasan batas, dan penyelesaian konflik tenurial atau kemitraan konservasi.",
+    "Tuntaskan garapan aktif (327,0 ha) lewat patroli gabungan, penegasan batas, dan penyelesaian konflik tenurial atau kemitraan konservasi.",
     "Sapu jerat terjadwal dan awasi jalur masuk pemburu (sasaran tercatat: Kepudang kuduk-hitam), termasuk patroli malam pada musim berburu.",
     "Pantau populasi satwa kunci (Rusa timor, Elang flores) dengan metode baku, misalnya transek atau titik hitung, sebagai dasar tren."
    ]
@@ -2652,47 +2713,42 @@
     ]
    ],
    "upaya": {
-    "hari_patroli": 5,
+    "hari_patroli": 15,
     "km_jalur": 27.4,
     "sel": 93,
-    "sel_terjamah": 17,
-    "cakupan_pct": 18.3,
-    "observasi": 84,
+    "sel_terjamah": 23,
+    "cakupan_pct": 24.7,
+    "observasi": 287,
     "observasi_tepi": 5,
-    "indikatif": true
+    "indikatif": false
    },
    "kategori": [
     [
      "Tumbuhan",
-     44
+     140
     ],
     [
      "Satwa Liar",
-     26
+     102
     ],
     [
      "Ground Check",
-     9
+     35
     ],
     [
      "Aktivitas Manusia",
-     3
+     6
     ],
     [
      "Fitur",
-     1
+     2
     ],
     [
      "Penyuluhan dan Pemberdayaan Masyarakat",
-     1
+     2
     ]
    ],
    "bulanan": [
-    [
-     "2026-01",
-     0,
-     0
-    ],
     [
      "2026-02",
      10,
@@ -2705,23 +2761,23 @@
     ],
     [
      "2026-04",
-     67,
+     115,
      1
     ],
     [
      "2026-05",
-     0,
+     75,
      0
     ],
     [
      "2026-06",
-     0,
+     51,
      0
     ],
     [
      "2026-07",
-     0,
-     0
+     29,
+     1
     ],
     [
      "2026-08",
@@ -2782,12 +2838,12 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 2.0,
-     "rasio": 2.13,
+     "laju": 0.67,
+     "rasio": 0.29,
      "lingkup": {
       "nilai": 2,
-      "pct": 5.9,
-      "dasar": "temuan di 1 dari 17 sel grid 1 km yang dipatroli; dinaikkan ke Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
+      "pct": 4.3,
+      "dasar": "temuan di 1 dari 23 sel grid 1 km yang dipatroli; dinaikkan ke Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
      },
      "keparahan": {
       "nilai": 3,
@@ -2812,20 +2868,20 @@
     },
     {
      "id": "buru",
-     "temuan": 0,
+     "temuan": 1,
      "indikasi": 0,
-     "sel": 0,
-     "laju": null,
-     "rasio": null,
+     "sel": 1,
+     "laju": 0.67,
+     "rasio": 1.53,
      "lingkup": {
       "nilai": 2,
-      "pct": null,
-      "dasar": "belum ada temuan pada periode ini; Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
+      "pct": 4.3,
+      "dasar": "temuan di 1 dari 23 sel grid 1 km yang dipatroli; dinaikkan ke Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
      },
      "keparahan": {
       "nilai": 2,
       "alasan": [
-       "menurunkan populasi satwa sasaran (nilai bawaan; belum ada temuan SMART pada periode ini)"
+       "menurunkan populasi satwa sasaran"
       ]
      },
      "ketakpulihan": {
@@ -2835,24 +2891,25 @@
      "magnitudo": 2,
      "peringkat": 2,
      "sumber": [
+      "SMART",
       "Kajian"
      ],
      "aktif": 0,
-     "tindak_lanjut": 0,
-     "terakhir": "",
-     "rincian": ""
+     "tindak_lanjut": 1,
+     "terakhir": "2026-07-08",
+     "rincian": "temuan: tempat mengintai buruan/ para'"
     },
     {
      "id": "kayu",
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 2.0,
-     "rasio": 7.8,
+     "laju": 0.67,
+     "rasio": 0.58,
      "lingkup": {
       "nilai": 1,
-      "pct": 5.9,
-      "dasar": "temuan di 1 dari 17 sel grid 1 km yang dipatroli"
+      "pct": 4.3,
+      "dasar": "temuan di 1 dari 23 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
       "nilai": 2,
@@ -2879,12 +2936,12 @@
      "temuan": 1,
      "indikasi": 0,
      "sel": 1,
-     "laju": 2.0,
-     "rasio": 1.8,
+     "laju": 0.67,
+     "rasio": 0.82,
      "lingkup": {
       "nilai": 1,
-      "pct": 5.9,
-      "dasar": "temuan di 1 dari 17 sel grid 1 km yang dipatroli"
+      "pct": 4.3,
+      "dasar": "temuan di 1 dari 23 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
       "nilai": 2,
@@ -2909,6 +2966,13 @@
    ],
    "status_ancaman": 2,
    "temuan_terbaru": [
+    {
+     "tanggal": "2026-07-08",
+     "jenis": "buru",
+     "tipe": "tempat mengintai buruan/ para'",
+     "aktif": false,
+     "n": 1
+    },
     {
      "tanggal": "2026-04-09",
      "jenis": "kayu",
@@ -2938,51 +3002,51 @@
     "gangguan": 1.131
    },
    "satwa": {
-    "rekaman": 26,
-    "teridentifikasi": 24,
-    "S": 14,
-    "H": 2.56,
-    "E": 0.97,
+    "rekaman": 102,
+    "teridentifikasi": 99,
+    "S": 40,
+    "H": 3.32,
+    "E": 0.9,
     "teratas": [
      {
-      "nama": "Bubut alang-alang",
-      "ilmiah": "Centropus bengalensis",
-      "n": 3,
-      "dilindungi": false,
+      "nama": "Nuri Pipi Merah",
+      "ilmiah": "Geoffroyus geoffroyi",
+      "n": 11,
+      "dilindungi": true,
       "iucn": "LC"
      },
      {
-      "nama": "Cucak kutilang",
-      "ilmiah": "Pycnonotus aurigaster",
-      "n": 3,
-      "dilindungi": false,
-      "iucn": "LC"
-     },
-     {
-      "nama": "Burung-madu sriganti",
-      "ilmiah": "Cinnyris jugularis",
-      "n": 2,
+      "nama": "Kirik-kirik australia",
+      "ilmiah": "Merops ornatus",
+      "n": 9,
       "dilindungi": false,
       "iucn": "LC"
      },
      {
       "nama": "Walet tenggara",
       "ilmiah": "Collocalia sumbawae",
-      "n": 2,
+      "n": 7,
       "dilindungi": false,
       "iucn": "LC"
      },
      {
-      "nama": "Ayam Hutan Hijau",
-      "ilmiah": "Gallus varius",
-      "n": 2,
+      "nama": "Burung-madu sriganti",
+      "ilmiah": "Cinnyris jugularis",
+      "n": 6,
       "dilindungi": false,
       "iucn": "LC"
      },
      {
       "nama": "Isap-madu australia",
       "ilmiah": "Lichmera indistincta",
-      "n": 2,
+      "n": 6,
+      "dilindungi": false,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Cikukua tanduk",
+      "ilmiah": "Philemon buceroides",
+      "n": 6,
       "dilindungi": false,
       "iucn": "LC"
      }
@@ -2991,19 +3055,75 @@
      {
       "nama": "Nuri Pipi Merah",
       "ilmiah": "Geoffroyus geoffroyi",
+      "n": 11,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Opior wallacea",
+      "ilmiah": "Heleia wallacei",
+      "n": 3,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Cekakak Tunggir Putih",
+      "ilmiah": "Caridonax fulgidus",
+      "n": 2,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Elang Ular Jari Pendek",
+      "ilmiah": "Circaetus gallicus",
       "n": 1,
       "dilindungi": true,
       "iucn": "LC"
+     },
+     {
+      "nama": "Elang Bondol",
+      "ilmiah": "Haliastur indus",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Monyet Ekor Panjang",
+      "ilmiah": "Macaca fascicularis",
+      "n": 1,
+      "dilindungi": false,
+      "iucn": "EN"
+     },
+     {
+      "nama": "Gosong Kaki Merah",
+      "ilmiah": "Megapodius reinwardt",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Rusa Timor",
+      "ilmiah": "Rusa timorensis",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "VU"
+     },
+     {
+      "nama": "Perkici Dada Merah",
+      "ilmiah": "Trichoglossus forsteni",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "EN"
      }
     ],
-    "dilindungi": 1,
-    "terancam": 0,
+    "dilindungi": 8,
+    "terancam": 3,
     "kunci": [
      {
       "nama": "Rusa timor",
       "ilmiah": "Rusa timorensis",
-      "rekaman": 0,
-      "sel": 0
+      "rekaman": 1,
+      "sel": 1
      },
      {
       "nama": "Elang flores",
@@ -3015,78 +3135,98 @@
     "belum_tercatat_status": []
    },
    "tumbuhan": {
-    "rekaman": 44,
-    "S": 17,
+    "rekaman": 140,
+    "S": 33,
     "teratas": [
-     {
-      "nama": "Simpur",
-      "ilmiah": "Dillenia pentagyna",
-      "n": 6
-     },
      {
       "nama": "Malaka",
       "ilmiah": "Phyllanthus emblica",
-      "n": 6
+      "n": 15
      },
      {
       "nama": "Ketimunan",
       "ilmiah": "Timonius timon",
-      "n": 6
+      "n": 14
      },
      {
-      "nama": "Weru",
-      "ilmiah": "Albizia procera",
-      "n": 3
+      "nama": "Kesambi",
+      "ilmiah": "Schleichera oleosa",
+      "n": 13
      },
      {
-      "nama": "Pulai",
-      "ilmiah": "Alstonia scholaris",
-      "n": 3
+      "nama": "Simpur",
+      "ilmiah": "Dillenia pentagyna",
+      "n": 8
      },
      {
       "nama": "Mahang",
       "ilmiah": "Macaranga tanarius",
-      "n": 3
+      "n": 8
+     },
+     {
+      "nama": "Weru",
+      "ilmiah": "Albizia procera",
+      "n": 7
      }
     ]
    },
    "ekosistem": [
     [
      "Hutan pamah",
+     11
+    ],
+    [
+     "Savana",
      4
     ],
     [
      "Padang rumput",
+     2
+    ],
+    [
+     "Hutan pegunungan bawah",
      1
     ]
    ],
    "tutupan": [
     [
+     "Savana/padang rumput",
+     8
+    ],
+    [
+     "Hutan monsun",
+     4
+    ],
+    [
      "Semak",
      1
     ],
     [
-     "Savana/padang rumput",
+     "Hutan hujan",
      1
     ]
    ],
    "fitur_alami": [],
    "invasif": [],
-   "hhbk": 0,
-   "indikasi": 0,
+   "hhbk": 1,
+   "indikasi": 1,
    "masyarakat": {
-    "kegiatan": 1,
+    "kegiatan": 2,
     "jenis": [
      [
       "Sosialisasi",
+      1
+     ],
+     [
+      "Anjangsana",
       1
      ]
     ]
    },
    "potensi": {
     "pengawetan": {
-     "skor": 3.0,
-     "tingkat": 3,
+     "skor": 3.67,
+     "tingkat": 4,
      "indikator": [
       {
        "nama": "Indeks lokasi kehati (LQ)",
@@ -3102,8 +3242,8 @@
       },
       {
        "nama": "Jenis satwa dilindungi/terancam tercatat",
-       "nilai": 1,
-       "skor": 2,
+       "nilai": 9,
+       "skor": 4,
        "ket": "Permen LHK P.106/2018 atau IUCN CR/EN/VU, patroli SMART"
       }
      ]
@@ -3133,8 +3273,8 @@
      ]
     },
     "pemanfaatan": {
-     "skor": 2.67,
-     "tingkat": 3,
+     "skor": 3.33,
+     "tingkat": 4,
      "indikator": [
       {
        "nama": "Indeks lokasi pelayanan wisata (LQ)",
@@ -3150,15 +3290,15 @@
       },
       {
        "nama": "HHBK dan jasa lingkungan",
-       "nilai": "belum tercatat",
-       "skor": 1,
+       "nilai": "ada",
+       "skor": 3,
        "ket": "madu hutan (Laporan Kajian) dan temuan pengambilan HHBK (SMART)"
       }
      ]
     },
     "total": {
-     "skor": 2.45,
-     "tingkat": 2
+     "skor": 2.89,
+     "tingkat": 3
     }
    },
    "ancaman_utama": [
@@ -3167,10 +3307,10 @@
     "buru"
    ],
    "arahan": [
-    "Perluas cakupan patroli: baru 18% sel grid resor terjamah dalam 5 hari patroli. Utamakan sel yang belum pernah dikunjungi agar penilaian tidak lagi indikatif.",
     "Siaga kebakaran sebelum puncak kemarau (Juli–September): patroli pencegahan dan pemadaman dini di savana, sekat bakar di jalur rawan, dan penguatan MPA desa penyangga.",
     "Tuntaskan garapan aktif lewat patroli gabungan, penegasan batas, dan penyelesaian konflik tenurial atau kemitraan konservasi.",
-    "Sapu jerat terjadwal dan awasi jalur masuk pemburu, termasuk patroli malam pada musim berburu."
+    "Sapu jerat terjadwal dan awasi jalur masuk pemburu, termasuk patroli malam pada musim berburu.",
+    "Pantau populasi satwa kunci (Rusa timor) dengan metode baku, misalnya transek atau titik hitung, sebagai dasar tren."
    ]
   },
   {
@@ -3190,50 +3330,49 @@
     ]
    ],
    "upaya": {
-    "hari_patroli": 5,
+    "hari_patroli": 38,
     "km_jalur": 49.3,
     "sel": 104,
-    "sel_terjamah": 26,
-    "cakupan_pct": 25.0,
-    "observasi": 73,
-    "observasi_tepi": 0,
-    "indikatif": true
+    "sel_terjamah": 37,
+    "cakupan_pct": 35.6,
+    "observasi": 558,
+    "observasi_tepi": 3,
+    "indikatif": false
    },
    "kategori": [
     [
      "Tumbuhan",
-     30
+     238
     ],
     [
      "Satwa Liar",
-     21
+     159
     ],
     [
      "Ground Check",
-     7
-    ],
-    [
-     "Penyuluhan dan Pemberdayaan Masyarakat",
-     6
+     62
     ],
     [
      "Aktivitas Manusia",
-     6
+     49
     ],
     [
      "Fitur",
-     3
+     36
+    ],
+    [
+     "Penyuluhan dan Pemberdayaan Masyarakat",
+     13
+    ],
+    [
+     "Spesies invasif",
+     1
     ]
    ],
    "bulanan": [
     [
-     "2026-01",
-     0,
-     0
-    ],
-    [
      "2026-02",
-     15,
+     16,
      1
     ],
     [
@@ -3243,37 +3382,37 @@
     ],
     [
      "2026-04",
-     58,
-     4
+     76,
+     5
     ],
     [
      "2026-05",
-     0,
-     0
+     88,
+     3
     ],
     [
      "2026-06",
-     0,
-     0
+     142,
+     5
     ],
     [
      "2026-07",
-     0,
-     0
+     156,
+     6
     ],
     [
      "2026-08",
-     0,
-     0
+     35,
+     17
     ],
     [
      "2026-09",
-     0,
-     0
+     40,
+     10
     ],
     [
      "2026-10",
-     0,
+     5,
      0
     ]
    ],
@@ -3284,22 +3423,22 @@
    "ancaman": [
     {
      "id": "rambah",
-     "temuan": 5,
+     "temuan": 23,
      "indikasi": 0,
-     "sel": 4,
-     "laju": 10.0,
-     "rasio": 10.64,
+     "sel": 7,
+     "laju": 6.05,
+     "rasio": 2.59,
      "lingkup": {
       "nilai": 2,
-      "pct": 15.4,
-      "dasar": "temuan di 4 dari 26 sel grid 1 km yang dipatroli"
+      "pct": 18.9,
+      "dasar": "temuan di 7 dari 37 sel grid 1 km yang dipatroli"
      },
      "keparahan": {
       "nilai": 4,
       "alasan": [
        "tutupan asli hilang seluruhnya di areal garapan",
-       "16,9 ha garapan aktif berstatus pelanggaran",
-       "laju temuan 10,6× rata-rata TN"
+       "132,9 ha garapan aktif berstatus pelanggaran",
+       "laju temuan 2,6× rata-rata TN"
       ]
      },
      "ketakpulihan": {
@@ -3312,27 +3451,27 @@
       "SMART",
       "Kajian"
      ],
-     "aktif": 5,
-     "tindak_lanjut": 5,
-     "terakhir": "2026-04-22",
-     "rincian": "16,9 ha garapan aktif; modus: membuka sendiri, lainnya"
+     "aktif": 16,
+     "tindak_lanjut": 23,
+     "terakhir": "2026-08-05",
+     "rincian": "132,9 ha garapan aktif; modus: membuka sendiri, lainnya"
     },
     {
      "id": "buru",
-     "temuan": 0,
+     "temuan": 1,
      "indikasi": 0,
-     "sel": 0,
-     "laju": null,
-     "rasio": null,
+     "sel": 1,
+     "laju": 0.26,
+     "rasio": 0.61,
      "lingkup": {
       "nilai": 2,
-      "pct": null,
-      "dasar": "belum ada temuan pada periode ini; Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
+      "pct": 2.7,
+      "dasar": "temuan di 1 dari 37 sel grid 1 km yang dipatroli; dinaikkan ke Sedang karena tercantum sebagai ancaman utama resor dalam Laporan Kajian (data gangguan 2021–2026)"
      },
      "keparahan": {
       "nilai": 2,
       "alasan": [
-       "menurunkan populasi satwa sasaran (nilai bawaan; belum ada temuan SMART pada periode ini)"
+       "menurunkan populasi satwa sasaran"
       ]
      },
      "ketakpulihan": {
@@ -3342,20 +3481,54 @@
      "magnitudo": 2,
      "peringkat": 2,
      "sumber": [
+      "SMART",
       "Kajian"
      ],
-     "aktif": 0,
-     "tindak_lanjut": 0,
-     "terakhir": "",
-     "rincian": ""
+     "aktif": 1,
+     "tindak_lanjut": 1,
+     "terakhir": "2026-06-30",
+     "rincian": "temuan: bekas pengolahan"
+    },
+    {
+     "id": "kayu",
+     "temuan": 18,
+     "indikasi": 0,
+     "sel": 5,
+     "laju": 4.74,
+     "rasio": 4.15,
+     "lingkup": {
+      "nilai": 2,
+      "pct": 13.5,
+      "dasar": "temuan di 5 dari 37 sel grid 1 km yang dipatroli"
+     },
+     "keparahan": {
+      "nilai": 3,
+      "alasan": [
+       "penebangan pohon secara selektif",
+       "laju temuan 4,2× rata-rata TN"
+      ]
+     },
+     "ketakpulihan": {
+      "nilai": 3,
+      "alasan": "pohon besar butuh puluhan tahun untuk tumbuh kembali"
+     },
+     "magnitudo": 2,
+     "peringkat": 2,
+     "sumber": [
+      "SMART"
+     ],
+     "aktif": 17,
+     "tindak_lanjut": 18,
+     "terakhir": "2026-09-22",
+     "rincian": "temuan: tunggul/tunggak, pembalak, kayu olahan; jenis: Rajumas, Belum Ada di List, Beringin"
     },
     {
      "id": "karhut",
-     "temuan": 0,
+     "temuan": 1,
      "indikasi": 0,
-     "sel": 0,
-     "laju": null,
-     "rasio": null,
+     "sel": 1,
+     "laju": 0.26,
+     "rasio": 0.1,
      "lingkup": {
       "nilai": 1,
       "pct": 3.3,
@@ -3364,7 +3537,7 @@
      "keparahan": {
       "nilai": 2,
       "alasan": [
-       "api di savana umumnya membakar rumput dan lapisan bawah (nilai bawaan; belum ada temuan SMART pada periode ini)"
+       "api di savana umumnya membakar rumput dan lapisan bawah"
       ]
      },
      "ketakpulihan": {
@@ -3374,43 +3547,154 @@
      "magnitudo": 1,
      "peringkat": 1,
      "sumber": [
+      "SMART",
       "delineasi"
+     ],
+     "aktif": 1,
+     "tindak_lanjut": 0,
+     "terakhir": "2026-09-25",
+     "rincian": "1 kejadian masih menyala saat ditemukan; 1 disebabkan manusia"
+    },
+    {
+     "id": "ternak",
+     "temuan": 2,
+     "indikasi": 0,
+     "sel": 2,
+     "laju": 0.53,
+     "rasio": 0.65,
+     "lingkup": {
+      "nilai": 1,
+      "pct": 5.4,
+      "dasar": "temuan di 2 dari 37 sel grid 1 km yang dipatroli"
+     },
+     "keparahan": {
+      "nilai": 2,
+      "alasan": [
+       "menekan regenerasi anakan dan bersaing pakan dengan rusa"
+      ]
+     },
+     "ketakpulihan": {
+      "nilai": 2,
+      "alasan": "vegetasi pulih 6–20 tahun setelah ternak dikeluarkan"
+     },
+     "magnitudo": 1,
+     "peringkat": 1,
+     "sumber": [
+      "SMART"
      ],
      "aktif": 0,
      "tindak_lanjut": 0,
-     "terakhir": "",
-     "rincian": ""
+     "terakhir": "2026-07-23",
+     "rincian": "2 lokasi ternak dilepas di dalam kawasan"
+    },
+    {
+     "id": "invasif",
+     "temuan": 1,
+     "indikasi": 0,
+     "sel": 1,
+     "laju": 0.26,
+     "rasio": 0.81,
+     "lingkup": {
+      "nilai": 1,
+      "pct": 2.7,
+      "dasar": "temuan di 1 dari 37 sel grid 1 km yang dipatroli"
+     },
+     "keparahan": {
+      "nilai": 2,
+      "alasan": [
+       "menekan tumbuhan asli di areal terbuka"
+      ]
+     },
+     "ketakpulihan": {
+      "nilai": 3,
+      "alasan": "sulit diberantas setelah mapan"
+     },
+     "magnitudo": 1,
+     "peringkat": 1,
+     "sumber": [
+      "SMART"
+     ],
+     "aktif": 0,
+     "tindak_lanjut": 0,
+     "terakhir": "2026-05-02",
+     "rincian": "jenis: Tumbuhan invasif lainnya"
+    },
+    {
+     "id": "jalan",
+     "temuan": 1,
+     "indikasi": 0,
+     "sel": 1,
+     "laju": 0.26,
+     "rasio": 2.42,
+     "lingkup": {
+      "nilai": 1,
+      "pct": 2.7,
+      "dasar": "temuan di 1 dari 37 sel grid 1 km yang dipatroli"
+     },
+     "keparahan": {
+      "nilai": 1,
+      "alasan": [
+       "membuka akses bagi gangguan lain"
+      ]
+     },
+     "ketakpulihan": {
+      "nilai": 2,
+      "alasan": "badan jalan tertutup vegetasi dalam 6–20 tahun"
+     },
+     "magnitudo": 1,
+     "peringkat": 1,
+     "sumber": [
+      "SMART"
+     ],
+     "aktif": 0,
+     "tindak_lanjut": 0,
+     "terakhir": "2026-05-02",
+     "rincian": "jalan motor"
     }
    ],
    "status_ancaman": 2,
    "temuan_terbaru": [
     {
-     "tanggal": "2026-04-22",
-     "jenis": "rambah",
-     "tipe": "ladang",
+     "tanggal": "2026-09-25",
+     "jenis": "karhut",
+     "tipe": "masih terbakar",
      "aktif": true,
      "n": 1
     },
     {
-     "tanggal": "2026-04-14",
-     "jenis": "rambah",
-     "tipe": "ladang",
+     "tanggal": "2026-09-22",
+     "jenis": "kayu",
+     "tipe": "tunggul/tunggak",
      "aktif": true,
-     "n": 1
+     "n": 5
     },
     {
-     "tanggal": "2026-04-08",
-     "jenis": "rambah",
-     "tipe": "ladang",
+     "tanggal": "2026-09-22",
+     "jenis": "kayu",
+     "tipe": "kayu olahan",
      "aktif": true,
-     "n": 2
+     "n": 4
     },
     {
-     "tanggal": "2026-02-11",
+     "tanggal": "2026-08-05",
      "jenis": "rambah",
-     "tipe": "kebun",
+     "tipe": "ladang",
+     "aktif": false,
+     "n": 3
+    },
+    {
+     "tanggal": "2026-08-05",
+     "jenis": "rambah",
+     "tipe": "lahan terbuka",
      "aktif": true,
-     "n": 1
+     "n": 3
+    },
+    {
+     "tanggal": "2026-08-04",
+     "jenis": "rambah",
+     "tipe": "lahan terbuka",
+     "aktif": true,
+     "n": 3
     }
    ],
    "lq": {
@@ -3420,72 +3704,128 @@
     "gangguan": 0.831
    },
    "satwa": {
-    "rekaman": 21,
-    "teridentifikasi": 18,
-    "S": 9,
-    "H": 2.12,
-    "E": 0.96,
+    "rekaman": 159,
+    "teridentifikasi": 156,
+    "S": 44,
+    "H": 3.3,
+    "E": 0.87,
     "teratas": [
      {
       "nama": "Nuri Pipi Merah",
       "ilmiah": "Geoffroyus geoffroyi",
-      "n": 4,
+      "n": 24,
       "dilindungi": true,
       "iucn": "LC"
      },
      {
-      "nama": "Isap-madu australia",
-      "ilmiah": "Lichmera indistincta",
-      "n": 2,
+      "nama": "Walet tenggara",
+      "ilmiah": "Collocalia sumbawae",
+      "n": 16,
+      "dilindungi": false,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Kirik-kirik australia",
+      "ilmiah": "Merops ornatus",
+      "n": 10,
       "dilindungi": false,
       "iucn": "LC"
      },
      {
       "nama": "Cucak kutilang",
       "ilmiah": "Pycnonotus aurigaster",
-      "n": 2,
+      "n": 9,
       "dilindungi": false,
       "iucn": "LC"
      },
      {
-      "nama": "cabaidahihitamdicaeumigniferum",
-      "ilmiah": "",
-      "n": 2,
+      "nama": "Cikukua tanduk",
+      "ilmiah": "Philemon buceroides",
+      "n": 8,
       "dilindungi": false,
-      "iucn": ""
+      "iucn": "LC"
      },
      {
-      "nama": "delimukanzamrudchalcophapsindica",
-      "ilmiah": "",
-      "n": 2,
+      "nama": "Burung-madu sriganti",
+      "ilmiah": "Cinnyris jugularis",
+      "n": 6,
       "dilindungi": false,
-      "iucn": ""
-     },
-     {
-      "nama": "kipasanfloresrhipiduradiluta",
-      "ilmiah": "",
-      "n": 2,
-      "dilindungi": false,
-      "iucn": ""
+      "iucn": "LC"
      }
     ],
     "penting": [
      {
       "nama": "Nuri Pipi Merah",
       "ilmiah": "Geoffroyus geoffroyi",
-      "n": 4,
+      "n": 24,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Cekakak Tunggir Putih",
+      "ilmiah": "Caridonax fulgidus",
+      "n": 5,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Opior wallacea",
+      "ilmiah": "Heleia wallacei",
+      "n": 5,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Monyet Ekor Panjang",
+      "ilmiah": "Macaca fascicularis",
+      "n": 5,
+      "dilindungi": false,
+      "iucn": "EN"
+     },
+     {
+      "nama": "Rusa Timor",
+      "ilmiah": "Rusa timorensis",
+      "n": 3,
+      "dilindungi": true,
+      "iucn": "VU"
+     },
+     {
+      "nama": "Alap-alap Sapi",
+      "ilmiah": "Falco moluccensis",
+      "n": 2,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Alap-alap Australia",
+      "ilmiah": "Falco longipennis",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Sikep Madu Asia",
+      "ilmiah": "Pernis ptilorhynchus",
+      "n": 1,
+      "dilindungi": true,
+      "iucn": "LC"
+     },
+     {
+      "nama": "Paok laus-utara",
+      "ilmiah": "Pitta concinna",
+      "n": 1,
       "dilindungi": true,
       "iucn": "LC"
      }
     ],
-    "dilindungi": 1,
-    "terancam": 0,
+    "dilindungi": 8,
+    "terancam": 2,
     "kunci": [
      {
       "nama": "Rusa timor",
       "ilmiah": "Rusa timorensis",
-      "rekaman": 0,
-      "sel": 0
+      "rekaman": 3,
+      "sel": 2
      },
      {
       "nama": "Elang flores",
@@ -3497,51 +3837,87 @@
     "belum_tercatat_status": []
    },
    "tumbuhan": {
-    "rekaman": 30,
-    "S": 15,
+    "rekaman": 238,
+    "S": 42,
     "teratas": [
-     {
-      "nama": "Mahang",
-      "ilmiah": "Macaranga tanarius",
-      "n": 4
-     },
      {
       "nama": "Kesambi",
       "ilmiah": "Schleichera oleosa",
-      "n": 3
+      "n": 20
      },
      {
-      "nama": "Mengkirai",
-      "ilmiah": "Trema orientale",
-      "n": 3
+      "nama": "Mahang",
+      "ilmiah": "Macaranga tanarius",
+      "n": 19
      },
      {
-      "nama": "Jelatang gajah",
-      "ilmiah": "Dendrocnide stimulans",
-      "n": 2
+      "nama": "Malaka",
+      "ilmiah": "Phyllanthus emblica",
+      "n": 15
      },
      {
-      "nama": "Rajumas",
-      "ilmiah": "Duabanga moluccana",
-      "n": 2
+      "nama": "Awar-awar",
+      "ilmiah": "Ficus septica",
+      "n": 14
      },
      {
-      "nama": "Ara ratu",
-      "ilmiah": "Ficus albipila",
-      "n": 2
+      "nama": "Kerinyuh",
+      "ilmiah": "Chromolaena odorata",
+      "n": 11
+     },
+     {
+      "nama": "Pulai",
+      "ilmiah": "Alstonia scholaris",
+      "n": 10
      }
     ]
    },
    "ekosistem": [
     [
+     "Hutan pamah",
+     15
+    ],
+    [
+     "Savana",
+     8
+    ],
+    [
      "Ladang",
-     2
+     4
+    ],
+    [
+     "Hutan pegunungan bawah",
+     3
+    ],
+    [
+     "Padang rumput",
+     1
     ]
    ],
    "tutupan": [
     [
+     "Savana/padang rumput",
+     8
+    ],
+    [
      "Ladang",
-     4
+     6
+    ],
+    [
+     "Hutan monsun",
+     3
+    ],
+    [
+     "Hutan hujan",
+     3
+    ],
+    [
+     "Tanaman campuran",
+     2
+    ],
+    [
+     "Semak",
+     1
     ]
    ],
    "fitur_alami": [
@@ -3550,26 +3926,28 @@
      2
     ]
    ],
-   "invasif": [],
-   "hhbk": 0,
-   "indikasi": 1,
+   "invasif": [
+    "Tumbuhan invasif lainnya"
+   ],
+   "hhbk": 1,
+   "indikasi": 2,
    "masyarakat": {
-    "kegiatan": 9,
+    "kegiatan": 16,
     "jenis": [
      [
       "Anjangsana",
-      6
+      12
      ],
      [
       "Sosialisasi",
-      3
+      4
      ]
     ]
    },
    "potensi": {
     "pengawetan": {
-     "skor": 3.0,
-     "tingkat": 3,
+     "skor": 4.0,
+     "tingkat": 4,
      "indikator": [
       {
        "nama": "Indeks lokasi kehati (LQ)",
@@ -3579,14 +3957,14 @@
       },
       {
        "nama": "Satwa kunci dengan bukti keberadaan",
-       "nilai": "Elang flores",
-       "skor": 3,
+       "nilai": "Rusa timor, Elang flores",
+       "skor": 4,
        "ket": "Laporan Kajian atau rekaman SMART"
       },
       {
        "nama": "Jenis satwa dilindungi/terancam tercatat",
-       "nilai": 1,
-       "skor": 2,
+       "nilai": 9,
+       "skor": 4,
        "ket": "Permen LHK P.106/2018 atau IUCN CR/EN/VU, patroli SMART"
       }
      ]
@@ -3616,8 +3994,8 @@
      ]
     },
     "pemanfaatan": {
-     "skor": 2.0,
-     "tingkat": 2,
+     "skor": 2.67,
+     "tingkat": 3,
      "indikator": [
       {
        "nama": "Indeks lokasi pelayanan wisata (LQ)",
@@ -3633,26 +4011,27 @@
       },
       {
        "nama": "HHBK dan jasa lingkungan",
-       "nilai": "belum tercatat",
-       "skor": 1,
+       "nilai": "ada",
+       "skor": 3,
        "ket": "madu hutan (Laporan Kajian) dan temuan pengambilan HHBK (SMART)"
       }
      ]
     },
     "total": {
-     "skor": 2.33,
-     "tingkat": 2
+     "skor": 2.89,
+     "tingkat": 3
     }
    },
    "ancaman_utama": [
     "rambah",
-    "buru"
+    "buru",
+    "kayu"
    ],
    "arahan": [
-    "Perluas cakupan patroli: baru 25% sel grid resor terjamah dalam 5 hari patroli. Utamakan sel yang belum pernah dikunjungi agar penilaian tidak lagi indikatif.",
-    "Tuntaskan garapan aktif (16,9 ha) lewat patroli gabungan, penegasan batas, dan penyelesaian konflik tenurial atau kemitraan konservasi.",
+    "Tuntaskan garapan aktif (132,9 ha) lewat patroli gabungan, penegasan batas, dan penyelesaian konflik tenurial atau kemitraan konservasi.",
     "Sapu jerat terjadwal dan awasi jalur masuk pemburu, termasuk patroli malam pada musim berburu.",
-    "Pantau populasi satwa kunci (Elang flores) dengan metode baku, misalnya transek atau titik hitung, sebagai dasar tren."
+    "Amankan jalur angkut kayu dan pohon bernilai tinggi bersama desa penyangga; tindak lanjuti setiap temuan pembalakan.",
+    "Pantau populasi satwa kunci (Rusa timor, Elang flores) dengan metode baku, misalnya transek atau titik hitung, sebagai dasar tren."
    ]
   },
   {
@@ -3696,11 +4075,6 @@
     ]
    ],
    "bulanan": [
-    [
-     "2026-01",
-     0,
-     0
-    ],
     [
      "2026-02",
      0,
@@ -3822,7 +4196,7 @@
      "indikasi": 1,
      "sel": 1,
      "laju": 2.5,
-     "rasio": 9.75,
+     "rasio": 15.33,
      "lingkup": {
       "nilai": 2,
       "pct": null,
