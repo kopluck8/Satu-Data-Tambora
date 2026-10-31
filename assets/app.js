@@ -374,7 +374,7 @@
     karhut: function (d) {
       var manual = d.sumber === 'delineasi';
       var persen = d.luasKawasan ? fmt(d.terbakar / d.luasKawasan * 100, 1) + '% luas kawasan' : '';
-      var akhir = manual && d.riwayat.length ? d.riwayat[d.riwayat.length - 1] : null;
+      var akhir = manual && d.riwayat.length > 1 ? d.riwayat[d.riwayat.length - 1] : null; // satu delineasi: tambahan = total
       var peta = M.item.filter(function (x) { return /peta_terbakar\.html/.test(x.url); })[0];
       return '<div class="panel-kaca"><p class="stat-label">' + (manual ? 'Areal terbakar' : 'Bekas terbakar') + ' musim ini' +
         (d.cakupan === 'kawasan' ? ' di kawasan TN' : '') + '</p>' +
