@@ -1,0 +1,63 @@
+# Olah ulang profil potensi dan ancaman tab Resor Pengelolaan dari data SMART Patrol terbaru
+# dan delineasi areal terbakar, lalu simpan data/resor/analisis.json dan data/resor/peta.geojson.
+# Berjalan setiap hari pukul 07.40 WITA (setelah data SMART diperbarui pukul 06.00 WITA),
+# setiap kali isi kajian, batas resor, atau skrip berubah, dan bisa dijalankan manual dari
+# tab Actions > "Perbarui analisis resor" > Run workflow.
+name: Perbarui analisis resor
+
+on:
+  schedule:
+    - cron: "40 23 * * *"   # 23.40 UTC = 07.40 WITA
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - data/resor/kajian_2026.json
+      - data/resor/batas_resor_2026.geojson
+      - tools/resor/**
+      - .github/workflows/resor.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: analisis-resor
+  cancel-in-progress: false
+
+jobs:
+  olah:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ambil data Dashboard SMART
+        uses: actions/checkout@v4
+        with:
+          repository: kopluck8/Dashboard_SMART_TNGunungTambora
+          path: _smart
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Pasang pustaka
+        run: pip install numpy shapely pyproj pytest
+
+      - name: Uji aturan penilaian
+        run: python -m pytest -q tools/resor
+
+      - name: Olah analisis resor
+        run: python tools/resor/olah_resor.py --smart _smart
+
+      - name: Simpan bila ada perubahan
+        run: |
+          git add data/resor/analisis.json data/resor/peta.geojson
+          if git diff --cached --quiet; then
+            echo "Analisis tidak berubah."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Perbarui analisis resor"
+            git pull --rebase origin main
+            git push
+          fi

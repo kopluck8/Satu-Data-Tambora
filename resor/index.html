@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resor Pengelolaan · TN Gunung Tambora</title>
+<meta name="description" content="Profil potensi dan ancaman tujuh resor pengelolaan Taman Nasional Gunung Tambora berdasarkan Laporan Hasil Kajian Wilayah Kerja Resor 2026 dan data SMART Patrol.">
+<meta name="theme-color" content="#0b1510">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2313241b'/%3E%3Cpath d='M12 4.5 7.2 11h2.6L6.3 16.5h11.4L14.2 11h2.6z' fill='%23d9a944'/%3E%3Cpath d='M12 16.5v3' stroke='%23d9a944' stroke-width='1.6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="resor.css">
+</head>
+<body>
+<a class="lompat" href="#isi">Langsung ke isi</a>
+<header class="kepala">
+  <div class="kepala-baris">
+    <a class="merek" href="#/" aria-label="Ikhtisar Resor Pengelolaan">
+      <span class="merek-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 6.8 10.6h2.8L5.8 16.6h12.4l-3.8-6h2.8z"/><path d="M12 16.6v3.9"/></svg></span>
+      <span class="merek-teks"><b>Resor Pengelolaan</b><small>Taman Nasional Gunung Tambora</small></span>
+    </a>
+    <div class="kepala-aksi">
+      <span class="kepala-data" id="kepalaData"></span>
+      <button class="tombol tombol--hantu" type="button" id="tombolCetak" title="Cetak atau simpan profil sebagai PDF">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V3.5h10V9"/><rect x="3.5" y="9" width="17" height="8" rx="2"/><path d="M7 14h10v6.5H7z"/></svg>
+        <span>Cetak profil</span>
+      </button>
+    </div>
+  </div>
+  <nav class="tab" id="tab" aria-label="Pilih resor"></nav>
+</header>
+<main id="isi" tabindex="-1">
+  <div class="memuat" role="status"><span class="memuat-cincin" aria-hidden="true"></span>Memuat profil resor…</div>
+</main>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<footer class="kaki">
+  <p>Profil disusun dari <b>Laporan Hasil Kajian Wilayah Kerja Resor</b> (Balai TN Tambora, 13 September 2026), data <b>SMART Patrol</b>, dan <b>delineasi areal terbakar</b>. Batas resor 2026 di halaman ini hanya dipakai untuk tab Resor Pengelolaan.</p>
+  <p class="kaki-kecil" id="kakiData"></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="resor.js"></script>
+</body>
+</html>

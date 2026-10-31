@@ -46,11 +46,11 @@
   function slug(s) {
     return normal(s).replace(/&/g, ' dan ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60);
   }
-  // Hanya link http(s) atau berkas di repo ini yang dipakai.
+  // Hanya link http(s) atau berkas di repo ini (boleh dengan #bagian, misalnya resor/index.html#/piong) yang dipakai.
   function aman(url) {
     url = bersih(url);
     if (/^https?:\/\/[^\s"'<>]+$/i.test(url)) return url;
-    if (/^[\w-]+(\/[\w.-]+)*\.[a-z0-9]+$/i.test(url) && url.indexOf('..') < 0) return url;
+    if (/^[\w-]+(\/[\w.-]+)*\.[a-z0-9]+(#[\w\/=&.-]*)?$/i.test(url) && url.indexOf('..') < 0) return url;
     return '';
   }
   function warna(s) {
@@ -370,6 +370,13 @@
         '<p class="stat-sub">' + fmt(d.titik) + ' titik temuan (waypoint)</p>' +
         (atas.length ? daftarBatang('Kategori terbanyak', atas, function (r) { return fmt(r.nilai); }) : '') +
         '<p class="stat-catatan">Dihitung dari data Dashboard SMART Patrol</p></div>';
+    },
+    resor: function (d) {
+      return '<div class="panel-kaca"><p class="stat-label">Resor pengelolaan ' + d.tahun + '</p>' +
+        '<p class="stat-nilai">' + d.jumlah + '<small> resor</small></p>' +
+        '<p class="stat-sub">' + d.sptn + ' SPTN · ' + fmt(d.luas) + ' ha' + (d.baru.length ? ' · resor baru ' + esc(d.baru.join(', ')) : '') + '</p>' +
+        daftarBatang('Skor potensi (1–4)', d.perResor, function (r) { return fmt(r.nilai, 2); }, 4) +
+        '<p class="stat-catatan">Ancaman tertinggi di kawasan: ' + esc(d.ancaman) + ' · diolah ' + esc(tanggal(d.diperbarui)) + ' dari Laporan Kajian dan SMART Patrol</p></div>';
     },
     karhut: function (d) {
       var manual = d.sumber === 'delineasi';

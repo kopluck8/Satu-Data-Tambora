@@ -1,0 +1,70 @@
+{
+ "petunjuk": "Tempat foto tab Resor Pengelolaan. Isi src dengan path foto di repo (misalnya assets/foto/resor/piong-savana.jpg) atau link Google Drive yang dibagikan 'Siapa saja yang memiliki link'. Biarkan src kosong untuk menampilkan tempat foto beserta temanya. Foto dengan utama: true menjadi foto sampul.",
+ "tn": [
+  {"tema": "Kaldera Tambora dari bibir kawah", "src": "assets/foto/kawasan.jpg", "kredit": "", "utama": true},
+  {"tema": "Sarang lebah madu hutan di tebing", "src": "assets/foto/lebah.jpg", "kredit": ""},
+  {"tema": "Air terjun di kawasan TN Tambora", "src": "assets/foto/wisata.jpg", "kredit": "Dwi Oblo"},
+  {"tema": "Elang di atas tajuk hutan Tambora", "src": "assets/foto/smart.jpg", "kredit": "Dok. TN Tambora"},
+  {"tema": "Api di savana pada musim kemarau", "src": "assets/foto/karhut.jpg", "kredit": ""},
+  {"tema": "Pemadaman kebakaran oleh petugas dan MPA", "src": "assets/foto/pemadaman.jpg", "kredit": ""}
+ ],
+ "resor": {
+  "piong": [
+   {"tema": "Hamparan savana Piong berlatar Gunung Tambora", "src": "", "kredit": "", "utama": true},
+   {"tema": "Bibir kaldera dari jalur pendakian Piong (2.415 mdpl)", "src": "assets/foto/puncak.jpg", "kredit": ""},
+   {"tema": "Jalur pendakian berkendara Piong (4x4 dan motor trail)", "src": "", "kredit": ""},
+   {"tema": "Rusa timor di savana Piong", "src": "", "kredit": ""},
+   {"tema": "Pengamatan burung di Piong", "src": "", "kredit": ""},
+   {"tema": "Patroli dan pemadaman kebakaran savana", "src": "", "kredit": ""},
+   {"tema": "Kantor Resor Piong dan tim resor", "src": "", "kredit": ""}
+  ],
+  "oi-katupa": [
+   {"tema": "Savana dan hutan pamah Oi Katupa", "src": "", "kredit": "", "utama": true},
+   {"tema": "Elang flores di habitatnya", "src": "", "kredit": ""},
+   {"tema": "Madu hutan (Uma Ani) dan pencari madu", "src": "", "kredit": ""},
+   {"tema": "Mata air yang dimanfaatkan Desa Oi Katupa", "src": "", "kredit": ""},
+   {"tema": "Patroli di areal pemulihan ekosistem", "src": "", "kredit": ""},
+   {"tema": "Kantor Resor Oi Katupa dan tim resor", "src": "", "kredit": ""}
+  ],
+  "kawinda-toi": [
+   {"tema": "Hutan di jalur pendakian Kawinda Toi", "src": "", "kredit": "", "utama": true},
+   {"tema": "Air Terjun Oi Marai", "src": "", "kredit": ""},
+   {"tema": "Madu hutan Kawinda Toi", "src": "", "kredit": ""},
+   {"tema": "Sumber air di dalam kawasan", "src": "", "kredit": ""},
+   {"tema": "Sapu jerat: jerat sling yang dimusnahkan", "src": "", "kredit": ""},
+   {"tema": "Kantor Resor Kawinda Toi dan tim resor", "src": "", "kredit": ""}
+  ],
+  "doro-tabe": [
+   {"tema": "Savana dan fitur geologi Doro Tabe", "src": "", "kredit": "", "utama": true},
+   {"tema": "Batas Zona Khusus So Tompo", "src": "", "kredit": ""},
+   {"tema": "Hutan pamah Doro Tabe", "src": "", "kredit": ""},
+   {"tema": "Patroli gabungan di areal perambahan", "src": "", "kredit": ""},
+   {"tema": "Rekomendasi lokasi kantor resor di Hodo (Jalan Lintas Calabai)", "src": "", "kredit": ""},
+   {"tema": "Tim Resor Doro Tabe", "src": "", "kredit": ""}
+  ],
+  "doroncanga": [
+   {"tema": "Sanctuary Rusa Timor Doroncanga", "src": "", "kredit": "", "utama": true},
+   {"tema": "Jalur pendakian berkendara Doroncanga", "src": "", "kredit": ""},
+   {"tema": "Savana Doroncanga", "src": "", "kredit": ""},
+   {"tema": "Fitur geologi pascaletusan 1815", "src": "", "kredit": ""},
+   {"tema": "Pemadaman kebakaran hutan", "src": "", "kredit": ""},
+   {"tema": "Pos 1 Doroncanga (kantor resor) dan tim resor", "src": "", "kredit": ""}
+  ],
+  "doropeti": [
+   {"tema": "Hutan Doropeti", "src": "", "kredit": "", "utama": true},
+   {"tema": "Elang flores di Doropeti", "src": "", "kredit": ""},
+   {"tema": "Sumber air Doropeti", "src": "", "kredit": ""},
+   {"tema": "Batas kawasan dengan ladang jagung Karya Sari", "src": "", "kredit": ""},
+   {"tema": "Patroli pengamanan hutan", "src": "", "kredit": ""},
+   {"tema": "Kantor Resor Doropeti dan tim resor", "src": "", "kredit": ""}
+  ],
+  "pancasila": [
+   {"tema": "Jalur pendakian Pancasila menembus hutan pegunungan", "src": "", "kredit": "", "utama": true},
+   {"tema": "Puncak dan kaldera dari jalur Pancasila", "src": "", "kredit": ""},
+   {"tema": "Rusa timor di Pancasila", "src": "", "kredit": ""},
+   {"tema": "Pos pendakian dan layanan SIMAKSI", "src": "", "kredit": ""},
+   {"tema": "Hutan cemara gunung dan edelweis", "src": "", "kredit": ""},
+   {"tema": "Kantor Resor Pancasila dan tim resor", "src": "", "kredit": ""}
+  ]
+ }
+}

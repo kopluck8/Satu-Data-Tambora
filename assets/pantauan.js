@@ -1,5 +1,6 @@
-/* Angka terkini dari aplikasi lain di kopluck8.github.io: capaian RBM, observasi SMART Patrol,
-   dan estimasi bekas terbakar. Tiap sumber boleh gagal; dashboard tetap tampil tanpa angka itu. */
+/* Angka terkini dari aplikasi lain di kopluck8.github.io (capaian RBM, observasi SMART Patrol,
+   areal terbakar) dan dari olahan harian repo ini (potensi dan ancaman Resor Pengelolaan).
+   Tiap sumber boleh gagal; dashboard tetap tampil tanpa angka itu. */
 (function () {
   'use strict';
 
@@ -175,7 +176,31 @@
 
   function karhut() { return karhutDelineasi().catch(karhutSentinel); }
 
-  var SUMBER = { rbm: rbm, smart: smart, karhut: karhut };
+  /* ---------- Resor Pengelolaan: hasil olahan harian di repo ini (data/resor/analisis.json) ---------- */
+  var TINGKAT = ['', 'rendah', 'sedang', 'tinggi', 'sangat tinggi'];
+  function resor() {
+    return ambil('data/resor/analisis.json', 12000).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d.resor || !d.resor.length) throw new Error('Analisis resor kosong');
+      var jenis = {};
+      (d.jenis_ancaman || []).forEach(function (j) { jenis[j.id] = j.nama; });
+      var atas = (d.tn.ancaman || []).slice().sort(function (a, b) { return b.peringkat - a.peringkat || b.temuan - a.temuan; })[0];
+      var sptn = {};
+      d.resor.forEach(function (r) { sptn[r.sptn] = 1; });
+      return {
+        tahun: d.periode.tahun_awal,
+        jumlah: d.resor.length,
+        sptn: Object.keys(sptn).length,
+        luas: d.tn.luas_ha,
+        baru: d.resor.filter(function (r) { return r.asal && r.asal.length && !r.asal.some(function (a) { return a[0] === r.nama; }); })
+          .map(function (r) { return r.nama; }),
+        ancaman: atas ? String(jenis[atas.id] || atas.id).toLowerCase() + ' (' + TINGKAT[atas.peringkat] + ')' : '–',
+        diperbarui: d.diperbarui,
+        perResor: d.resor.map(function (r) { return { nama: r.nama, nilai: r.potensi.total.skor }; })
+      };
+    });
+  }
+
+  var SUMBER = { rbm: rbm, smart: smart, karhut: karhut, resor: resor };
   var janji = {};
 
   window.PANTAUAN = {
