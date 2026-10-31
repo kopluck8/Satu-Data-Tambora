@@ -13,6 +13,7 @@ kawasan,Akses dan desa,Aksesibilitas ke Dalam Kawasan,peta,https://www.google.co
 kawasan,Akses dan desa,Desa Binaan,peta,https://www.google.com/maps/d/embed?mid=1QpvKZnaRnsVIzZ3g_YUobbG9jCkICPg,Peta desa binaan di sekitar kawasan.,,,,ya
 smart,Aplikasi,Dashboard Data SMART Patrol,aplikasi,https://kopluck8.github.io/Dashboard_SMART_TNGunungTambora/,"Statistik, grafik, peta, dan tabel temuan patroli per kategori, SPTN, dan resor.",,kopluck8/Dashboard_SMART_TNGunungTambora,ya,ya
 smart,Aplikasi,Generator LPK & RPK,aplikasi,https://kopluck8.github.io/SMART_Report_generator/,Mengubah ekspor SMART Desktop menjadi Laporan Pelaksanaan Kegiatan dan menyusun Rencana Pelaksanaan Kegiatan.,,kopluck8/SMART_Report_generator,,ya
+smart,Aplikasi,Flight SMART,aplikasi,https://kopluck8.github.io/Flight_SMART/,"Arsip log terbang drone DJI (jalur GPX, KML, peta) dan pengisian data SMART untuk foto drone.",,kopluck8/Flight_SMART,,ya
 smart,Rekap per kategori,Aktivitas Manusia,grafik,https://kopluck8.github.io/Dashboard_SMART_TNGunungTambora/aktivitas-manusia.html?embed=1,"Temuan aktivitas manusia: komposisi, tren bulanan, peta, dan rincian.",,,,ya
 smart,Rekap per kategori,Satwa Liar,grafik,https://kopluck8.github.io/Dashboard_SMART_TNGunungTambora/satwa-liar.html?embed=1,"Daftar jenis satwa, tren bulanan, dan peta sebaran temuan.",,,,ya
 smart,Rekap per kategori,Tumbuhan,grafik,https://kopluck8.github.io/Dashboard_SMART_TNGunungTambora/tumbuhan.html?embed=1,"Daftar jenis tumbuhan, tren bulanan, dan peta sebaran temuan.",,,,ya
