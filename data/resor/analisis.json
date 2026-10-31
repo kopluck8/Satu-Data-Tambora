@@ -1,6 +1,6 @@
 {
  "versi": 1,
- "diperbarui": "2026-10-31T19:52+08:00",
+ "diperbarui": "2026-10-31T19:58+08:00",
  "periode": {
   "awal": "2026-02-03",
   "akhir": "2026-10-03",
@@ -228,7 +228,7 @@
      "ilmiah": "Nisaetus floris",
      "n": 4,
      "dilindungi": true,
-     "iucn": "CR"
+     "iucn": "EN"
     },
     {
      "nama": "Alap-alap Sapi",
@@ -714,7 +714,7 @@
       "ilmiah": "Nisaetus floris",
       "n": 3,
       "dilindungi": true,
-      "iucn": "CR"
+      "iucn": "EN"
      },
      {
       "nama": "Elang Bondol",
@@ -2483,7 +2483,7 @@
       "ilmiah": "Nisaetus floris",
       "n": 1,
       "dilindungi": true,
-      "iucn": "CR"
+      "iucn": "EN"
      },
      {
       "nama": "Paok laus-utara",
