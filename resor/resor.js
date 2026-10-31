@@ -745,7 +745,7 @@
       '<li>Ketiadaan temuan belum tentu berarti ketiadaan ancaman. Karena itu ancaman utama dari Laporan Kajian tetap dinilai walau belum ada temuan tahun ini.</li>' +
       '<li>Indeks Shannon dihitung dari jumlah rekaman per jenis, sehingga dipengaruhi upaya dan lokasi patroli.</li>' +
       '<li>Nilai keparahan dan ketakpulihan dasar adalah penilaian pakar yang dapat disesuaikan bersama tim resor di <code>tools/resor/olah_resor.py</code>.</li>' +
-      '<li>Status IUCN mengikuti tabel status jenis Dashboard SMART; Laporan Kajian mencatat Elang flores sebagai EN, tabel SMART mencatat CR.</li></ul></div>');
+      '<li>Status IUCN mengikuti tabel status jenis Dashboard SMART, kecuali Elang flores yang dicatat EN sesuai Daftar Merah IUCN 2024 dan Laporan Kajian (tabel SMART masih mencatat CR).</li></ul></div>');
     html += bagian('05', 'Pustaka', '<div class="kartu"><ol class="pustaka">' +
       '<li>Balai TN Tambora. 2026. Laporan Hasil Kajian Wilayah Kerja Resor Taman Nasional Gunung Tambora. Dompu.</li>' +
       '<li>Conservation Measures Partnership. 2020. Open Standards for the Practice of Conservation, Version 4.0.</li>' +

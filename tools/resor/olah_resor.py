@@ -320,10 +320,20 @@ def muat_smart(akar, pakai_sheet=True, log=print):
     return drive + tambahan, cfg, info
 
 
+# Koreksi status IUCN yang di tabel Dashboard SMART belum mengikuti penilaian terbaru.
+# Elang flores diturunkan dari CR ke EN pada Daftar Merah IUCN 2024
+# (BirdLife International 2024, e.T22732096A229714191); Laporan Kajian Resor juga mencatat EN.
+KOREKSI_IUCN = {'Nisaetus floris': 'EN'}
+
+
 def muat_status(path):
     t = Path(path).read_text(encoding='utf-8')
     pola = r'"([^"]+)":\s*\{\s*dilindungi:\s*(true|false),\s*iucn:\s*"(\w+)"'
-    return {m.group(1): {'dilindungi': m.group(2) == 'true', 'iucn': m.group(3)} for m in re.finditer(pola, t)}
+    status = {m.group(1): {'dilindungi': m.group(2) == 'true', 'iucn': m.group(3)} for m in re.finditer(pola, t)}
+    for ilmiah, kategori in KOREKSI_IUCN.items():
+        if ilmiah in status:
+            status[ilmiah]['iucn'] = kategori
+    return status
 
 
 def pisah_jenis(s):
