@@ -43,19 +43,21 @@ var SUMBER = {
 var BAWAAN = {
   PENYEDIA: 'gemini',                 // 'gemini' atau 'claude'
   MODEL_GEMINI: 'gemini-3.8-flash',
+  PIKIR_GEMINI: 'low',                // tingkat berpikir Gemini 3: minimal | low | medium | high (makin tinggi makin lambat)
   MODEL_CLAUDE: 'claude-opus-5-5',
   UPAYA_CLAUDE: 'medium',             // effort Claude: low | medium | high
   BATAS_HARIAN_TOTAL: 600,            // semua pegawai, per hari
   BATAS_HARIAN_ORANG: 20,             // per pegawai, per hari (bisa diubah per akun di sheet Akun)
   LAMA_SESI_JAM: 6,                   // maksimal 6 jam (batas CacheService)
-  SIMPAN_CACHE_MENIT: 30              // data sumber disimpan sementara selama ini
+  SIMPAN_CACHE_MENIT: 30,             // data sumber disimpan sementara selama ini
+  BATAS_DETIK: 150                    // lewat dari ini AI diminta menjawab dengan data yang sudah dibaca
 };
 
 var ZONA = 'Asia/Makassar';
 var LEMBAR_AKUN = 'Akun';
 var LEMBAR_LOG = 'Log';
 var KOLOM_AKUN = ['Username', 'Nama', 'Peran', 'Aktif', 'Batas harian', 'Password baru', 'Hash', 'Garam', 'Terakhir masuk'];
-var KOLOM_LOG = ['Waktu', 'Username', 'Pertanyaan', 'Alat dipakai', 'Status', 'Token masuk', 'Token keluar'];
+var KOLOM_LOG = ['Waktu', 'Username', 'Pertanyaan', 'Alat dipakai', 'Status', 'Token masuk', 'Token keluar', 'Durasi (detik)'];
 var PUTARAN_HASH = 600;
 var MAKS_PUTARAN_ALAT = 6;
 var MAKS_BARIS_JAWABAN = 25;
@@ -75,6 +77,8 @@ function onOpen() {
     .addSeparator()
     .addItem('Buat password acak untuk baris terpilih', 'menuPasswordAcak')
     .addItem('Uji koneksi AI', 'menuUjiAi')
+    .addItem('Uji kecepatan', 'menuUjiKecepatan')
+    .addItem('Aktifkan pemanasan data otomatis', 'menuPemanasan')
     .addToUi();
 }
 
@@ -142,6 +146,43 @@ function menuPasswordAcak() {
   var html = HtmlService.createHtmlOutput('<p style="font:14px sans-serif">Salin dan bagikan ke masing-masing pegawai. Password ini tidak disimpan dan tidak bisa ditampilkan lagi.</p>' +
     '<textarea style="width:100%;height:280px;font:13px monospace">' + hasil.join('\n').replace(/</g, '&lt;') + '</textarea>').setWidth(460).setHeight(380);
   ui.showModalDialog(html, 'Password baru (' + hasil.length + ' akun)');
+}
+
+/** Muat ulang semua dataset ke cache. Dipanggil pemicu waktu tiap 15 menit agar pertanyaan tidak menunggu data. */
+function hangatkanData() {
+  SEGARKAN_ = true;
+  MEMORI_ = {};
+  var hasil = [];
+  Object.keys(KATALOG).forEach(function (id) {
+    var d = KATALOG[id], t = Date.now();
+    try { if (d.muat) d.muat(); else if (d.ringkas) d.ringkas(''); hasil.push(id + ': ' + ((Date.now() - t) / 1000).toFixed(1) + ' dtk'); }
+    catch (e) { hasil.push(id + ': GAGAL ' + e.message); }
+  });
+  SEGARKAN_ = false;
+  console.log(hasil.join('\n'));
+  return hasil;
+}
+
+function menuPemanasan() {
+  var ui = SpreadsheetApp.getUi();
+  ScriptApp.getProjectTriggers().forEach(function (t) { if (t.getHandlerFunction() === 'hangatkanData') ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('hangatkanData').timeBased().everyMinutes(15).create();
+  var hasil = hangatkanData();
+  ui.alert('Pemanasan data aktif: semua dataset dimuat ulang tiap 15 menit, jadi pertanyaan tidak perlu menunggu data dibaca.\n\nPemuatan pertama:\n' + hasil.join('\n'));
+}
+
+function menuUjiKecepatan() {
+  var ui = SpreadsheetApp.getUi();
+  var baris = ['Memuat data dari sumber (tanpa cache):'].concat(hangatkanData().map(function (x) { return '  ' + x; }));
+  var t = Date.now();
+  try {
+    var h = jalankanAi_([{ peran: 'user', teks: 'Berapa jumlah observasi SMART Patrol per kategori tahun ini?' }], [], null, { u: 'uji', nama: 'Uji', peran: 'admin' });
+    baris.push('', 'Pertanyaan uji dengan ' + atur_('PENYEDIA') + ': ' + ((Date.now() - t) / 1000).toFixed(1) + ' dtk, alat: ' + (h.alat.join(', ') || '-'),
+      'Token masuk ' + h.pakai.masuk + ', keluar ' + h.pakai.keluar, '', h.jawaban.slice(0, 500));
+  } catch (e) {
+    baris.push('', 'Pertanyaan uji GAGAL setelah ' + ((Date.now() - t) / 1000).toFixed(1) + ' dtk: ' + e.message);
+  }
+  ui.alert('Uji kecepatan', baris.join('\n'), ui.ButtonSet.OK);
 }
 
 function menuUjiAi() {
@@ -274,12 +315,13 @@ function pakaiKuota_(sesi) {
   }
 }
 
-function catatLog_(sesi, pertanyaan, alat, status, pakai) {
+function catatLog_(sesi, pertanyaan, alat, status, pakai, durasi) {
   try {
     var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(LEMBAR_LOG);
     if (!sh) return;
+    if (sh.getLastColumn() < KOLOM_LOG.length) sh.getRange(1, 1, 1, KOLOM_LOG.length).setValues([KOLOM_LOG]).setFontWeight('bold');
     sh.appendRow([new Date(), sesi ? sesi.u : '', String(pertanyaan || '').slice(0, 500), (alat || []).join(', '), status,
-      pakai ? pakai.masuk : '', pakai ? pakai.keluar : '']);
+      pakai ? pakai.masuk : '', pakai ? pakai.keluar : '', durasi === undefined ? '' : durasi]);
   } catch (e) { /* log tidak boleh menggagalkan jawaban */ }
 }
 
@@ -320,12 +362,14 @@ function tanya_(sesi, m) {
   if (galat) return { ok: false, galat: galat, sisa: 0 };
   var konten = bersihkanKonten_(m.konten);
   var pertanyaan = pesan[pesan.length - 1].teks;
+  var mulai = Date.now();
+  var detik = function () { return Math.round((Date.now() - mulai) / 100) / 10; };
   try {
     var h = jalankanAi_(pesan, konten, m.posisi || null, sesi);
-    catatLog_(sesi, pertanyaan, h.alat, 'ok', h.pakai);
+    catatLog_(sesi, pertanyaan, h.alat, 'ok', h.pakai, detik());
     return { ok: true, jawaban: h.jawaban, aksi: h.aksi, sisa: sisaKuota_(sesi) };
   } catch (err) {
-    catatLog_(sesi, pertanyaan, [], 'galat: ' + err.message, null);
+    catatLog_(sesi, pertanyaan, [], 'galat: ' + err.message, null, detik());
     throw err;
   }
 }
@@ -383,12 +427,14 @@ function bacaCache_(kunci) {
 }
 
 var MEMORI_ = {};
+var SEGARKAN_ = false; // true saat pemanasan: baca ulang sumber dan timpa cache
 function denganCache_(kunci, buat) {
   if (MEMORI_[kunci]) return MEMORI_[kunci];
-  var v = bacaCache_(kunci);
+  var v = SEGARKAN_ ? null : bacaCache_(kunci);
   if (!v) {
     v = buat();
-    try { simpanCache_(kunci, v, Number(atur_('SIMPAN_CACHE_MENIT')) * 60); } catch (e) { console.warn('cache ' + kunci + ': ' + e.message); }
+    var menit = Math.max(Number(atur_('SIMPAN_CACHE_MENIT')), SEGARKAN_ ? 25 : 1);
+    try { simpanCache_(kunci, v, menit * 60); } catch (e) { console.warn('cache ' + kunci + ': ' + e.message); }
   }
   MEMORI_[kunci] = v;
   return v;
@@ -961,10 +1007,15 @@ function promptSistem_(konten, posisi, sesi) {
 }
 
 function jalankanAi_(pesan, konten, posisi, sesi) {
-  var ctx = { sesi: sesi, konten: konten, aksi: [], alat: [], pakai: { masuk: 0, keluar: 0 } };
+  var ctx = { sesi: sesi, konten: konten, aksi: [], alat: [], pakai: { masuk: 0, keluar: 0 }, mulai: Date.now() };
   var sistem = promptSistem_(konten, posisi, sesi);
   var jawaban = atur_('PENYEDIA') === 'claude' ? putaranClaude_(sistem, pesan, ctx) : putaranGemini_(sistem, pesan, ctx);
   return { jawaban: jawaban || 'Maaf, saya belum bisa menjawab. Coba ulangi dengan kalimat lain.', aksi: ctx.aksi, alat: ctx.alat, pakai: ctx.pakai };
+}
+
+/** true bila AI harus berhenti memakai alat dan langsung menjawab (putaran terakhir atau waktu hampir habis). */
+function harusMenjawab_(ctx, i) {
+  return i >= MAKS_PUTARAN_ALAT || (i > 0 && Date.now() - ctx.mulai > Number(atur_('BATAS_DETIK')) * 1000);
 }
 
 function panggil_(url, header, badan) {
@@ -992,17 +1043,29 @@ function skemaGemini_(s) {
 function putaranGemini_(sistem, pesan, ctx) {
   var kunci = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
   if (!kunci) throw new Error('Kunci API Gemini belum diatur (menu Tanya Data → Atur kunci API).');
-  var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + atur_('MODEL_GEMINI') + ':generateContent';
+  var model = atur_('MODEL_GEMINI');
+  var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
   var contents = pesan.map(function (p) { return { role: p.peran === 'bot' ? 'model' : 'user', parts: [{ text: p.teks }] }; });
   var badan = {
     systemInstruction: { parts: [{ text: sistem }] },
     tools: [{ functionDeclarations: ALAT.map(function (a) { return { name: a.name, description: a.description, parameters: skemaGemini_(a.params) }; }) }],
     toolConfig: { functionCallingConfig: { mode: 'AUTO' } },
-    generationConfig: { maxOutputTokens: 4096 }
+    generationConfig: { maxOutputTokens: 8192 }
   };
+  var pikir = String(atur_('PIKIR_GEMINI') || '').trim().toLowerCase();
+  if (pikir && /^gemini-([3-9]|\d\d)/.test(model)) badan.generationConfig.thinkingConfig = { thinkingLevel: pikir };
   for (var i = 0; i <= MAKS_PUTARAN_ALAT; i++) {
     badan.contents = contents;
-    var r = panggil_(url, { 'x-goog-api-key': kunci }, badan);
+    var akhir = harusMenjawab_(ctx, i);
+    if (akhir) badan.toolConfig = { functionCallingConfig: { mode: 'NONE' } };
+    var r;
+    try { r = panggil_(url, { 'x-goog-api-key': kunci }, badan); }
+    catch (e) {
+      // Model yang tidak mengenal thinkingLevel: ulangi tanpa pengaturan itu.
+      if (!badan.generationConfig.thinkingConfig || !/HTTP 400/.test(e.message) || !/think/i.test(e.message)) throw e;
+      delete badan.generationConfig.thinkingConfig;
+      r = panggil_(url, { 'x-goog-api-key': kunci }, badan);
+    }
     if (r.usageMetadata) { ctx.pakai.masuk += r.usageMetadata.promptTokenCount || 0; ctx.pakai.keluar += (r.usageMetadata.candidatesTokenCount || 0) + (r.usageMetadata.thoughtsTokenCount || 0); }
     var kand = (r.candidates || [])[0];
     if (!kand || !kand.content) {
@@ -1011,7 +1074,7 @@ function putaranGemini_(sistem, pesan, ctx) {
     }
     var bagian = kand.content.parts || [];
     var panggilan = bagian.filter(function (p) { return p.functionCall; });
-    if (!panggilan.length || i === MAKS_PUTARAN_ALAT) {
+    if (!panggilan.length || akhir) {
       return bagian.filter(function (p) { return p.text && !p.thought; }).map(function (p) { return p.text; }).join('').trim();
     }
     contents.push(kand.content); // dikirim balik utuh, termasuk thoughtSignature
@@ -1053,11 +1116,13 @@ function putaranClaude_(sistem, pesan, ctx) {
   });
   for (var i = 0; i <= MAKS_PUTARAN_ALAT; i++) {
     badan.messages = messages;
+    var akhir = harusMenjawab_(ctx, i);
+    if (akhir) badan.tool_choice = { type: 'none' };
     var r = panggil_('https://api.anthropic.com/v1/messages', header, badan);
     if (r.usage) { ctx.pakai.masuk += (r.usage.input_tokens || 0) + (r.usage.cache_read_input_tokens || 0); ctx.pakai.keluar += r.usage.output_tokens || 0; }
     if (r.stop_reason === 'refusal') return 'Maaf, permintaan ini tidak bisa saya jawab.';
     var teks = (r.content || []).filter(function (b) { return b.type === 'text'; }).map(function (b) { return b.text; }).join('').trim();
-    if (r.stop_reason !== 'tool_use' || i === MAKS_PUTARAN_ALAT) return teks;
+    if (r.stop_reason !== 'tool_use' || akhir) return teks;
     messages.push({ role: 'assistant', content: r.content }); // utuh, termasuk blok thinking
     messages.push({ role: 'user', content: r.content.filter(function (b) { return b.type === 'tool_use'; }).map(function (b) {
       var h = jalankanAlat_(b.name, b.input, ctx);

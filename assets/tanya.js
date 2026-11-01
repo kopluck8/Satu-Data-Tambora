@@ -121,7 +121,7 @@
 
   function kirimApi(badan, ms) {
     var ctrl = window.AbortController ? new AbortController() : null;
-    var t = ctrl ? setTimeout(function () { ctrl.abort(); }, ms || 120000) : null;
+    var t = ctrl ? setTimeout(function () { ctrl.abort(); }, ms || 300000) : null;
     // text/plain agar tidak ada preflight CORS; Apps Script membaca e.postData.contents.
     return fetch(URL_API, { method: 'POST', body: JSON.stringify(badan), redirect: 'follow', signal: ctrl ? ctrl.signal : undefined })
       .then(function (r) { if (t) clearTimeout(t); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); },
@@ -225,7 +225,7 @@
     var mulai = Date.now();
     var jam = setInterval(function () {
       var d = Math.round((Date.now() - mulai) / 1000);
-      tunggu.querySelector('.tanya-tunggu-teks').textContent = d < 8 ? 'Membaca data…' : d < 25 ? 'Menghitung dari data… ' + d + ' dtk' : 'Masih bekerja, data yang dibaca cukup besar… ' + d + ' dtk';
+      tunggu.querySelector('.tanya-tunggu-teks').textContent = d < 8 ? 'Membaca data…' : d < 25 ? 'Menghitung dari data… ' + d + ' dtk' : d < 70 ? 'Masih bekerja, data yang dibaca cukup besar… ' + d + ' dtk' : 'Pertanyaan ini butuh beberapa langkah, mohon tunggu… ' + d + ' dtk';
     }, 1000);
     var pesan = riwayat.filter(function (m) { return !m.galat; }).slice(-8).map(function (m) { return { peran: m.peran, teks: m.teks }; });
     kirimApi({

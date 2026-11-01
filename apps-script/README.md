@@ -63,8 +63,9 @@ Langkah bertanda 🔐 adalah **otorisasi Google**: muncul jendela izin dari Goog
    Bila muncul "Google belum memverifikasi aplikasi ini", klik **Lanjutan → Buka Tanya Data (tidak aman)**. Itu wajar untuk skrip buatan sendiri. Setelah selesai, Sheets punya lembar **Akun** dan **Log**.
 4. Kembali ke Sheets dan muat ulang halaman. Muncul menu **Tanya Data**. Pilih **Tanya Data → Atur kunci API**, lalu tempel kuncinya. Skrip mengenali sendiri apakah itu kunci Gemini atau Claude.
 5. **Tanya Data → Uji koneksi AI**. Bila berhasil, muncul jawaban tentang jumlah resor.
-6. Isi akun pegawai di lembar **Akun** (lihat bagian berikut). Minimal buat satu akun `admin` untuk dirimu.
-7. 🔐 Di editor Apps Script: **Terapkan → Deployment baru → ikon roda gigi → Aplikasi web**.
+6. 🔐 **Tanya Data → Aktifkan pemanasan data otomatis**. Google meminta satu izin tambahan: **Menjalankan aplikasi saat Anda tidak ada** (pemicu waktu). Setelah itu semua dataset dibaca ulang tiap 15 menit di belakang layar, sehingga pegawai tidak perlu menunggu data SMART dan RBM dimuat saat bertanya.
+7. Isi akun pegawai di lembar **Akun** (lihat bagian berikut). Minimal buat satu akun `admin` untuk dirimu.
+8. 🔐 Di editor Apps Script: **Terapkan → Deployment baru → ikon roda gigi → Aplikasi web**.
    - Deskripsi: `Tanya Data`
    - **Jalankan sebagai: Saya**
    - **Yang memiliki akses: Siapa saja**
@@ -72,7 +73,7 @@ Langkah bertanda 🔐 adalah **otorisasi Google**: muncul jendela izin dari Goog
    Klik **Terapkan**, setujui izin bila diminta, lalu salin **URL aplikasi web** (berakhiran `/exec`).
 
    "Siapa saja" diperlukan karena pegawai tidak masuk dengan akun Google. Penjaganya adalah username dan password di lembar Akun: tanpa token sesi, Web App hanya menjawab "silakan masuk".
-8. Tempel URL itu ke `TANYA_DATA` di [`data/sumber.js`](../data/sumber.js), lalu commit. Selama `TANYA_DATA` kosong, tombol Tanya Data tidak tampil di dashboard.
+9. Tempel URL itu ke `TANYA_DATA` di [`data/sumber.js`](../data/sumber.js), lalu commit. Selama `TANYA_DATA` kosong, tombol Tanya Data tidak tampil di dashboard.
 
 ## Akun pegawai
 
@@ -115,15 +116,24 @@ Semua pengaturan punya nilai bawaan di bagian `BAWAAN` pada `TanyaData.gs`. Untu
 |---|---|---|
 | `PENYEDIA` | `gemini` | `gemini` atau `claude`. Bisa juga lewat menu **Pilih penyedia AI**. |
 | `MODEL_GEMINI` | `gemini-3.8-flash` | Model Gemini |
+| `PIKIR_GEMINI` | `low` | Seberapa dalam Gemini 3 berpikir: `minimal`, `low`, `medium`, `high`. Makin tinggi makin teliti tetapi makin lambat. |
 | `MODEL_CLAUDE` | `claude-opus-5-5` | Model Claude. `claude-haiku-5-5` lebih murah dan lebih cepat. |
 | `UPAYA_CLAUDE` | `medium` | Seberapa dalam Claude berpikir: `low`, `medium`, `high` |
 | `BATAS_HARIAN_TOTAL` | `600` | Pertanyaan per hari untuk seluruh kantor |
 | `BATAS_HARIAN_ORANG` | `20` | Pertanyaan per hari per pegawai |
 | `LAMA_SESI_JAM` | `6` | Lama login sebelum harus masuk lagi (maksimal 6) |
 | `SIMPAN_CACHE_MENIT` | `30` | Lama data sumber disimpan sementara sebelum dibaca ulang |
+| `BATAS_DETIK` | `150` | Setelah sekian detik, AI berhenti membaca data dan langsung menjawab dengan yang sudah ada |
 | `GITHUB_TOKEN` | kosong | Diperlukan bila repo data dijadikan privat (lihat di bawah) |
 
 Kunci API tersimpan di properti `GEMINI_API_KEY` atau `ANTHROPIC_API_KEY`. Jangan menulis kunci di kode atau di repo.
+
+## Bila jawaban lambat
+
+Jalankan **Tanya Data → Uji kecepatan**. Jendela hasilnya menunjukkan lama membaca setiap dataset dari sumbernya dan lama satu pertanyaan uji ke AI. Kolom **Durasi (detik)** di lembar Log mencatat lama setiap pertanyaan pegawai.
+
+- Membaca data lama (misalnya SMART lebih dari 20 detik): pastikan pemanasan data otomatis aktif.
+- AI lama: turunkan `PIKIR_GEMINI` ke `minimal`, atau pakai model yang lebih ringan.
 
 ## Memperbarui skrip
 
@@ -159,4 +169,4 @@ Tambahkan alamat sumbernya di `SUMBER`, bungkus pembacaan dengan `denganCache_` 
 - Pertanyaan dan data yang dibaca alat dikirim ke penyedia AI (Google atau Anthropic) untuk diproses. Gunakan tier berbayar agar data tidak dipakai untuk melatih model.
 - Bot tidak menuliskan koordinat persis satwa dilindungi di teks jawaban. Unduhan data SMART tetap berisi koordinat lengkap untuk pegawai yang masuk.
 - Isi data diperlakukan sebagai data. Teks di catatan patroli yang berbunyi seperti perintah tidak dijalankan.
-- Lembar Log menyimpan setiap pertanyaan beserta username-nya.
+- Lembar Log menyimpan setiap pertanyaan beserta username-nya, alat yang dipakai, jumlah token, dan lamanya.
