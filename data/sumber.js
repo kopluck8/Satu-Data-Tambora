@@ -17,5 +17,5 @@ window.SUMBER = {
    * TANYA DATA (chatbot): URL Aplikasi Web Apps Script (berakhiran /exec) dari apps-script/TanyaData.gs.
    * Kosongkan untuk menyembunyikan tombol Tanya Data. Panduan pasang: apps-script/README.md.
    */
-  TANYA_DATA: ""
+  TANYA_DATA: "https://script.google.com/macros/s/AKfycbxusKvHzNofeX45WZwqt2mmQwIlE8bkxThRwchCGj7gu4Bg7S0oVKdpw8gtzMsJ6P_DHg/exec"
 };
