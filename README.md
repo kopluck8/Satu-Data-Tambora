@@ -2,7 +2,9 @@
 
 Satu layar untuk data, peta, dan aplikasi kerja Balai Taman Nasional Tambora.
 
-Alamat: **https://kopluck8.github.io/Satu-Data-Tambora/**
+Alamat: **https://satudatambora.my.id/**
+
+Domain diatur lewat file `CNAME` di repo ini dan DNS di Hostinger. Alamat lama `https://kopluck8.github.io/Satu-Data-Tambora/` otomatis dialihkan ke domain ini. Aplikasi lain (SMART, RBM, Simulasi API, dan seterusnya) tetap di `kopluck8.github.io`.
 
 ## Tampilan
 

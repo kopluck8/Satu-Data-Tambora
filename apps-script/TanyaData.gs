@@ -20,10 +20,13 @@
 /* =========================== PENGATURAN =========================== */
 
 var PAGES = 'https://kopluck8.github.io/';
+/** Domain sendiri Satu Data Tambora (CNAME repo Satu-Data-Tambora). Alamat lama PAGES + 'Satu-Data-Tambora/' dialihkan ke sini. */
+var HUB = 'https://satudatambora.my.id/';
+var HUB_LAMA = PAGES + 'Satu-Data-Tambora/';
 
 /** Sumber data. Ubah alamat di sini bila tempat penyimpanan berpindah. */
 var SUMBER = {
-  hub: PAGES + 'Satu-Data-Tambora/',
+  hub: HUB,
   smartConfig: PAGES + 'Dashboard_SMART_TNGunungTambora/assets/config.js',
   smartDrive: PAGES + 'Dashboard_SMART_TNGunungTambora/data/patroli-observasi.csv',
   smartCadangan: PAGES + 'Dashboard_SMART_TNGunungTambora/data/data.csv',
@@ -33,11 +36,11 @@ var SUMBER = {
   arealTerbakar: PAGES + 'Simulasi-API-Tambora/status/areal_terbakar.json',
   arealTerbakarPeta: PAGES + 'Simulasi-API-Tambora/data/areal_terbakar.geojson',
   penerbangan: PAGES + 'Flight_SMART/flights/index.json',
-  resorAnalisis: PAGES + 'Satu-Data-Tambora/data/resor/analisis.json',
-  resorKajian: PAGES + 'Satu-Data-Tambora/data/resor/kajian_2026.json',
-  resorPeta: PAGES + 'Satu-Data-Tambora/data/resor/batas_resor_2026.geojson',
-  tenurial: PAGES + 'Satu-Data-Tambora/data/tenurial/ringkasan.json',
-  tenurialPeta: PAGES + 'Satu-Data-Tambora/data/tenurial/bidang.geojson'
+  resorAnalisis: HUB + 'data/resor/analisis.json',
+  resorKajian: HUB + 'data/resor/kajian_2026.json',
+  resorPeta: HUB + 'data/resor/batas_resor_2026.geojson',
+  tenurial: HUB + 'data/tenurial/ringkasan.json',
+  tenurialPeta: HUB + 'data/tenurial/bidang.geojson'
 };
 
 var BAWAAN = {
@@ -405,7 +408,8 @@ function bersihkanKonten_(daftar) {
 
 function ambilTeks_(url) {
   var token = PropertiesService.getScriptProperties().getProperty('GITHUB_TOKEN');
-  var m = token && /^https:\/\/kopluck8\.github\.io\/([^/]+)\/(.+)$/.exec(url);
+  var alamatRepo = url.indexOf(HUB) === 0 ? HUB_LAMA + url.slice(HUB.length) : url;
+  var m = token && /^https:\/\/kopluck8\.github\.io\/([^/]+)\/(.+)$/.exec(alamatRepo);
   if (m) {
     // Repo privat: baca lewat API GitHub dengan token (Script Properties GITHUB_TOKEN, izin baca isi repo).
     var jalur = m[2];
@@ -415,8 +419,13 @@ function ambilTeks_(url) {
     });
     if (r.getResponseCode() === 200) return r.getContentText('UTF-8');
   }
-  var res = UrlFetchApp.fetch(url, { muteHttpExceptions: true, followRedirects: true });
-  if (res.getResponseCode() !== 200) throw new Error('Gagal membaca ' + url + ' (HTTP ' + res.getResponseCode() + ')');
+  var res;
+  try { res = UrlFetchApp.fetch(url, { muteHttpExceptions: true, followRedirects: true }); } catch (e) { res = null; }
+  if ((!res || res.getResponseCode() !== 200) && alamatRepo !== url) {
+    // Domain sendiri bermasalah (DNS atau sertifikat): coba alamat GitHub Pages lama.
+    try { res = UrlFetchApp.fetch(alamatRepo, { muteHttpExceptions: true, followRedirects: true }); } catch (e) { /* dilaporkan di bawah */ }
+  }
+  if (!res || res.getResponseCode() !== 200) throw new Error('Gagal membaca ' + url + (res ? ' (HTTP ' + res.getResponseCode() + ')' : ''));
   return res.getContentText('UTF-8');
 }
 
