@@ -8,6 +8,8 @@
   if (!/^https:\/\/script\.google(usercontent)?\.com\/.+/.test(URL_API) && !/^https?:\/\/localhost[:/]/.test(URL_API)) return;
 
   var KUNCI_SESI = 'sdt-tanya-sesi';
+  // Gerbang masuk situs (assets/gerbang.js): bila aktif, login dan keluar diurus di sana dengan sesi yang sama.
+  var GERBANG = window.SDTGerbang && window.SDTGerbang.aktif ? window.SDTGerbang : null;
   var KUNCI_RIWAYAT = 'sdt-tanya-riwayat';
   var XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
 
@@ -138,6 +140,7 @@
   }
 
   function buka() {
+    if (GERBANG && !sesiSah()) { GERBANG.kunci('Sesi berakhir. Silakan masuk lagi.'); return; }
     panel.hidden = false;
     tombol.setAttribute('aria-expanded', 'true');
     document.body.classList.add('tanya-terbuka');
@@ -201,6 +204,7 @@
 
   function sesiBerakhir(pesan) {
     sesi = null;
+    if (GERBANG) { tutup(); GERBANG.kunci(pesan || 'Sesi berakhir. Silakan masuk lagi.'); return; }
     hapus(KUNCI_SESI);
     tampilkanMode();
     var g = $('tanyaGalatMasuk');
@@ -302,6 +306,7 @@
   tombol.addEventListener('click', function () { panel.hidden ? buka() : tutup(); });
   $('tanyaTutup').addEventListener('click', tutup);
   $('tanyaKeluar').addEventListener('click', function () {
+    if (GERBANG) { GERBANG.keluar(); return; }
     if (sesi) kirimApi({ aksi: 'keluar', token: sesi.token }, 15000).catch(function () { /* tetap keluar */ });
     sesi = null;
     riwayat = [];
@@ -310,6 +315,13 @@
     $('tanyaGalatMasuk').hidden = true;
     tampilkanMode();
     $('tanyaUser').focus();
+  });
+
+  // Masuk atau keluar lewat gerbang: muat ulang sesi dan riwayat.
+  window.addEventListener('sdt-sesi', function () {
+    sesi = baca(KUNCI_SESI);
+    if (!sesi) { riwayat = []; hapus(KUNCI_RIWAYAT, sessionStorage); }
+    if (!panel.hidden) { if (sesi) tampilkanMode(); else tutup(); }
   });
 
   $('tanyaMasuk').addEventListener('submit', function (e) {

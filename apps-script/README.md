@@ -77,7 +77,7 @@ Langkah bertanda 🔐 adalah **otorisasi Google**: muncul jendela izin dari Goog
 
 ## Akun pegawai
 
-Satu baris per pegawai di lembar **Akun**:
+Akun yang sama dipakai untuk masuk ke seluruh situs Satu Data Tambora dan panel Tanya Data. Satu baris per pegawai di lembar **Akun**:
 
 | Kolom | Isi |
 |---|---|

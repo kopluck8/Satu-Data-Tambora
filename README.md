@@ -99,6 +99,12 @@ Tab **Perlindungan Kawasan** memuat kartu *Penanganan Konflik Tenurial Karya Sar
 - **Tanpa identitas pribadi**: nama pengguna lahan, pihak yang menyewakan atau menjual, dan nilai transaksi tidak disimpan di repo ini. Rinciannya hanya ada di Laporan Pelaksanaan Kegiatan ST.1452.
 - **Pembaruan**: setelah pulbaket lanjutan, olah ulang isian pulbaket dan SHP bidang, lalu ganti keempat file di `data/tenurial/`. Halaman langsung memakai angka baru tanpa perubahan kode.
 
+## Login
+
+Situs ini, termasuk halaman `resor/` dan `tenurial/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
+
+> Gerbang ini menutup tampilan, bukan file. Selama repo dan GitHub Pages publik, file data (misalnya `data/resor/*.json`, `data/tenurial/*.geojson`) dan aplikasi lain di `kopluck8.github.io` tetap bisa dibuka langsung oleh siapa pun yang tahu alamatnya, dan isi repo terlihat di GitHub. Data yang benar-benar rahasia jangan disimpan di repo publik; sajikan lewat Apps Script yang memeriksa login. Halaman diberi `noindex` dan `robots.txt` agar tidak muncul di mesin pencari.
+
 ## Tanya Data (chatbot)
 
 Tombol **Tanya Data** di pojok kanan bawah membuka panel chat. Pegawai masuk dengan username dan password, lalu bisa bertanya bebas tentang data dashboard: SMART Patrol, RBM, Resor Pengelolaan, Laporan Kajian, areal terbakar, konflik tenurial, dan penerbangan drone. Bot bisa menghitung dan merekap, menyiapkan unduhan (CSV, Excel, GeoJSON), dan membuka kartu dashboard yang relevan. Angka di jawaban selalu dihitung dari data lewat alat, bukan dikarang AI.
@@ -124,6 +130,7 @@ assets/style.css                   tampilan
 assets/seni.js                     ikon dan ilustrasi otomatis (SVG)
 assets/pantauan.js                 angka langsung dari RBM, SMART, Simulasi API, dan analisis resor
 assets/tanya.js, tanya.css         panel chat Tanya Data
+assets/gerbang.js                  halaman masuk (login) untuk seluruh situs
 assets/foto/                       foto latar
 assets/img/                        logo
 data/sumber.js                     link Google Sheets dan URL Web App Tanya Data
