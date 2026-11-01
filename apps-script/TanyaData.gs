@@ -43,6 +43,7 @@ var SUMBER = {
 var BAWAAN = {
   PENYEDIA: 'gemini',                 // 'gemini' atau 'claude'
   MODEL_GEMINI: 'gemini-3.8-flash',
+  MODEL_GEMINI_CADANGAN: 'gemini-flash-lite-latest', // dipakai bila model utama sedang penuh; kosongkan untuk mematikan
   PIKIR_GEMINI: 'low',                // tingkat berpikir Gemini 3: minimal | low | medium | high (makin tinggi makin lambat)
   MODEL_CLAUDE: 'claude-opus-5-5',
   UPAYA_CLAUDE: 'medium',             // effort Claude: low | medium | high
@@ -315,6 +316,20 @@ function pakaiKuota_(sesi) {
   }
 }
 
+/** Mengembalikan satu pertanyaan yang gagal karena layanan AI, agar tidak memotong jatah pegawai. */
+function kembalikanKuota_(sesi) {
+  var kunci = LockService.getScriptLock();
+  kunci.waitLock(10000);
+  try {
+    var k = bacaKuota_();
+    k.total = Math.max(0, k.total - 1);
+    k.orang[sesi.u] = Math.max(0, (k.orang[sesi.u] || 0) - 1);
+    PropertiesService.getScriptProperties().setProperty('KUOTA', JSON.stringify(k));
+  } finally {
+    kunci.releaseLock();
+  }
+}
+
 function catatLog_(sesi, pertanyaan, alat, status, pakai, durasi) {
   try {
     var sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(LEMBAR_LOG);
@@ -370,6 +385,10 @@ function tanya_(sesi, m) {
     return { ok: true, jawaban: h.jawaban, aksi: h.aksi, sisa: sisaKuota_(sesi) };
   } catch (err) {
     catatLog_(sesi, pertanyaan, [], 'galat: ' + err.message, null, detik());
+    if (err.sibuk) {
+      try { kembalikanKuota_(sesi); } catch (e) { /* biarkan */ }
+      return { ok: false, galat: err.message + ' Jatah pertanyaan Anda tidak berkurang.', sisa: sisaKuota_(sesi) };
+    }
     throw err;
   }
 }
@@ -1009,7 +1028,20 @@ function promptSistem_(konten, posisi, sesi) {
 function jalankanAi_(pesan, konten, posisi, sesi) {
   var ctx = { sesi: sesi, konten: konten, aksi: [], alat: [], pakai: { masuk: 0, keluar: 0 }, mulai: Date.now() };
   var sistem = promptSistem_(konten, posisi, sesi);
-  var jawaban = atur_('PENYEDIA') === 'claude' ? putaranClaude_(sistem, pesan, ctx) : putaranGemini_(sistem, pesan, ctx);
+  var jawaban;
+  if (atur_('PENYEDIA') === 'claude') jawaban = putaranClaude_(sistem, pesan, ctx);
+  else {
+    var utama = atur_('MODEL_GEMINI'), cadangan = String(atur_('MODEL_GEMINI_CADANGAN') || '').trim();
+    try { jawaban = putaranGemini_(sistem, pesan, ctx, utama); }
+    catch (e) {
+      // Model utama penuh: ulangi pertanyaan dari awal dengan model cadangan (tanda tangan pikiran tidak dibawa antarmodel).
+      if (!e.sibuk || !cadangan || cadangan === utama) throw e;
+      console.warn('Beralih ke model cadangan ' + cadangan);
+      ctx.aksi = [];
+      ctx.alat.push('cadangan:' + cadangan);
+      jawaban = putaranGemini_(sistem, pesan, ctx, cadangan);
+    }
+  }
   return { jawaban: jawaban || 'Maaf, saya belum bisa menjawab. Coba ulangi dengan kalimat lain.', aksi: ctx.aksi, alat: ctx.alat, pakai: ctx.pakai };
 }
 
@@ -1018,12 +1050,26 @@ function harusMenjawab_(ctx, i) {
   return i >= MAKS_PUTARAN_ALAT || (i > 0 && Date.now() - ctx.mulai > Number(atur_('BATAS_DETIK')) * 1000);
 }
 
+/** Kode HTTP saat layanan AI penuh atau dibatasi; dicoba ulang lalu dialihkan ke model cadangan. */
+var KODE_SIBUK = [429, 500, 502, 503, 504, 529];
+var JEDA_COBA_ULANG = [2000, 6000];
+
 function panggil_(url, header, badan) {
-  var res = UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', headers: header, payload: JSON.stringify(badan), muteHttpExceptions: true });
-  var kode = res.getResponseCode(), teks = res.getContentText();
-  if (kode === 429) throw new Error('Layanan AI sedang sibuk atau kuota API habis. Coba beberapa saat lagi.');
-  if (kode >= 400) throw new Error('Layanan AI menolak permintaan (HTTP ' + kode + '): ' + teks.slice(0, 300));
-  return JSON.parse(teks);
+  for (var coba = 0; ; coba++) {
+    var res = UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', headers: header, payload: JSON.stringify(badan), muteHttpExceptions: true });
+    var kode = res.getResponseCode(), teks = res.getContentText();
+    if (KODE_SIBUK.indexOf(kode) >= 0) {
+      if (coba < JEDA_COBA_ULANG.length) { Utilities.sleep(JEDA_COBA_ULANG[coba]); continue; }
+      console.warn('AI sibuk HTTP ' + kode + ': ' + teks.slice(0, 300));
+      var e = new Error(kode === 429
+        ? 'Layanan AI sedang membatasi permintaan atau kuota API habis. Coba lagi beberapa saat lagi.'
+        : 'Layanan AI sedang penuh. Coba lagi beberapa saat lagi.');
+      e.sibuk = true;
+      throw e;
+    }
+    if (kode >= 400) throw new Error('Layanan AI menolak permintaan (HTTP ' + kode + '): ' + teks.slice(0, 300));
+    return JSON.parse(teks);
+  }
 }
 
 /* ---------- Gemini (generateContent + function calling) ---------- */
@@ -1040,10 +1086,10 @@ function skemaGemini_(s) {
   return o;
 }
 
-function putaranGemini_(sistem, pesan, ctx) {
+function putaranGemini_(sistem, pesan, ctx, model) {
   var kunci = PropertiesService.getScriptProperties().getProperty('GEMINI_API_KEY');
   if (!kunci) throw new Error('Kunci API Gemini belum diatur (menu Tanya Data → Atur kunci API).');
-  var model = atur_('MODEL_GEMINI');
+  model = model || atur_('MODEL_GEMINI');
   var url = 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent';
   var contents = pesan.map(function (p) { return { role: p.peran === 'bot' ? 'model' : 'user', parts: [{ text: p.teks }] }; });
   var badan = {

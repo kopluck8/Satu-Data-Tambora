@@ -116,6 +116,7 @@ Semua pengaturan punya nilai bawaan di bagian `BAWAAN` pada `TanyaData.gs`. Untu
 |---|---|---|
 | `PENYEDIA` | `gemini` | `gemini` atau `claude`. Bisa juga lewat menu **Pilih penyedia AI**. |
 | `MODEL_GEMINI` | `gemini-3.8-flash` | Model Gemini |
+| `MODEL_GEMINI_CADANGAN` | `gemini-flash-lite-latest` | Dipakai otomatis bila model utama sedang penuh. Kosongkan untuk mematikan. |
 | `PIKIR_GEMINI` | `low` | Seberapa dalam Gemini 3 berpikir: `minimal`, `low`, `medium`, `high`. Makin tinggi makin teliti tetapi makin lambat. |
 | `MODEL_CLAUDE` | `claude-opus-5-5` | Model Claude. `claude-haiku-5-5` lebih murah dan lebih cepat. |
 | `UPAYA_CLAUDE` | `medium` | Seberapa dalam Claude berpikir: `low`, `medium`, `high` |
@@ -134,6 +135,10 @@ Jalankan **Tanya Data → Uji kecepatan**. Jendela hasilnya menunjukkan lama mem
 
 - Membaca data lama (misalnya SMART lebih dari 20 detik): pastikan pemanasan data otomatis aktif.
 - AI lama: turunkan `PIKIR_GEMINI` ke `minimal`, atau pakai model yang lebih ringan.
+
+## Bila muncul "Layanan AI sedang penuh"
+
+Server Gemini kadang menolak permintaan saat sedang ramai (HTTP 503), terutama untuk model yang baru rilis dan di tier gratis. Skrip mencoba ulang dua kali (jeda 2 dan 6 detik), lalu mengulang pertanyaan dengan `MODEL_GEMINI_CADANGAN`. Bila keduanya tetap penuh, pegawai melihat pesan "Layanan AI sedang penuh" dan jatah pertanyaannya tidak berkurang. Bila sering terjadi, aktifkan penagihan (tier berbayar) atau ganti `MODEL_GEMINI` ke model yang lebih stabil.
 
 ## Memperbarui skrip
 
