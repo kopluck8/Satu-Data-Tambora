@@ -11,5 +11,11 @@
  * cadangan di folder data/konten/ (CSV).
  */
 window.SUMBER = {
-  GOOGLE_SHEETS: ""
+  GOOGLE_SHEETS: "",
+
+  /*
+   * TANYA DATA (chatbot): URL Aplikasi Web Apps Script (berakhiran /exec) dari apps-script/TanyaData.gs.
+   * Kosongkan untuk menyembunyikan tombol Tanya Data. Panduan pasang: apps-script/README.md.
+   */
+  TANYA_DATA: ""
 };

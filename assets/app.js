@@ -1045,6 +1045,20 @@
     document.addEventListener('keydown', tekanTombol);
   }
 
+  // Dibaca panel Tanya Data (assets/tanya.js): daftar isi hub dan posisi pengguna sekarang.
+  window.SDT = {
+    konten: function () {
+      if (!M) return [];
+      return M.item.map(function (x) {
+        var t = M.temaById[x.tema];
+        return { id: x.id, tema: x.tema, temaJudul: t ? t.judul : '', judul: x.judul, jenis: x.jenis, ket: x.ket };
+      });
+    },
+    posisi: function () {
+      return { tema: S.tampilan === 'pustaka' ? 'pustaka' : S.pilih, item: S.penampil ? S.penampil.item.id : '' };
+    }
+  };
+
   pasangPeristiwa();
   jalankanJam();
   pasangGulirHalaman();

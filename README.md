@@ -97,6 +97,16 @@ Tab **Perlindungan Kawasan** memuat kartu *Penanganan Konflik Tenurial Karya Sar
 - **Tanpa identitas pribadi**: nama pengguna lahan, pihak yang menyewakan atau menjual, dan nilai transaksi tidak disimpan di repo ini. Rinciannya hanya ada di Laporan Pelaksanaan Kegiatan ST.1452.
 - **Pembaruan**: setelah pulbaket lanjutan, olah ulang isian pulbaket dan SHP bidang, lalu ganti keempat file di `data/tenurial/`. Halaman langsung memakai angka baru tanpa perubahan kode.
 
+## Tanya Data (chatbot)
+
+Tombol **Tanya Data** di pojok kanan bawah membuka panel chat. Pegawai masuk dengan username dan password, lalu bisa bertanya bebas tentang data dashboard: SMART Patrol, RBM, Resor Pengelolaan, Laporan Kajian, areal terbakar, konflik tenurial, dan penerbangan drone. Bot bisa menghitung dan merekap, menyiapkan unduhan (CSV, Excel, GeoJSON), dan membuka kartu dashboard yang relevan. Angka di jawaban selalu dihitung dari data lewat alat, bukan dikarang AI.
+
+- **Backend** ada di [`apps-script/`](apps-script/): Google Apps Script yang menempel pada satu Google Sheets berisi akun pegawai dan log pertanyaan. Kunci API Gemini atau Claude disimpan di sana, tidak pernah di browser atau repo.
+- **Batas harian**: 20 pertanyaan per pegawai dan 600 untuk seluruh kantor, bisa diubah.
+- **Tombol baru tampil** setelah URL Web App diisi di `TANYA_DATA` pada [`data/sumber.js`](data/sumber.js).
+
+Panduan pemasangan, membuat akun pegawai, mengganti model, dan menambah dataset: [`apps-script/README.md`](apps-script/README.md).
+
 ## Foto
 
 Foto latar ada di `assets/foto/` (versi besar 1920 px dan versi `-kecil` 720 px untuk ubin dan kartu). Data EXIF, termasuk lokasi GPS, sudah dihapus. Kredit tampil di pojok sorotan dan diatur di kolom `kredit` tab `Tema`.
@@ -111,9 +121,10 @@ assets/app.js                      memuat isi dan menyusun tampilan
 assets/style.css                   tampilan
 assets/seni.js                     ikon dan ilustrasi otomatis (SVG)
 assets/pantauan.js                 angka langsung dari RBM, SMART, Simulasi API, dan analisis resor
+assets/tanya.js, tanya.css         panel chat Tanya Data
 assets/foto/                       foto latar
 assets/img/                        logo
-data/sumber.js                     link Google Sheets
+data/sumber.js                     link Google Sheets dan URL Web App Tanya Data
 data/konten/*.csv                  salinan cadangan isi (sama dengan tab spreadsheet)
 data/Konten_Satu_Data_Tambora.xlsx spreadsheet awal untuk diunggah ke Google Drive
 resor/                             halaman Resor Pengelolaan (ikhtisar, profil per resor, metode)
@@ -121,6 +132,7 @@ data/resor/                        batas resor 2026, isi Laporan Kajian, hasil a
 tools/resor/                       skrip analisis potensi dan ancaman per resor beserta ujinya
 tenurial/                          halaman Penanganan Konflik Tenurial Karya Sari dan So Tompo
 data/tenurial/                     rangkuman pulbaket ST.1452 tanpa identitas pribadi, peta bidang, areal terbakar, zonasi
+apps-script/                       backend Tanya Data (Google Apps Script) dan panduan pemasangannya
 .github/workflows/resor.yml        pembaruan analisis resor harian
 ```
 

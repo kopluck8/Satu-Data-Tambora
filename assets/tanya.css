@@ -1,0 +1,122 @@
+/* Tanya Data: tombol dan panel chatbot. Memakai token warna hub (style.css). */
+.tanya { --tanya-panel: rgba(12, 16, 26, .9); --tanya-balon: rgba(255, 255, 255, .08); }
+
+.tanya-tombol {
+  position: fixed; right: calc(20px + env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 80;
+  display: inline-flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px 0 18px;
+  border-radius: 999px; border: 1px solid rgba(255, 255, 255, .26); cursor: pointer;
+  background: rgba(20, 26, 40, .72); color: #fff; font-size: 15.5px; font-weight: 700;
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .45);
+  transition: transform .16s var(--pegas), background .16s ease;
+}
+.tanya-tombol .ikon { font-size: 22px; color: var(--aksen); }
+.tanya-tombol:hover { background: rgba(32, 40, 58, .86); transform: translateY(-1px); }
+.tanya-tombol:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+body.ada-penampil .tanya-tombol { width: 52px; padding: 0; justify-content: center; bottom: calc(18px + env(safe-area-inset-bottom)); }
+body.ada-penampil .tanya-tombol span { display: none; }
+body.tanya-terbuka .tanya-tombol { opacity: 0; pointer-events: none; }
+
+.tanya-panel {
+  position: fixed; right: calc(20px + env(safe-area-inset-right)); bottom: calc(20px + env(safe-area-inset-bottom)); z-index: 85;
+  width: min(440px, calc(100vw - 40px)); height: min(680px, calc(100vh - 110px));
+  display: flex; flex-direction: column; overflow: hidden;
+  border-radius: 22px; border: 1px solid var(--garis);
+  background: var(--tanya-panel); color: var(--teks);
+  backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .6);
+  opacity: 0; transform: translateY(14px) scale(.98); transform-origin: bottom right;
+  transition: opacity .18s ease, transform .22s var(--pegas);
+}
+.tanya-panel.tampil { opacity: 1; transform: none; }
+
+.tanya-kepala { display: flex; align-items: center; gap: 12px; padding: 14px 12px 14px 16px; border-bottom: 1px solid var(--garis); }
+.tanya-logo { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; background: rgba(255, 255, 255, .1); color: var(--aksen); font-size: 21px; flex: none; }
+.tanya-nama { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.tanya-nama strong { font-size: 16px; font-weight: 800; }
+.tanya-nama small { font-size: 12.5px; color: var(--teks-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tanya-ikon { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; border: 0; background: transparent; color: var(--teks-2); font-size: 20px; cursor: pointer; flex: none; }
+.tanya-ikon:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+.tanya-ikon:focus-visible, .tanya-chip:focus-visible, .tanya-aksi-tombol:focus-visible, .tanya-utama:focus-visible, .tanya-kirim:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* masuk */
+.tanya-masuk { display: flex; flex-direction: column; gap: 14px; padding: 22px 20px; overflow-y: auto; }
+.tanya-sambut { margin: 0 0 4px; color: var(--teks-2); font-size: 14.5px; line-height: 1.55; }
+.tanya-masuk label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--teks-2); }
+.tanya-masuk input {
+  height: 46px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--garis);
+  background: rgba(255, 255, 255, .06); color: #fff; font: inherit; font-size: 15.5px; font-weight: 500;
+}
+.tanya-masuk input:focus { outline: 2px solid var(--aksen); outline-offset: 1px; border-color: transparent; }
+.tanya-utama { height: 46px; border-radius: 999px; border: 0; background: #fff; color: #0a0d14; font-weight: 800; font-size: 15px; cursor: pointer; }
+.tanya-utama:disabled { opacity: .6; cursor: progress; }
+.tanya-galat { margin: 0; padding: 10px 12px; border-radius: 10px; background: rgba(255, 107, 107, .14); color: #ffb3b3; font-size: 13.5px; }
+.tanya-kecil { margin: 0; font-size: 12px; line-height: 1.5; color: var(--teks-3); }
+
+/* obrolan */
+.tanya-obrolan { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.tanya-isi { flex: 1; overflow-y: auto; padding: 16px 14px 8px; display: flex; flex-direction: column; gap: 10px; overscroll-behavior: contain; }
+.tanya-pesan { max-width: 92%; padding: 10px 14px; border-radius: 16px; font-size: 14.5px; line-height: 1.55; overflow-wrap: anywhere; }
+.tanya-pesan p { margin: 0 0 8px; }
+.tanya-pesan p:last-child, .tanya-pesan ul:last-child, .tanya-pesan ol:last-child { margin-bottom: 0; }
+.tanya-pesan ul, .tanya-pesan ol { margin: 0 0 8px; padding-left: 20px; }
+.tanya-pesan li { margin: 2px 0; }
+.tanya-pesan code { font-size: .92em; padding: 1px 5px; border-radius: 5px; background: rgba(255, 255, 255, .1); }
+.tanya-pesan strong { font-weight: 700; color: #fff; }
+.tanya-sub { font-weight: 800; }
+.tanya-pesan--user { align-self: flex-end; background: var(--aksen); color: #0a0d14; border-bottom-right-radius: 6px; font-weight: 500; }
+.tanya-pesan--bot { align-self: flex-start; background: var(--tanya-balon); border: 1px solid rgba(255, 255, 255, .08); border-bottom-left-radius: 6px; }
+.tanya-pesan--galat { background: rgba(255, 107, 107, .12); border-color: rgba(255, 107, 107, .3); color: #ffd0d0; }
+.tanya-tabel { overflow-x: auto; margin: 4px 0 8px; }
+.tanya-tabel table { border-collapse: collapse; font-size: 13px; min-width: 100%; }
+.tanya-tabel th, .tanya-tabel td { padding: 5px 8px; border-bottom: 1px solid rgba(255, 255, 255, .1); text-align: left; white-space: nowrap; }
+.tanya-tabel th { color: var(--teks-2); font-weight: 700; }
+
+.tanya-aksi { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+.tanya-aksi-tombol {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; text-align: left;
+  border-radius: 12px; border: 1px solid rgba(255, 255, 255, .2); background: rgba(255, 255, 255, .08);
+  color: #fff; font-size: 13.5px; font-weight: 600; cursor: pointer;
+}
+.tanya-aksi-tombol .ikon { font-size: 18px; color: var(--aksen); }
+.tanya-aksi-tombol small { display: block; font-weight: 500; color: var(--teks-3); font-size: 12px; }
+.tanya-aksi-tombol:hover { background: rgba(255, 255, 255, .15); }
+.tanya-aksi-tombol:disabled { opacity: .65; cursor: progress; }
+
+.tanya-tunggu { display: flex; align-items: center; gap: 10px; color: var(--teks-2); font-size: 13.5px; }
+.tanya-titik { display: inline-flex; gap: 4px; }
+.tanya-titik i { width: 6px; height: 6px; border-radius: 50%; background: var(--aksen); animation: tanya-denyut 1.2s infinite ease-in-out; }
+.tanya-titik i:nth-child(2) { animation-delay: .15s; }
+.tanya-titik i:nth-child(3) { animation-delay: .3s; }
+@keyframes tanya-denyut { 0%, 80%, 100% { opacity: .25; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+
+.tanya-saran { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 14px 8px; }
+.tanya-saran:empty { display: none; }
+.tanya-chip {
+  padding: 7px 12px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, .2); background: transparent;
+  color: var(--teks-2); font-size: 12.5px; font-weight: 600; cursor: pointer; text-align: left;
+}
+.tanya-chip:hover { background: rgba(255, 255, 255, .1); color: #fff; }
+
+.tanya-tulis { display: flex; align-items: flex-end; gap: 8px; margin: 0 12px; padding: 6px 6px 6px 14px; border-radius: 18px; border: 1px solid var(--garis); background: rgba(255, 255, 255, .06); }
+.tanya-tulis:focus-within { border-color: var(--aksen); }
+.tanya-tulis textarea {
+  flex: 1; min-height: 38px; max-height: 140px; padding: 9px 0; resize: none; border: 0; outline: 0;
+  background: transparent; color: #fff; font: inherit; font-size: 15px; line-height: 1.4;
+}
+.tanya-tulis textarea::placeholder { color: var(--teks-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tanya-kirim { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 0; background: #fff; color: #0a0d14; font-size: 19px; cursor: pointer; flex: none; }
+.tanya-kirim:disabled { opacity: .45; cursor: progress; }
+.tanya-kaki { padding: 8px 16px 12px; text-align: center; }
+.tanya-kaki:empty { padding: 0 0 12px; }
+
+@media (max-width: 600px) {
+  .tanya-tombol { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); height: 48px; padding: 0 18px 0 14px; font-size: 14.5px; }
+  .tanya-panel { inset: 0; right: 0; bottom: 0; width: 100%; height: 100%; height: 100dvh; border-radius: 0; border: 0; }
+  .tanya-pesan { max-width: 96%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tanya-panel, .tanya-tombol { transition: none; }
+  .tanya-titik i { animation: none; opacity: .7; }
+}
+@media print { .tanya { display: none; } }
