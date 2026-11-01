@@ -45,8 +45,8 @@ var BAWAAN = {
   MODEL_GEMINI: 'gemini-3.8-flash',
   MODEL_GEMINI_CADANGAN: 'gemini-flash-lite-latest', // dipakai bila model utama sedang penuh; kosongkan untuk mematikan
   PIKIR_GEMINI: 'low',                // tingkat berpikir Gemini 3: minimal | low | medium | high (makin tinggi makin lambat)
-  MODEL_CLAUDE: 'claude-opus-5-5',
-  UPAYA_CLAUDE: 'medium',             // effort Claude: low | medium | high
+  MODEL_CLAUDE: 'claude-haiku-5-5',   // cepat dan murah; claude-sonnet-5-5 atau claude-opus-5-5 lebih teliti tetapi lebih lambat
+  UPAYA_CLAUDE: 'low',                // effort Claude: low | medium | high (makin tinggi makin lambat)
   BATAS_HARIAN_TOTAL: 600,            // semua pegawai, per hari
   BATAS_HARIAN_ORANG: 20,             // per pegawai, per hari (bisa diubah per akun di sheet Akun)
   LAMA_SESI_JAM: 6,                   // maksimal 6 jam (batas CacheService)
@@ -1145,7 +1145,8 @@ function putaranClaude_(sistem, pesan, ctx) {
     max_tokens: 8000,
     system: sistem,
     tools: ALAT.map(function (a) { return { name: a.name, description: a.description, input_schema: a.params }; }),
-    output_config: { effort: atur_('UPAYA_CLAUDE') }
+    output_config: { effort: atur_('UPAYA_CLAUDE') },
+    cache_control: { type: 'ephemeral' } // cache otomatis: putaran alat berikutnya membaca ulang awalan yang sama dengan murah
   };
   // Cadangan otomatis di sisi server bila model menolak karena pengaman (berlaku untuk model Opus/Fable/Sonnet terbaru).
   if (/^claude-(opus-5|fable-5|sonnet-5-5)/.test(model)) {
