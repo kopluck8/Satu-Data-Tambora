@@ -99,62 +99,6 @@ Password tidak pernah disimpan apa adanya. Bila pegawai lupa, buat password baru
 
 Bagikan Sheets ini hanya ke pengelola. Siapa pun yang bisa mengedit Sheets bisa mengganti password orang lain dan membaca Log.
 
-## Kepegawaian (De-Bora)
-
-Skrip yang sama menyajikan data untuk tab **Kepegawaian** di hub (halaman [`kepegawaian/`](../kepegawaian/index.html)). Sumbernya spreadsheet **DE-BORA** yang dikelola dan diperbarui sendiri oleh bagian Kepegawaian. Skrip hanya membaca spreadsheet itu, tidak pernah mengubahnya.
-
-```
-Spreadsheet DE-BORA (bagian Kepegawaian)
-   │  dibaca oleh akun pemilik skrip (cukup akses Lihat)
-   ▼
-Apps Script ── olah: komposisi, formasi, kinerja, administrasi, pengingat tenggat, agenda
-   │  disimpan sementara 10 menit, hanya dikirim ke pegawai yang sudah masuk
-   ▼
-Halaman kepegawaian/ dan panel ringkas di ubin Kepegawaian
-```
-
-### Menyambungkan (sekali saja)
-
-1. 🔐 Pastikan akun Google pemilik skrip ini bisa membuka spreadsheet DE-BORA. Cara paling aman: bagian Kepegawaian membuka **Bagikan**, menambahkan email akun itu sebagai **Pelihat**, lalu mengubah **Akses umum** menjadi **Dibatasi**. DE-BORA berisi data pribadi (NIP, tanggal lahir, alamat asal), jadi sebaiknya tidak terbuka untuk "Siapa saja yang memiliki link".
-2. Tempel isi `TanyaData.gs` terbaru dan terbitkan versi baru (lihat *Memperbarui skrip*).
-3. 🔐 Di Sheets ini: **Tanya Data → Atur spreadsheet Kepegawaian (De-Bora)**, tempel link spreadsheet DE-BORA, lalu OK. Bila Google meminta izin, setujui. Jendela hasilnya menyebut nama spreadsheet, jumlah pegawai dan pengingat yang terbaca, serta tab yang gagal dibaca bila ada.
-4. Buka ubin **Kepegawaian** di dashboard.
-
-Link DE-BORA disimpan di Properti skrip `KEPEGAWAIAN_ID`, tidak di repo. Untuk melepas sambungan, jalankan menu yang sama dan kosongkan isiannya.
-
-### Tab yang dibaca
-
-Tab dikenali dari awal namanya, dan kolom dari judul atau isinya. Bagian Kepegawaian bebas menambah baris, menggeser kolom, atau membuat tab tahun baru (misalnya `KGB 2027`). Untuk tab bertahun, skrip memakai tahun berjalan, atau tahun terakhir sebelumnya bila tab tahun ini belum ada.
-
-| Tab di DE-BORA | Menjadi |
-|---|---|
-| `Sheet1` / `Daftar Pegawai` | Komposisi PNS, CPNS, PPPK, jenis kelamin, jabatan, golongan, umur, masa kerja, diklat fungsional. Pengingat pensiun (2 tahun ke depan) dan ulang tahun (7 hari). |
-| `Struktur Organisasi` | Sebaran pegawai per unit kerja |
-| `Peta Jabatan <tahun>` | Formasi: pegawai yang ada dan kebutuhan per unit dan jabatan |
-| `Jadwal …` | Agenda kenaikan pangkat, uji kompetensi, dan jadwal lain. Pengingat batas usulan. |
-| `KGB <tahun>`, `Belum Upload Dok…` | KGB per bulan. Pengingat KGB 90 hari ke depan dan berkas KGB yang belum lengkap. |
-| `PAK …`, `Upload PAK …` | Angka kredit cukup atau kurang untuk kenaikan pangkat dan jabatan, batas usulan, tenggat triwulan, unggahan SIMPEG |
-| `SKP <tahun>` | SKP per triwulan: sudah OK dan sudah diunggah |
-| `Kelengkapan Dokumen` | Kelengkapan dokumen per jenis |
-| `Cuti <tahun>` | Cuti per bulan dan jenis, sisa cuti tahunan. Pengingat pegawai yang akan cuti. |
-| `Pelatihan …` | Daftar pelatihan dan jumlah peserta |
-| tab berisi `IPASN` | Rata-rata indeks profesionalitas per dimensi dan kategori |
-| `Kendala Sikadir` | Laporan kendala presensi per bulan dan status |
-| `Aplikasi …` / `Daftar Laman` | Tautan aplikasi, pengumuman, dan daftar peraturan |
-
-Tanggal tanpa tahun, atau dari jadwal tahun lalu, digeser ke tahun berjalan dan ditandai *perkiraan*. Tab yang gagal dibaca dicatat di bagian *Catatan* halaman Kepegawaian; bagian lain tetap tampil.
-
-### Yang sampai ke browser
-
-- Angka olahan (jumlah, persentase, rata-rata), dan nama pegawai hanya untuk pengingat dan daftar tindak lanjut.
-- **Tidak dikirim**: NIP, tanggal lahir, tempat asal, agama, dan nilai per orang (IPASN, angka kredit).
-- Hanya pegawai yang sudah masuk yang menerima data. Link DE-BORA, tombol **Buka spreadsheet**, dan tombol **Muat ulang** hanya untuk akun `admin`.
-- Untuk membuka halaman ini bagi admin saja, isi Properti skrip `KEPEGAWAIAN_UNTUK` = `admin`.
-
-### Pembaruan
-
-Hasil olahan disimpan sementara 10 menit (`SIMPAN_KEPEGAWAIAN_MENIT`), jadi perubahan di DE-BORA tampil paling lambat 10 menit kemudian. Admin bisa menekan **Muat ulang** di halaman Kepegawaian untuk membaca ulang saat itu juga. Bila pemanasan data otomatis aktif, data kepegawaian ikut dibaca ulang tiap 15 menit. **Tanya Data → Uji baca Kepegawaian** menunjukkan lama membaca dan ringkasan hasilnya.
-
 ## Batas harian dan biaya
 
 - **Per pegawai**: 20 pertanyaan per hari (bisa diubah per akun di kolom `Batas harian`).
@@ -182,9 +126,6 @@ Semua pengaturan punya nilai bawaan di bagian `BAWAAN` pada `TanyaData.gs`. Untu
 | `SIMPAN_CACHE_MENIT` | `30` | Lama data sumber disimpan sementara sebelum dibaca ulang |
 | `BATAS_DETIK` | `150` | Setelah sekian detik, AI berhenti membaca data dan langsung menjawab dengan yang sudah ada |
 | `GITHUB_TOKEN` | kosong | Diperlukan bila repo data dijadikan privat (lihat di bawah) |
-| `KEPEGAWAIAN_ID` | kosong | ID spreadsheet DE-BORA. Diisi lewat menu **Atur spreadsheet Kepegawaian (De-Bora)**. |
-| `KEPEGAWAIAN_UNTUK` | `semua` | `semua` pegawai yang sudah masuk, atau `admin` saja |
-| `SIMPAN_KEPEGAWAIAN_MENIT` | `10` | Lama hasil olahan Kepegawaian disimpan sebelum DE-BORA dibaca ulang |
 
 Kunci API tersimpan di properti `GEMINI_API_KEY` atau `ANTHROPIC_API_KEY`. Jangan menulis kunci di kode atau di repo.
 
@@ -234,4 +175,3 @@ Tambahkan alamat sumbernya di `SUMBER`, bungkus pembacaan dengan `denganCache_` 
 - Bot tidak menuliskan koordinat persis satwa dilindungi di teks jawaban. Unduhan data SMART tetap berisi koordinat lengkap untuk pegawai yang masuk.
 - Isi data diperlakukan sebagai data. Teks di catatan patroli yang berbunyi seperti perintah tidak dijalankan.
 - Lembar Log menyimpan setiap pertanyaan beserta username-nya, alat yang dipakai, jumlah token, dan lamanya.
-- Data Kepegawaian tidak masuk ke AI dan tidak ada di repo. Browser hanya menerima angka olahan dan nama untuk pengingat (lihat *Kepegawaian (De-Bora)*).

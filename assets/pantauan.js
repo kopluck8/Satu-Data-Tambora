@@ -1,6 +1,7 @@
 /* Angka terkini dari aplikasi lain di kopluck8.github.io (capaian RBM, observasi SMART Patrol,
-   areal terbakar) dan dari olahan harian repo ini (potensi dan ancaman Resor Pengelolaan).
-   Tiap sumber boleh gagal; dashboard tetap tampil tanpa angka itu. */
+   areal terbakar), dari olahan harian repo ini (potensi dan ancaman Resor Pengelolaan), dan
+   ringkasan kepegawaian dari spreadsheet DE-BORA. Tiap sumber boleh gagal; dashboard tetap
+   tampil tanpa angka itu. */
 (function () {
   'use strict';
 
@@ -200,10 +201,15 @@
     });
   }
 
-  /* ---------- Kepegawaian: olahan spreadsheet DE-BORA lewat Tanya Data, hanya setelah login ---------- */
+  /* ---------- Kepegawaian: spreadsheet DE-BORA dibaca dan diolah di browser (assets/pegawai.js) ---------- */
+  var DASAR = (function () {
+    var el = document.currentScript, src = el && el.src || '';
+    return src ? src.replace(/assets\/pantauan\.js(\?.*)?$/, '') : '';
+  })();
   function tungguSesi() {
+    // Tanpa login (Tanya Data belum diatur) langsung jalan; dengan login, tunggu sampai pegawai masuk.
     var G = window.SDTGerbang;
-    if (!G || !G.aktif) return Promise.reject(new Error('Login belum aktif'));
+    if (!G || !G.aktif) return Promise.resolve(null);
     var s = G.sesi();
     if (s) return Promise.resolve(s);
     return new Promise(function (ok) {
@@ -219,12 +225,13 @@
     return m ? Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())) / 864e5) : null;
   }
   function kepegawaian() {
-    var url = ((window.SUMBER || {}).TANYA_DATA || '').trim();
-    return tungguSesi().then(function (s) {
-      return ambilPost(url, { aksi: 'kepegawaian', token: s.token }, 90000);
-    }).then(function (j) {
-      if (!j.ok) throw new Error(j.galat || 'Data kepegawaian tidak tersedia');
-      var d = j.data, P = d.pegawai || {};
+    return tungguSesi().then(function () {
+      return window.DataPegawai ? null : muatSkrip(DASAR + 'assets/pegawai.js');
+    }).then(function () {
+      if (!window.DataPegawai) throw new Error('assets/pegawai.js tidak termuat');
+      return window.DataPegawai.ambil();
+    }).then(function (h) {
+      var d = h.data, P = d.pegawai || {};
       var dekat = (d.pengingat || []).map(function (x) {
         var akhir = x.sampai || x.tanggal, h0 = hariKe(x.tanggal), h1 = hariKe(akhir);
         return { judul: x.judul, jenis: x.jenis, tanggal: x.tanggal, hari: h0 !== null && h0 < 0 && h1 >= 0 ? h1 : h0, berlangsung: h0 !== null && h0 < 0 && h1 >= 0, orang: (x.orang || []).length || x.jumlah || 0 };
@@ -237,15 +244,6 @@
         terdekat: dekat.slice(0, 4)
       };
     });
-  }
-  function ambilPost(url, badan, ms) {
-    var ctrl = window.AbortController ? new AbortController() : null;
-    var t = ctrl ? setTimeout(function () { ctrl.abort(); }, ms) : null;
-    return fetch(url, { method: 'POST', body: JSON.stringify(badan), redirect: 'follow', signal: ctrl ? ctrl.signal : undefined }).then(function (r) {
-      if (t) clearTimeout(t);
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    }, function (e) { if (t) clearTimeout(t); throw e; });
   }
 
   var SUMBER = { rbm: rbm, smart: smart, karhut: karhut, resor: resor, kepegawaian: kepegawaian };

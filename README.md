@@ -24,7 +24,7 @@ Semua isi (tema, kartu, teks, foto, link) dibaca dari satu spreadsheet dengan ti
 
 | Tab | Isi |
 |---|---|
-| `Pengaturan` | Nama dashboard, sambutan, teks pengelola |
+| `Pengaturan` | Nama dashboard, sambutan, teks pengelola, link spreadsheet DE-BORA (kunci `kepegawaian`) |
 | `Tema` | Satu baris per ubin tema: judul, ringkasan, ikon, warna, foto latar |
 | `Item` | Satu baris per kartu: tema, kelompok, judul, jenis, link, keterangan |
 
@@ -75,7 +75,7 @@ Tema dengan `id` berikut menampilkan angka terkini. Jangan ganti kelima `id` ini
 | `smart` | Jumlah observasi patroli tahun berjalan dan kategori terbanyak | [Dashboard_SMART_TNGunungTambora](https://github.com/kopluck8/Dashboard_SMART_TNGunungTambora) |
 | `karhut` | Areal terbakar musim ini dari delineasi manual, per resor dan per delineasi; bila belum ada delineasi, estimasi Sentinel-2 | [Simulasi-API-Tambora](https://github.com/kopluck8/Simulasi-API-Tambora) (`status/areal_terbakar.json`, cadangan `status/landscape_terbaru.json`) |
 | `resor` | Jumlah resor, skor potensi tiap resor, dan ancaman tertinggi di kawasan | `data/resor/analisis.json` di repo ini (lihat *Resor Pengelolaan*) |
-| `kepegawaian` | Jumlah pegawai per status dan pengingat tenggat terdekat | Spreadsheet DE-BORA bagian Kepegawaian, dibaca Apps Script Tanya Data setelah login (lihat *Kepegawaian (De-Bora)*) |
+| `kepegawaian` | Jumlah pegawai per status dan pengingat tenggat terdekat | Spreadsheet DE-BORA bagian Kepegawaian, dibaca langsung oleh browser setelah login (lihat *Kepegawaian (De-Bora)*) |
 
 Bila salah satu sumber tidak terbaca, kartunya menulis *Belum bisa dimuat* dan bagian lain tetap jalan.
 
@@ -111,7 +111,14 @@ Tab **Kepegawaian** membuka halaman [`kepegawaian/`](kepegawaian/index.html), ha
 - **Agenda**: jadwal kepegawaian per bulan.
 - **Komposisi**, **Formasi**, **Kinerja** (SKP, IPASN rata-rata, PAK, diklat, pelatihan), **Administrasi** (dokumen, KGB, cuti, presensi), dan **Tautan** (aplikasi kepegawaian, pengumuman, peraturan).
 
-Datanya tidak disimpan di repo ini. Apps Script Tanya Data membaca DE-BORA, mengolahnya, lalu mengirim ke browser hanya angka olahan dan nama untuk pengingat, dan hanya kepada pegawai yang sudah masuk. NIP, tanggal lahir, asal, agama, dan nilai per orang tidak dikirim. Perubahan di DE-BORA tampil paling lambat 10 menit kemudian. Cara menyambungkan DE-BORA (sekali saja): [`apps-script/README.md`](apps-script/README.md#kepegawaian-de-bora).
+Pengingat berlaku umum untuk semua pegawai, tidak per akun. Browser membaca DE-BORA langsung lewat link (CSV gviz Google Sheets, seperti isi dashboard) dan mengolahnya di perangkat dengan [`assets/pegawai.js`](assets/pegawai.js). Tidak ada Apps Script dan tidak ada izin Google tambahan.
+
+- **Menyambungkan (sekali saja)**: di Sheet konten, tab `Pengaturan`, tambahkan baris dengan `kunci` = `kepegawaian` dan `nilai` = link DE-BORA. Link itu sengaja tidak disimpan di repo ini.
+- **Akses DE-BORA** harus tetap *Siapa saja yang memiliki link: Pelihat*. Bila diubah menjadi terbatas, halaman menampilkan pesan bahwa spreadsheet tidak bisa dibuka.
+- **Nama tab** dikenali dari namanya: `sheet1`, `Daftar Pegawai TNT`, `Struktur Organisasi`, `Peta Jabatan Revisi <tahun>`, `Jadwal Kepegawaian`, `KGB <tahun>`, `Belum Upload DOk KGB`, `PAK`, `Upload PAK SIMPEG`, `SKP <tahun>`, `Kelengkapan Dokumen`, `Cuti <tahun>`, `Pelatihan`, `Nilai IPASN`, `Bukti kendala Sikadir`, `Aplikasi Kepegawaian`. Untuk tab bertahun dipakai tahun berjalan, atau tahun terakhir sebelumnya bila tab tahun ini belum dibuat (misalnya `KGB 2027` otomatis terbaca begitu dibuat). Kolom dikenali dari judul atau isinya, jadi bagian Kepegawaian bebas menambah baris atau menggeser kolom. Tab yang tidak ditemukan disebut di bagian catatan halaman. Tab `sheet1` sebaiknya tetap paling kiri, karena lewat link tab paling kiri tidak bisa dibedakan dari tab yang tidak ada.
+- **Batas cara link**: tautan yang ditanam di sel (misalnya file materi atau SK) tidak ikut terbaca, hanya teksnya. Tautan yang ditulis sebagai teks `https://…` tetap bisa dibuka. Pada kolom yang isinya bercampur angka dan teks, Google kadang mengosongkan jenis yang lebih sedikit.
+- **Pembaruan**: hasil olahan disimpan di tab browser selama 10 menit (sessionStorage `sdt-pegawai-v1`, dihapus saat keluar). Tombol **Muat ulang** membaca ulang DE-BORA saat itu juga.
+- **Privasi**: tidak ada data pegawai di repo ini. Halaman hanya menampilkan angka olahan dan nama untuk pengingat; NIP, tanggal lahir, asal, agama, dan nilai per orang tidak ditampilkan. Namun, karena browser membaca tab DE-BORA apa adanya, siapa pun yang memegang link DE-BORA tetap bisa membuka isi lengkapnya. Link itu tersimpan di Sheet konten yang juga bisa dibaca lewat link.
 
 ## Login
 
@@ -142,9 +149,10 @@ index.html                         kerangka halaman
 assets/app.js                      memuat isi dan menyusun tampilan
 assets/style.css                   tampilan
 assets/seni.js                     ikon dan ilustrasi otomatis (SVG)
-assets/pantauan.js                 angka langsung dari RBM, SMART, Simulasi API, dan analisis resor
+assets/pantauan.js                 angka langsung dari RBM, SMART, Simulasi API, analisis resor, dan DE-BORA
 assets/tanya.js, tanya.css         panel chat Tanya Data
 assets/gerbang.js                  halaman masuk (login) untuk seluruh situs
+assets/pegawai.js                  membaca dan mengolah spreadsheet DE-BORA di browser (tab Kepegawaian)
 assets/foto/                       foto latar
 assets/img/                        logo
 data/sumber.js                     link Google Sheets dan URL Web App Tanya Data
@@ -154,7 +162,7 @@ resor/                             halaman Resor Pengelolaan (ikhtisar, profil p
 data/resor/                        batas resor 2026, isi Laporan Kajian, hasil analisis, tempat foto
 tools/resor/                       skrip analisis potensi dan ancaman per resor beserta ujinya
 tenurial/                          halaman Penanganan Konflik Tenurial Karya Sari dan So Tompo
-kepegawaian/                       halaman Kepegawaian De-Bora (data dari Apps Script setelah login, tidak disimpan di repo)
+kepegawaian/                       halaman Kepegawaian De-Bora (DE-BORA dibaca langsung oleh browser, tidak disimpan di repo)
 data/tenurial/                     rangkuman pulbaket ST.1452 tanpa identitas pribadi, peta bidang, areal terbakar, zonasi
 apps-script/                       backend Tanya Data (Google Apps Script) dan panduan pemasangannya
 .github/workflows/resor.yml        pembaruan analisis resor harian

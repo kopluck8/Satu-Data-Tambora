@@ -10,6 +10,7 @@
 
   var KUNCI_SESI = 'sdt-tanya-sesi';
   var KUNCI_RIWAYAT = 'sdt-tanya-riwayat';
+  var KUNCI_PEGAWAI = 'sdt-pegawai-v1'; // olahan DE-BORA (assets/pegawai.js)
   var URL_API = ((window.SUMBER || {}).TANYA_DATA || '').trim();
   var aktif = /^https:\/\/script\.google(usercontent)?\.com\/.+/.test(URL_API) || /^https?:\/\/localhost[:/]/.test(URL_API);
   var skrip = document.currentScript;
@@ -172,6 +173,7 @@
   /** Tutup halaman dan minta masuk lagi (sesi habis atau ditolak server). */
   function kunci(pesan) {
     hapus(KUNCI_SESI);
+    hapus(KUNCI_PEGAWAI, window.sessionStorage);
     sesiAwal = null;
     akar.classList.add('sdt-terkunci');
     var a = document.querySelector('.sdt-akun');
@@ -189,6 +191,7 @@
     }
     hapus(KUNCI_SESI);
     hapus(KUNCI_RIWAYAT, window.sessionStorage);
+    hapus(KUNCI_PEGAWAI, window.sessionStorage);
     location.reload();
   }
 

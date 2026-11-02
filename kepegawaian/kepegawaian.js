@@ -1,10 +1,9 @@
 /* Kepegawaian De-Bora: ringkasan data pegawai dan pengingat tenggat dari spreadsheet DE-BORA bagian Kepegawaian.
-   Data tidak disimpan di repo. Halaman meminta data ke layanan Tanya Data (Apps Script, aksi "kepegawaian")
-   dengan token sesi login, jadi hanya pegawai yang sudah masuk yang menerima datanya. */
+   Data tidak disimpan di repo. Spreadsheet dibaca langsung dari browser dan diolah di perangkat oleh
+   assets/pegawai.js; halaman ini hanya menampilkan hasil olahannya (tanpa NIP, tanggal lahir, asal, atau agama). */
 (function () {
   'use strict';
 
-  var URL_API = ((window.SUMBER || {}).TANYA_DATA || '').trim();
   var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   var BULAN3 = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   var IKON = {
@@ -560,7 +559,7 @@
       catatanOlah(D);
     $('#kepalaData').textContent = 'Data per ' + waktuOlah(D.diolah);
     $('#kakiData').textContent = 'Sumber: ' + (D.judul || 'spreadsheet DE-BORA') + (D.lembar ? ' · ' + D.lembar + ' tab dibaca' : '') + ' · diolah ' + waktuOlah(D.diolah) + '.';
-    $('#tombolMuat').hidden = S.peran !== 'admin';
+    $('#tombolMuat').hidden = false;
     pasangSaring();
     amatiBagian();
     if (location.hash.length > 1) {
@@ -603,10 +602,7 @@
       b.remove();
     });
     $('#tombolCetak').addEventListener('click', function () { window.print(); });
-    $('#tombolMuat').addEventListener('click', function () {
-      var s = window.SDTGerbang && window.SDTGerbang.sesi();
-      if (s) muat(s, true);
-    });
+    $('#tombolMuat').addEventListener('click', function () { muatBila(true); });
   }
 
   function amatiBagian() {
@@ -651,56 +647,53 @@
     $('#isi').innerHTML = '<div class="galat" role="status"><h2>' + esc(judul) + '</h2><p>' + teks + '</p>' +
       (tombol ? '<p style="margin-top:14px"><button type="button" class="tombol" id="cobaLagi">' + ikon('jam') + '<span>Coba lagi</span></button></p>' : '') + '</div>';
     var c = $('#cobaLagi');
-    if (c) c.addEventListener('click', function () { var s = window.SDTGerbang && window.SDTGerbang.sesi(); if (s) muat(s); });
+    if (c) c.addEventListener('click', function () { muatBila(false); });
   }
 
-  function apiPost(badan, ms) {
-    var ctrl = window.AbortController ? new AbortController() : null;
-    var t = ctrl ? setTimeout(function () { ctrl.abort(); }, ms) : null;
-    return fetch(URL_API, { method: 'POST', body: JSON.stringify(badan), redirect: 'follow', signal: ctrl ? ctrl.signal : undefined })
-      .then(function (r) { if (t) clearTimeout(t); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); },
-        function (e) { if (t) clearTimeout(t); throw new Error(e && e.name === 'AbortError' ? 'Server terlalu lama menjawab.' : 'Tidak tersambung ke server. Periksa koneksi internet.'); });
+  // Gerbang login aktif: muat hanya bila sudah masuk. Tanpa gerbang: langsung muat.
+  function muatBila(segarkan) {
+    var G = window.SDTGerbang;
+    if (!G || !G.aktif) return muat(null, segarkan);
+    var s = G.sesi();
+    if (s) muat(s, segarkan);
   }
 
   function muat(s, segarkan) {
     var nomor = ++S.nomor;
-    S.peran = s.peran || '';
+    S.peran = s && s.peran || '';
     if (!S.d || segarkan) $('#isi').innerHTML = '<div class="memuat" role="status"><span class="memuat-cincin" aria-hidden="true"></span>' +
-      (segarkan ? 'Membaca ulang spreadsheet…' : 'Memuat data kepegawaian…') + '</div>';
-    apiPost({ aksi: 'kepegawaian', token: s.token, segarkan: !!segarkan }, 120000).then(function (j) {
+      (segarkan ? 'Membaca ulang spreadsheet…' : 'Membaca spreadsheet DE-BORA…') + '</div>';
+    if (!window.DataPegawai) { pesan('Data kepegawaian belum bisa dimuat', 'Berkas assets/pegawai.js tidak termuat.', true); return; }
+    window.DataPegawai.ambil({ segarkan: !!segarkan }).then(function (h) {
       if (nomor !== S.nomor) return;
-      if (j.masukLagi) { if (window.SDTGerbang) window.SDTGerbang.kunci(j.galat || 'Sesi berakhir. Silakan masuk lagi.'); return; }
-      if (!j.ok) {
-        // Web App masih versi lama (belum punya aksi kepegawaian).
-        throw new Error(/aksi tidak dikenal/i.test(j.galat || '')
-          ? 'Layanan Tanya Data belum memuat fitur Kepegawaian. Admin: tempel TanyaData.gs terbaru, lalu terbitkan versi baru (Terapkan → Kelola deployment → Versi baru).'
-          : (j.galat || 'Data belum bisa dimuat.'));
-      }
-      S.d = j.data;
+      S.d = h.data;
+      // Link spreadsheet hanya ditampilkan untuk admin.
+      if (S.peran === 'admin') S.d.urlSumber = 'https://docs.google.com/spreadsheets/d/' + h.id + '/edit';
       render();
     }).catch(function (e) {
       if (nomor !== S.nomor) return;
-      pesan('Data kepegawaian belum bisa dimuat', esc(e.message), true);
+      var teks = e && e.message || 'Data belum bisa dimuat.';
+      if (e && e.belumDiatur) pesan('Spreadsheet DE-BORA belum disambungkan', esc(teks), false);
+      else pesan('Data kepegawaian belum bisa dimuat', esc(teks) + ' Pastikan DE-BORA bisa dibuka dengan akses <b>Siapa saja yang memiliki link: Pelihat</b>.', true);
     });
   }
 
   function kosongkan() {
-    // Keluar atau sesi habis: data pribadi dihapus dari halaman.
+    // Keluar atau sesi habis: hasil olahan dihapus dari halaman dan dari perangkat.
     S.nomor++;
     S.d = null;
+    if (window.DataPegawai) window.DataPegawai.hapus();
     $('#isi').innerHTML = '<div class="memuat" role="status">Masuk untuk melihat data kepegawaian.</div>';
     $('#kepalaData').textContent = '';
     $('#kakiData').textContent = '';
+    $('#tombolMuat').hidden = true;
   }
 
   function mulai() {
     pasangTip();
     pasangAksi();
     var G = window.SDTGerbang;
-    if (!URL_API || !G || !G.aktif) {
-      pesan('Belum tersambung', 'Halaman ini membaca spreadsheet Kepegawaian lewat layanan Tanya Data, dan hanya untuk pegawai yang sudah masuk. Isi alamat <b>TANYA_DATA</b> di <code>data/sumber.js</code>.');
-      return;
-    }
+    if (!G || !G.aktif) { muat(null); return; }
     window.addEventListener('sdt-sesi', function (e) { if (e.detail) muat(e.detail); else kosongkan(); });
     var s = G.sesi();
     if (s) muat(s); else kosongkan();
