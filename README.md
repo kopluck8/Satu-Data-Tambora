@@ -10,9 +10,9 @@ Domain diatur lewat file `CNAME` di repo ini dan DNS di Hostinger. Alamat lama `
 
 Tampilannya meniru layar utama konsol PS5:
 
-- **Deretan ubin** di atas: Beranda, satu ubin per tema (Profil Kawasan, Resor Pengelolaan, SMART Patrol, RBM, Kebakaran Hutan, Perlindungan Kawasan, Wisata & Pelayanan, Aset BMN), dan Pustaka. Memilih ubin mengganti foto latar, sorotan, dan baris kartu di bawahnya.
+- **Deretan ubin** di atas: Beranda, satu ubin per tema (Profil Kawasan, Resor Pengelolaan, SMART Patrol, RBM, Kebakaran Hutan, Perlindungan Kawasan, Wisata & Pelayanan, Aset BMN, Kepegawaian), dan Pustaka. Memilih ubin mengganti foto latar, sorotan, dan baris kartu di bawahnya.
 - **Sorotan tema**: judul, ringkasan, tombol **Buka** untuk isi utama tema, dan menu **⋯** (buka di tab baru, lihat kode di GitHub, salin tautan).
-- **Angka langsung** dari aplikasi lain: capaian RBM, observasi SMART Patrol, areal terbakar, dan skor potensi tiap resor.
+- **Angka langsung** dari aplikasi lain: capaian RBM, observasi SMART Patrol, areal terbakar, skor potensi tiap resor, serta jumlah pegawai dan pengingat kepegawaian terdekat.
 - **Pustaka**: semua isi dalam satu daftar, dengan pencarian dan saringan jenis/tema.
 - **Penampil layar penuh**: aplikasi, peta, grafik, slide, dan file Drive dibuka di dalam dashboard. Setiap isi punya alamat sendiri (misalnya `#/smart/dashboard-data-smart-patrol`) yang bisa dibagikan.
 
@@ -67,7 +67,7 @@ Link `github.com` selalu dibuka di tab baru. File Google yang tidak dibagikan ke
 
 ## Angka langsung
 
-Tema dengan `id` berikut menampilkan angka terkini. Jangan ganti keempat `id` ini.
+Tema dengan `id` berikut menampilkan angka terkini. Jangan ganti kelima `id` ini.
 
 | `id` | Angka | Sumber |
 |---|---|---|
@@ -75,6 +75,7 @@ Tema dengan `id` berikut menampilkan angka terkini. Jangan ganti keempat `id` in
 | `smart` | Jumlah observasi patroli tahun berjalan dan kategori terbanyak | [Dashboard_SMART_TNGunungTambora](https://github.com/kopluck8/Dashboard_SMART_TNGunungTambora) |
 | `karhut` | Areal terbakar musim ini dari delineasi manual, per resor dan per delineasi; bila belum ada delineasi, estimasi Sentinel-2 | [Simulasi-API-Tambora](https://github.com/kopluck8/Simulasi-API-Tambora) (`status/areal_terbakar.json`, cadangan `status/landscape_terbaru.json`) |
 | `resor` | Jumlah resor, skor potensi tiap resor, dan ancaman tertinggi di kawasan | `data/resor/analisis.json` di repo ini (lihat *Resor Pengelolaan*) |
+| `kepegawaian` | Jumlah pegawai per status dan pengingat tenggat terdekat | Spreadsheet DE-BORA bagian Kepegawaian, dibaca Apps Script Tanya Data setelah login (lihat *Kepegawaian (De-Bora)*) |
 
 Bila salah satu sumber tidak terbaca, kartunya menulis *Belum bisa dimuat* dan bagian lain tetap jalan.
 
@@ -101,9 +102,20 @@ Tab **Perlindungan Kawasan** memuat kartu *Penanganan Konflik Tenurial Karya Sar
 - **Tanpa identitas pribadi**: nama pengguna lahan, pihak yang menyewakan atau menjual, dan nilai transaksi tidak disimpan di repo ini. Rinciannya hanya ada di Laporan Pelaksanaan Kegiatan ST.1452.
 - **Pembaruan**: setelah pulbaket lanjutan, olah ulang isian pulbaket dan SHP bidang, lalu ganti keempat file di `data/tenurial/`. Halaman langsung memakai angka baru tanpa perubahan kode.
 
+## Kepegawaian (De-Bora)
+
+Tab **Kepegawaian** membuka halaman [`kepegawaian/`](kepegawaian/index.html), hasil olahan spreadsheet **DE-BORA** yang dikelola dan diperbarui sendiri oleh bagian Kepegawaian. Bagian Kepegawaian tetap bekerja di spreadsheet seperti biasa; halaman ini tidak menampilkan spreadsheet, melainkan ringkasannya:
+
+- **Ringkasan**: jumlah pegawai (PNS, CPNS, PPPK), laki-laki dan perempuan, pengingat 30 hari ke depan, formasi terisi, diklat fungsional, rata-rata umur dan masa kerja.
+- **Pengingat**: semua tenggat yang mendekat, diurutkan dari yang terdekat dan bisa disaring per jenis: KGB, pensiun, jadwal kenaikan pangkat dan uji kompetensi, batas usulan PAK, SKP triwulan, cuti, pelatihan, ulang tahun, serta hal yang belum lengkap (dokumen, berkas KGB, unggahan SIMPEG, kendala presensi Sikadir). Hitungan hari mengikuti tanggal di perangkat.
+- **Agenda**: jadwal kepegawaian per bulan.
+- **Komposisi**, **Formasi**, **Kinerja** (SKP, IPASN rata-rata, PAK, diklat, pelatihan), **Administrasi** (dokumen, KGB, cuti, presensi), dan **Tautan** (aplikasi kepegawaian, pengumuman, peraturan).
+
+Datanya tidak disimpan di repo ini. Apps Script Tanya Data membaca DE-BORA, mengolahnya, lalu mengirim ke browser hanya angka olahan dan nama untuk pengingat, dan hanya kepada pegawai yang sudah masuk. NIP, tanggal lahir, asal, agama, dan nilai per orang tidak dikirim. Perubahan di DE-BORA tampil paling lambat 10 menit kemudian. Cara menyambungkan DE-BORA (sekali saja): [`apps-script/README.md`](apps-script/README.md#kepegawaian-de-bora).
+
 ## Login
 
-Situs ini, termasuk halaman `resor/` dan `tenurial/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
+Situs ini, termasuk halaman `resor/`, `tenurial/`, dan `kepegawaian/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
 
 > Gerbang ini menutup tampilan, bukan file. Selama repo dan GitHub Pages publik, file data (misalnya `data/resor/*.json`, `data/tenurial/*.geojson`) dan aplikasi lain di `kopluck8.github.io` tetap bisa dibuka langsung oleh siapa pun yang tahu alamatnya, dan isi repo terlihat di GitHub. Data yang benar-benar rahasia jangan disimpan di repo publik; sajikan lewat Apps Script yang memeriksa login. Halaman diberi `noindex` dan `robots.txt` agar tidak muncul di mesin pencari.
 
@@ -142,6 +154,7 @@ resor/                             halaman Resor Pengelolaan (ikhtisar, profil p
 data/resor/                        batas resor 2026, isi Laporan Kajian, hasil analisis, tempat foto
 tools/resor/                       skrip analisis potensi dan ancaman per resor beserta ujinya
 tenurial/                          halaman Penanganan Konflik Tenurial Karya Sari dan So Tompo
+kepegawaian/                       halaman Kepegawaian De-Bora (data dari Apps Script setelah login, tidak disimpan di repo)
 data/tenurial/                     rangkuman pulbaket ST.1452 tanpa identitas pribadi, peta bidang, areal terbakar, zonasi
 apps-script/                       backend Tanya Data (Google Apps Script) dan panduan pemasangannya
 .github/workflows/resor.yml        pembaruan analisis resor harian

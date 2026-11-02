@@ -200,7 +200,55 @@
     });
   }
 
-  var SUMBER = { rbm: rbm, smart: smart, karhut: karhut, resor: resor };
+  /* ---------- Kepegawaian: olahan spreadsheet DE-BORA lewat Tanya Data, hanya setelah login ---------- */
+  function tungguSesi() {
+    var G = window.SDTGerbang;
+    if (!G || !G.aktif) return Promise.reject(new Error('Login belum aktif'));
+    var s = G.sesi();
+    if (s) return Promise.resolve(s);
+    return new Promise(function (ok) {
+      window.addEventListener('sdt-sesi', function tunggu(e) {
+        if (!e.detail) return;
+        window.removeEventListener('sdt-sesi', tunggu);
+        ok(e.detail);
+      });
+    });
+  }
+  function hariKe(iso) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''), n = new Date();
+    return m ? Math.round((Date.UTC(+m[1], +m[2] - 1, +m[3]) - Date.UTC(n.getFullYear(), n.getMonth(), n.getDate())) / 864e5) : null;
+  }
+  function kepegawaian() {
+    var url = ((window.SUMBER || {}).TANYA_DATA || '').trim();
+    return tungguSesi().then(function (s) {
+      return ambilPost(url, { aksi: 'kepegawaian', token: s.token }, 90000);
+    }).then(function (j) {
+      if (!j.ok) throw new Error(j.galat || 'Data kepegawaian tidak tersedia');
+      var d = j.data, P = d.pegawai || {};
+      var dekat = (d.pengingat || []).map(function (x) {
+        var akhir = x.sampai || x.tanggal, h0 = hariKe(x.tanggal), h1 = hariKe(akhir);
+        return { judul: x.judul, jenis: x.jenis, tanggal: x.tanggal, hari: h0 !== null && h0 < 0 && h1 >= 0 ? h1 : h0, berlangsung: h0 !== null && h0 < 0 && h1 >= 0, orang: (x.orang || []).length || x.jumlah || 0 };
+      }).filter(function (x) { return x.hari !== null && x.hari >= 0; }).sort(function (a, b) { return a.hari - b.hari; });
+      return {
+        total: P.total || 0,
+        status: (P.status || []).map(function (x) { return x.nama + ' ' + x.n; }).join(' · '),
+        diolah: d.diolah,
+        dalam30: dekat.filter(function (x) { return x.hari <= 30; }).length,
+        terdekat: dekat.slice(0, 4)
+      };
+    });
+  }
+  function ambilPost(url, badan, ms) {
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var t = ctrl ? setTimeout(function () { ctrl.abort(); }, ms) : null;
+    return fetch(url, { method: 'POST', body: JSON.stringify(badan), redirect: 'follow', signal: ctrl ? ctrl.signal : undefined }).then(function (r) {
+      if (t) clearTimeout(t);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }, function (e) { if (t) clearTimeout(t); throw e; });
+  }
+
+  var SUMBER = { rbm: rbm, smart: smart, karhut: karhut, resor: resor, kepegawaian: kepegawaian };
   var janji = {};
 
   window.PANTAUAN = {

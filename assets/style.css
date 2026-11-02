@@ -310,6 +310,8 @@ main { flex: 1; display: flex; flex-direction: column; }
 .kolom-sumbu { display: flex; justify-content: space-between; margin-top: 6px; font-size: 11.5px; color: var(--teks-3); }
 .stat-catatan a { color: var(--teks-2); text-underline-offset: 3px; }
 .pantau-gagal { font-size: 14px; line-height: 1.5; color: var(--teks-2); }
+.batang li.ingat-ringkas { grid-template-columns: minmax(0, 1fr) auto; }
+.ingat-ringkas .batang-nilai { white-space: nowrap; }
 
 .pantau--ringkas { width: min(640px, 100%); }
 .pantau--ringkas > .stat-kecil { margin-top: 0; text-shadow: 0 1px 8px rgba(0, 0, 0, .6); }

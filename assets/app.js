@@ -378,6 +378,20 @@
         daftarBatang('Skor potensi (1–4)', d.perResor, function (r) { return fmt(r.nilai, 2); }, 4) +
         '<p class="stat-catatan">Ancaman tertinggi di kawasan: ' + esc(d.ancaman) + ' · diolah ' + esc(tanggal(d.diperbarui)) + ' dari Laporan Kajian dan SMART Patrol</p></div>';
     },
+    kepegawaian: function (d) {
+      var halaman = M.item.filter(function (x) { return /^kepegawaian\//.test(x.url); })[0];
+      var buka = halaman ? ' · <a href="' + esc(hrefItem(halaman, 'kepegawaian')) + '"' + atributLuar(halaman) + '>Buka dashboard</a>' : '';
+      var hari = function (x) { return x.hari === 0 ? (x.berlangsung ? 'berakhir hari ini' : 'hari ini') : x.hari === 1 ? 'besok' : (x.berlangsung ? 'berakhir ' : '') + x.hari + ' hari lagi'; };
+      return '<div class="panel-kaca"><p class="stat-label">Pegawai Balai TN Tambora</p>' +
+        '<p class="stat-nilai">' + fmt(d.total) + '<small> orang</small></p>' +
+        '<p class="stat-sub">' + esc(d.status) + '</p>' +
+        '<p class="stat-kecil">Pengingat terdekat' + (d.dalam30 ? ' · ' + d.dalam30 + ' dalam 30 hari' : '') + '</p>' +
+        (d.terdekat.length ? '<ul class="batang">' + d.terdekat.map(function (x) {
+          return '<li class="ingat-ringkas"><span class="batang-nama" title="' + esc(x.judul) + '">' + esc(x.judul) + (x.orang ? ' (' + x.orang + ')' : '') + '</span>' +
+            '<span class="batang-nilai">' + esc(hari(x)) + '</span></li>';
+        }).join('') + '</ul>' : '<p class="stat-sub">Tidak ada tenggat dalam waktu dekat.</p>') +
+        '<p class="stat-catatan">Dari spreadsheet DE-BORA bagian Kepegawaian · data per ' + esc(tanggal(d.diolah, true)) + buka + '</p></div>';
+    },
     karhut: function (d) {
       var manual = d.sumber === 'delineasi';
       var persen = d.luasKawasan ? fmt(d.terbakar / d.luasKawasan * 100, 1) + '% luas kawasan' : '';
