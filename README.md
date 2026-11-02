@@ -28,9 +28,11 @@ Semua isi (tema, kartu, teks, foto, link) dibaca dari satu spreadsheet dengan ti
 | `Tema` | Satu baris per ubin tema: judul, ringkasan, ikon, warna, foto latar |
 | `Item` | Satu baris per kartu: tema, kelompok, judul, jenis, link, keterangan |
 
+Spreadsheet yang dipakai sekarang: [Konten Satu Data Tambora](https://docs.google.com/spreadsheets/d/10YLAl0fgiLHScrToPyOLGLidSajFUiKJ6bSj516Naa0/edit) (tersambung sejak 2 November 2026). Perubahan di sana tampil di dashboard tanpa commit apa pun.
+
 Tab `Panduan` di spreadsheet menjelaskan setiap kolom. Arahkan kursor ke judul kolom untuk melihat catatannya.
 
-### Menyambungkan spreadsheet (sekali saja)
+### Menyambungkan spreadsheet baru (sekali saja)
 
 1. Unduh [`data/Konten_Satu_Data_Tambora.xlsx`](data/Konten_Satu_Data_Tambora.xlsx).
 2. Unggah ke Google Drive, buka, lalu **File → Simpan sebagai Google Spreadsheet**.

@@ -11,7 +11,7 @@
  * cadangan di folder data/konten/ (CSV).
  */
 window.SUMBER = {
-  GOOGLE_SHEETS: "",
+  GOOGLE_SHEETS: "https://docs.google.com/spreadsheets/d/10YLAl0fgiLHScrToPyOLGLidSajFUiKJ6bSj516Naa0/edit",
 
   /*
    * TANYA DATA (chatbot): URL Aplikasi Web Apps Script (berakhiran /exec) dari apps-script/TanyaData.gs.
