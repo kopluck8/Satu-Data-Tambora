@@ -564,7 +564,9 @@
     var b = $('ubin-' + id);
     if (opsi.fokus && b) b.focus({ preventScroll: true });
     gulirUbin(b);
-    if (opsi.alamat !== false) gantiAlamat(id === 'beranda' ? '#/' : '#/' + id);
+    // Ubin Pustaka di Beranda tidak memakai #/pustaka: alamat itu milik tampilan Pustaka,
+    // dan tautan "Buka Pustaka" ke alamat yang sama tidak memicu hashchange.
+    if (opsi.alamat !== false) gantiAlamat(id === 'beranda' || id === 'pustaka' ? '#/' : '#/' + id);
     if (!S.penampil) judulHalaman(id === 'beranda' ? '' : t.judul);
   }
 
@@ -612,7 +614,7 @@
   }
   function alamatSekarang() {
     if (S.tampilan === 'pustaka') return '#/pustaka';
-    return S.pilih === 'beranda' ? '#/' : '#/' + S.pilih;
+    return S.pilih === 'beranda' || S.pilih === 'pustaka' ? '#/' : '#/' + S.pilih;
   }
 
   function tampilkan(v) {
@@ -995,6 +997,13 @@
     });
 
     document.addEventListener('click', function (e) {
+      // Tautan ke alamat yang sedang aktif tidak memicu hashchange; terapkan rutenya langsung.
+      var tautan = e.target.closest('a[href^="#/"]:not([data-pilih])');
+      if (tautan && M && !e.defaultPrevented && !e.metaKey && !e.ctrlKey && !e.shiftKey && tautan.getAttribute('href') === location.hash) {
+        e.preventDefault();
+        terapkanRute(true);
+        return;
+      }
       var el = e.target.closest('[data-pilih], [data-menu], [data-geser], [data-salin], [data-jenis], [data-tema]');
       var menu = $('menuLain');
       if (!menu.hidden && !e.target.closest('#menuLain') && !e.target.closest('[data-menu]')) tutupMenu(false);
