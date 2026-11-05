@@ -1041,10 +1041,16 @@ function jalankanAi_(pesan, konten, posisi, sesi) {
   if (atur_('PENYEDIA') === 'claude') jawaban = putaranClaude_(sistem, pesan, ctx);
   else {
     var utama = atur_('MODEL_GEMINI'), cadangan = String(atur_('MODEL_GEMINI_CADANGAN') || '').trim();
-    try { jawaban = putaranGemini_(sistem, pesan, ctx, utama); }
-    catch (e) {
+    var cache = CacheService.getScriptCache(), kunciSibuk = 'sibuk:' + utama;
+    // Model utama baru saja penuh: langsung pakai cadangan selama 10 menit, tanpa menunggu percobaan ulang yang pasti gagal.
+    var lewati = cadangan && cadangan !== utama && cache.get(kunciSibuk);
+    try {
+      if (lewati) { var e0 = new Error('Model utama sedang penuh'); e0.sibuk = true; throw e0; }
+      jawaban = putaranGemini_(sistem, pesan, ctx, utama);
+    } catch (e) {
       // Model utama penuh: ulangi pertanyaan dari awal dengan model cadangan (tanda tangan pikiran tidak dibawa antarmodel).
       if (!e.sibuk || !cadangan || cadangan === utama) throw e;
+      if (!lewati) cache.put(kunciSibuk, '1', 600);
       console.warn('Beralih ke model cadangan ' + cadangan);
       ctx.aksi = [];
       ctx.alat.push('cadangan:' + cadangan);

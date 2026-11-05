@@ -138,7 +138,7 @@ Jalankan **Tanya Data → Uji kecepatan**. Jendela hasilnya menunjukkan lama mem
 
 ## Bila muncul "Layanan AI sedang penuh"
 
-Server Gemini kadang menolak permintaan saat sedang ramai (HTTP 503), terutama untuk model yang baru rilis dan di tier gratis. Skrip mencoba ulang dua kali (jeda 2 dan 6 detik), lalu mengulang pertanyaan dengan `MODEL_GEMINI_CADANGAN`. Bila keduanya tetap penuh, pegawai melihat pesan "Layanan AI sedang penuh" dan jatah pertanyaannya tidak berkurang. Bila sering terjadi, aktifkan penagihan (tier berbayar) atau ganti `MODEL_GEMINI` ke model yang lebih stabil.
+Server Gemini kadang menolak permintaan saat sedang ramai (HTTP 503), terutama untuk model yang baru rilis dan di tier gratis. Skrip mencoba ulang dua kali (jeda 2 dan 6 detik), lalu mengulang pertanyaan dengan `MODEL_GEMINI_CADANGAN`. Setelah itu model utama dilewati selama 10 menit, jadi pertanyaan berikutnya langsung dijawab model cadangan tanpa menunggu percobaan ulang. Bila keduanya tetap penuh, pegawai melihat pesan "Layanan AI sedang penuh" dan jatah pertanyaannya tidak berkurang. Bila sering terjadi, aktifkan penagihan (tier berbayar) atau ganti `MODEL_GEMINI` ke model yang lebih stabil.
 
 ## Memperbarui skrip
 
