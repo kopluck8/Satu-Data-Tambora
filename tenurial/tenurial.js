@@ -279,6 +279,7 @@
     var baru = L.geoJSON({ type: 'FeatureCollection', features: S.bidang.features.filter(function (f) { return f.properties.baru; }) },
       { pane: 'sorot', interactive: false, style: { color: '#f0cf7e', weight: 2.8, opacity: 1, fill: false } }).addTo(map);
     S.lapis = { bidang: bidang, baru: baru };
+    S.sembunyi = {};
     map.fitBounds(bidang.getBounds(), { padding: [24, 24] });
     S.blokBatas = {};
     S.r.blok.forEach(function (b, i) {
@@ -292,17 +293,24 @@
     var kontrol = L.control.layers(dasar, { 'Bidang garapan': bidang, 'Pembukaan baru 2026': baru }, { collapsed: true }).addTo(map);
     L.control.scale({ imperial: false }).addTo(map);
     S.map = map;
+    S.kontrol = kontrol;
+    pasangKeterangan(map);
 
     ambil(DATA + 'terbakar.geojson').then(function (g) {
       var rd = L.svg({ pane: 'arsir' });
       var lap = L.geoJSON(g, { pane: 'arsir', renderer: rd, interactive: false, style: { color: '#ff7a6b', weight: .9, opacity: .7, fillColor: 'url(#arsir-api)', fillOpacity: 1 } }).addTo(map);
       pasangArsir(rd);
       kontrol.addOverlay(lap, 'Areal terbakar 2026');
+      S.lapis.api = lap;
+      S.luasApi = g.features.reduce(function (a, f) { return a + (Number(f.properties.luas_ha) || 0); }, 0);
+      isiKeterangan();
     }).catch(noop);
     ambil(BATAS_RESOR).then(function (g) {
       g.features = g.features.filter(function (f) { return f.properties.nama === 'Doropeti' || f.properties.nama === 'Doro Tabe'; });
       var lap = L.geoJSON(g, { pane: 'sorot', interactive: false, style: { color: '#e8e2c8', weight: 1.6, opacity: .75, dashArray: '8 6', fill: false } }).addTo(map);
       kontrol.addOverlay(lap, 'Batas resor 2026');
+      S.lapis.resor = lap;
+      isiKeterangan();
     }).catch(noop);
     ambil(DATA + 'zonasi.geojson').then(function (g) {
       var lap = L.geoJSON(g, {
@@ -311,7 +319,100 @@
         onEachFeature: function (f, l) { l.bindTooltip('<b>' + esc(f.properties.zona) + '</b>', { sticky: true, className: 'tip-peta' }); }
       });
       kontrol.addOverlay(lap, 'Zonasi');
+      S.lapis.zonasi = lap;
+      S.zonaAda = {};
+      g.features.forEach(function (f) { S.zonaAda[f.properties.zona] = 1; });
+      isiKeterangan();
     }).catch(noop);
+    map.on('overlayadd overlayremove', isiKeterangan);
+  }
+
+  /* ---------- menu keterangan di dalam peta ---------- */
+  // Penjelasan setiap warna dan lapisan dari data (ringkasan.json, bidang.geojson, terbakar.geojson, zonasi.geojson);
+  // setiap baris bisa diketuk untuk menampilkan atau menyembunyikan isinya di peta.
+  var URUT_ZONA = ['Zona Inti', 'Zona Rimba', 'Zona Pemanfaatan', 'Zona Tradisional', 'Zona Rehabilitasi', 'Zona Khusus'];
+  function pasangKeterangan(map) {
+    var Ket = L.Control.extend({
+      options: { position: 'topleft' },
+      onAdd: function () {
+        var d = L.DomUtil.create('div', 'ket leaflet-bar');
+        var buka = window.matchMedia && window.matchMedia('(min-width: 900px)').matches;
+        d.innerHTML = '<button type="button" class="ket-tombol" aria-expanded="' + buka + '" aria-controls="ketIsi">' + ikon('info') + '<span>Keterangan</span></button>' +
+          '<div class="ket-isi" id="ketIsi"' + (buka ? '' : ' hidden') + '></div>';
+        L.DomEvent.disableClickPropagation(d);
+        L.DomEvent.disableScrollPropagation(d);
+        d.querySelector('.ket-tombol').addEventListener('click', function () {
+          var isi = d.querySelector('.ket-isi'), b = this, terbuka = isi.hidden;
+          isi.hidden = !terbuka;
+          b.setAttribute('aria-expanded', String(terbuka));
+        });
+        d.addEventListener('click', function (e) {
+          var t = e.target.closest('[data-ket]');
+          if (!t) return;
+          var v = t.getAttribute('data-ket');
+          if (v.indexOf('status:') === 0) aturStatus(v.slice(7), !!S.sembunyi[v.slice(7)]);
+          else {
+            var lap = S.lapis[v];
+            if (!lap) return;
+            if (map.hasLayer(lap)) map.removeLayer(lap); else map.addLayer(lap);
+          }
+          isiKeterangan();
+        });
+        return d;
+      }
+    });
+    S.ket = new Ket().addTo(map);
+    // Panel tidak melebihi tinggi peta (menyisakan tombol zoom dan skala).
+    var tinggi = function () { var el = document.getElementById('ketIsi'); if (el) el.style.maxHeight = Math.max(160, map.getSize().y - 150) + 'px'; };
+    map.on('resize', tinggi);
+    tinggi();
+    isiKeterangan();
+  }
+  function aturStatus(k, tampil) {
+    S.sembunyi[k] = !tampil;
+    S.bidang.features.forEach(function (f) {
+      if (f.properties.status !== k) return;
+      var l = S.indeks[f.properties.kode];
+      if (tampil) S.lapis.bidang.addLayer(l); else S.lapis.bidang.removeLayer(l);
+    });
+  }
+  function isiKeterangan() {
+    var el = document.getElementById('ketIsi');
+    if (!el || !S.r) return;
+    var map = S.map, st = S.r.status, fs = S.bidang.features;
+    var hitung = function (fn) { var n = 0, a = 0; fs.forEach(function (f) { if (fn(f.properties)) { n++; a += f.properties.luas || 0; } }); return { n: n, ha: a }; };
+    var aktif = function (k) { return S.lapis[k] && map && map.hasLayer(S.lapis[k]); };
+    var baris = function (kunci, on, simbol, judul, sub) {
+      return '<button type="button" class="ket-baris" data-ket="' + kunci + '" aria-pressed="' + on + '" title="' + (on ? 'Sembunyikan' : 'Tampilkan') + ' di peta">' +
+        '<i class="ket-simbol ' + simbol.k + '"' + (simbol.s ? ' style="' + simbol.s + '"' : '') + '></i>' +
+        '<span><b>' + judul + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span><span class="ket-mata" aria-hidden="true">' + (on ? '●' : '○') + '</span></button>';
+    };
+    var html = '<div class="ket-grup"><p class="ket-judul">Status bidang <span>' + S.r.total.n + ' bidang · ' + ha(S.r.total.ha) + '</span></p>' +
+      URUT.map(function (k) {
+        var on = !S.sembunyi[k] && aktif('bidang');
+        return baris('status:' + k, on, { k: 's-' + k, s: 'background:' + WARNA[k] + ';border-color:' + WARNA[k] }, NAMA[k] + ' · ' + st[k].n,
+          ha(st[k].ha) + ' · ' + esc(st[k].rinci || ARTI[k]));
+      }).join('') + '</div>';
+    var baru = hitung(function (p) { return p.baru; }), api = hitung(function (p) { return p.terbakar > 0; }), ganda = hitung(function (p) { return p.ganda; });
+    var tb = S.r.terbakar || {};
+    html += '<div class="ket-grup"><p class="ket-judul">Ciri bidang</p>' +
+      baris('baru', aktif('baru'), { k: 'baru' }, 'Pembukaan baru 2026 · ' + baru.n, ha(baru.ha) + ' · bergaris tepi emas') +
+      '<div class="ket-baris ket-baris--info"><i class="ket-simbol api-kecil"></i><span><b>Beririsan areal terbakar · ' + api.n + '</b><small>' +
+        fmt(tb.ha != null ? tb.ha : 0, 2) + ' ha irisan (' + fmt(tb.persen || 0, 1) + '% luas bidang di blok terdampak)</small></span></div>' +
+      (ganda.n ? '<div class="ket-baris ket-baris--info"><i class="ket-simbol ganda"></i><span><b>Keterangan pengguna ganda · ' + ganda.n + '</b><small>satu bidang diakui lebih dari satu pengguna</small></span></div>' : '') +
+      '</div>';
+    html += '<div class="ket-grup"><p class="ket-judul">Lapisan</p>' +
+      (S.lapis.api ? baris('api', aktif('api'), { k: 'api' }, 'Areal terbakar 2026', fmt(S.luasApi, 1) + ' ha di sekitar bidang · delineasi per ' + tgl(tb.pembaruan)) : '') +
+      (S.lapis.resor ? baris('resor', aktif('resor'), { k: 'resor' }, 'Batas resor 2026', 'Resor Doropeti dan Doro Tabe') : '') +
+      (S.lapis.zonasi ? baris('zonasi', aktif('zonasi'), { k: 'zona' }, 'Zonasi taman nasional', 'garis warna menurut zona') +
+        '<ul class="ket-zona">' + URUT_ZONA.filter(function (z) { return S.zonaAda[z]; }).map(function (z) {
+          var b = S.r.zona.filter(function (x) { return 'Zona ' + x.nama === z; })[0];
+          return '<li><i style="border-color:' + (ZONA_WARNA[z] || '#cfd8c8') + '"></i>' + esc(z) + (b ? ' <span class="redup">' + b.n + ' bidang</span>' : '') + '</li>';
+        }).join('') + '</ul>' : '') +
+      '</div>';
+    var k = S.r.kegiatan || {};
+    html += '<p class="ket-sumber">Pulbaket ' + esc(k.st || '') + ', ' + esc(periode(k.mulai, k.selesai)) + '. Batas bidang adalah delineasi lahan terbuka dari citra, luasnya indikatif.</p>';
+    el.innerHTML = html;
   }
 
   /* ---------- interaksi ---------- */
@@ -350,6 +451,7 @@
       if (!b || !S.map) return;
       var l = S.indeks[b.getAttribute('data-kode')];
       if (!l) return;
+      if (!S.lapis.bidang.hasLayer(l)) { aturStatus(l.feature.properties.status, true); isiKeterangan(); }
       $('#peta').scrollIntoView({ behavior: 'smooth', block: 'start' });
       S.map.flyToBounds(l.getBounds(), { maxZoom: 17, padding: [60, 60], duration: .8 });
       if (S.terbuka && S.terbuka !== l) S.terbuka.closeTooltip();
