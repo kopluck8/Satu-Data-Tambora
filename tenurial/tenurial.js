@@ -240,13 +240,15 @@
       fmt(p.luas, 2) + ' ha · ' + swatch(p.status) + (p.pengguna ? ' · ' + p.pengguna + ' pengguna' : '') +
       (p.ganda ? '<br>Keterangan pengguna ganda' : '') +
       (p.terbakar > 0 ? '<br>Beririsan areal terbakar 2026: ' + fmt(p.terbakar, 2) + ' ha' : '') +
-      (p.baru ? '<span class="baru">' + esc(p.baru) + '</span>' : '') + daftarOrang(p.orang);
+      (p.tutupan || p.catatan ? '<br>' + esc([p.tutupan, p.catatan].filter(Boolean).join(' · ')) : '') +
+      (p.baru ? '<span class="baru">' + esc(p.baru) + '</span>' : '') + daftarOrang(p.orang) +
+      (p.pengaruh ? '<span class="orang"><span><b>Pihak berpengaruh</b>' + esc(p.pengaruh.join(', ')) + '</span></span>' : '');
   }
   function daftarOrang(o) {
     if (!o || !o.length) return '';
     return '<span class="orang">' + o.map(function (x) {
       return '<span><b>' + esc(x.nama || 'Pengguna belum diketahui') + '</b>' +
-        [x.riwayat, x.menyewakan ? 'disewakan/dijual oleh ' + x.menyewakan : '', x.tahun ? 'sejak ' + x.tahun : '', x.ket].filter(Boolean).map(esc).join(' · ') + '</span>';
+        [x.alamat ? 'alamat ' + x.alamat : '', x.riwayat, x.menyewakan ? 'disewakan/dijual oleh ' + x.menyewakan : '', x.tahun ? 'sejak ' + x.tahun : '', x.ket].filter(Boolean).map(esc).join(' · ') + '</span>';
     }).join('') + '</span>';
   }
   function gaya(f) {
@@ -345,7 +347,7 @@
         var d = L.DomUtil.create('div', 'ket leaflet-bar');
         var buka = window.matchMedia && window.matchMedia('(min-width: 900px)').matches;
         d.innerHTML = '<button type="button" class="ket-tombol" aria-expanded="' + buka + '" aria-controls="ketIsiWadah">' + ikon('info') + '<span>Keterangan</span></button>' +
-          '<div class="ket-isi" id="ketIsiWadah"' + (buka ? '' : ' hidden') + '><label class="ket-cari"><span>Cari nama atau kode lahan</span>' +
+          '<div class="ket-isi" id="ketIsiWadah"' + (buka ? '' : ' hidden') + '><label class="ket-cari"><span>Cari nama, alamat, atau kode lahan</span>' +
           '<input type="search" id="ketCari" placeholder="mis. Frengki atau L003" autocomplete="off"></label><ul class="ket-hasil" id="ketHasil"></ul><div id="ketIsi"></div></div>';
         L.DomEvent.disableClickPropagation(d);
         L.DomEvent.disableScrollPropagation(d);
@@ -385,7 +387,8 @@
     if (!t) { ul.innerHTML = ''; return; }
     var hasil = S.bidang.features.filter(function (f) {
       var p = f.properties;
-      return normal(p.kode).indexOf(t) >= 0 || (p.orang || []).some(function (o) { return normal(o.nama).indexOf(t) >= 0 || normal(o.menyewakan).indexOf(t) >= 0; });
+      return normal(p.kode).indexOf(t) >= 0 || (p.orang || []).some(function (o) { return [o.nama, o.menyewakan, o.alamat].some(function (v) { return normal(v).indexOf(t) >= 0; }); }) ||
+        (p.pengaruh || []).some(function (v) { return normal(v).indexOf(t) >= 0; });
     }).slice(0, 30);
     ul.innerHTML = hasil.length ? hasil.map(function (f) {
       var p = f.properties, nm = (p.orang || []).map(function (o) { return o.nama + (o.menyewakan ? ' (dari ' + o.menyewakan + ')' : ''); }).join('; ');
