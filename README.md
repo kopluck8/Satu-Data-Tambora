@@ -99,7 +99,7 @@ Foto profil resor diatur di [`data/resor/foto.json`](data/resor/foto.json). Seti
 Tab **Perlindungan Kawasan** memuat kartu *Penanganan Konflik Tenurial Karya Sari dan So Tompo* yang membuka halaman [`tenurial/`](tenurial/index.html): rangkuman hasil pengumpulan bahan keterangan (pulbaket) penggunaan lahan dalam SMART Patrol berdasarkan Surat Tugas Nomor ST.1452/T.41/TU/DIPA/10/2026 (14–18 Oktober 2026). Isinya peta 146 bidang garapan, status identifikasi pengguna per blok dan lokasi, asal pengguna, sewa dan jual beli lahan, pembukaan baru 2026, irisan dengan areal terbakar 2026, rekomendasi tindak lanjut, dan metode.
 
 - **Data** ada di `data/tenurial/`: `ringkasan.json` (angka agregat), `bidang.geojson` (bidang L001–L146 dengan blok, resor, lokasi, zona, luas, status identifikasi, jumlah pengguna, dan luas irisan areal terbakar), `terbakar.geojson` (poligon areal terbakar 2026 yang beririsan dengan atau berjarak hingga 1 km dari bidang), dan `zonasi.geojson` (zonasi di sekitar kedua blok). Batas resor diambil dari `data/resor/batas_resor_2026.geojson`.
-- **Tanpa identitas pribadi**: nama pengguna lahan, pihak yang menyewakan atau menjual, dan nilai transaksi tidak disimpan di repo ini. Rinciannya hanya ada di Laporan Pelaksanaan Kegiatan ST.1452.
+- **Nama pengguna lahan dan pihak yang menyewakan/menjual** disimpan di `bidang.geojson` (properti `orang`: nama, riwayat, yang menyewakan, tahun aktif, keterangan) atas permintaan Balai, dari `join_rambah.xlsx`. Alamat, nama pihak berpengaruh, dan nilai transaksi tidak disimpan. Ingat: file ini bisa dibuka siapa saja yang tahu alamatnya, karena repo dan GitHub Pages publik.
 - **Pembaruan**: setelah pulbaket lanjutan, olah ulang isian pulbaket dan SHP bidang, lalu ganti keempat file di `data/tenurial/`. Halaman langsung memakai angka baru tanpa perubahan kode.
 
 ## Kepegawaian (De-Bora)
@@ -163,7 +163,7 @@ data/resor/                        batas resor 2026, isi Laporan Kajian, hasil a
 tools/resor/                       skrip analisis potensi dan ancaman per resor beserta ujinya
 tenurial/                          halaman Penanganan Konflik Tenurial Karya Sari dan So Tompo
 kepegawaian/                       halaman Kepegawaian De-Bora (DE-BORA dibaca langsung oleh browser, tidak disimpan di repo)
-data/tenurial/                     rangkuman pulbaket ST.1452 tanpa identitas pribadi, peta bidang, areal terbakar, zonasi
+data/tenurial/                     rangkuman pulbaket ST.1452, peta bidang beserta nama pengguna, areal terbakar, zonasi
 apps-script/                       backend Tanya Data (Google Apps Script) dan panduan pemasangannya
 .github/workflows/resor.yml        pembaruan analisis resor harian
 ```

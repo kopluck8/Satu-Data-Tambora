@@ -352,7 +352,7 @@
   "Memutakhirkan peta bidang dan rekap pulbaket di halaman ini setelah setiap kegiatan lanjutan."
  ],
  "catatan": {
-  "privasi": "Nama pengguna lahan, pihak yang menyewakan atau menjual, dan nilai transaksi tidak ditampilkan. Rinciannya ada di Laporan Pelaksanaan Kegiatan ST.1452 (dokumen internal).",
+  "privasi": "Nama pengguna lahan dan pihak yang menyewakan atau menjual ditampilkan pada keterangan bidang di peta untuk keperluan internal. Alamat dan nilai transaksi tidak ditampilkan; rinciannya ada di Laporan Pelaksanaan Kegiatan ST.1452 (dokumen internal).",
   "verifikasi": "Riwayat penggunaan dan asal pengguna merupakan keterangan masyarakat yang belum seluruhnya diverifikasi; batas bidang adalah delineasi lahan terbuka dari citra (angka indikatif).",
   "dasbor": "Angka berbeda sedikit dari dasbor paparan tim (98 bidang teridentifikasi; 253,55 ha) karena tiga bidang Jalur Trans (L022, L027, L036) ditambahkan pada baris terakhir isian dan belum masuk dasbor. Halaman ini memakai seluruh 87 baris isian."
  },

@@ -152,4 +152,17 @@ button.kode:hover { background: var(--s-baru); color: #1a1406; }
 .ket-zona li { display: flex; align-items: center; gap: 7px; }
 .ket-zona i { width: 13px; height: 9px; border: 2px solid; border-radius: 2px; }
 .ket-sumber { margin: 10px 2px 0; color: var(--teks-3); font-size: 11px; line-height: 1.45; }
+.ket-cari { display: block; padding-top: 10px; }
+.ket-cari span { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--teks-3); margin: 0 2px 5px; }
+.ket-cari input { width: 100%; box-sizing: border-box; border: 1px solid var(--garis-2); background: var(--panel-2); color: var(--teks); border-radius: 8px; padding: 7px 9px; font: inherit; font-size: 12.5px; }
+.ket-cari input:focus { outline: 2px solid var(--emas); outline-offset: 0; }
+.ket-hasil { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 2px; }
+.ket-hasil:empty { display: none; }
+.ket-hasil li.redup { padding: 4px; }
+.ket-hasil button { display: flex; gap: 7px; align-items: baseline; width: 100%; text-align: left; border: 0; background: transparent; color: var(--teks-2); font: inherit; font-size: 12px; padding: 5px 4px; border-radius: 6px; cursor: pointer; }
+.ket-hasil button:hover, .ket-hasil button:focus-visible { background: var(--panel-2); color: var(--teks); }
+.ket-hasil i { flex: none; width: 9px; height: 9px; border-radius: 2px; }
+.ket-hasil b { color: var(--teks); }
+.tip-peta .orang { display: grid; gap: 3px; margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(232, 226, 200, .18); }
+.tip-peta .orang b { display: block; }
 @media print { .ket { display: none; } }

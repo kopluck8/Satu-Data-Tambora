@@ -1,5 +1,5 @@
 /* Konflik Tenurial Karya Sari dan So Tompo: rangkuman hasil pulbaket ST.1452 (14–18 Oktober 2026).
-   Data: ../data/tenurial/ringkasan.json (angka agregat), bidang.geojson (146 bidang tanpa identitas pribadi),
+   Data: ../data/tenurial/ringkasan.json (angka agregat), bidang.geojson (146 bidang, dengan nama pengguna dan pihak yang menyewakan),
    terbakar.geojson dan zonasi.geojson (dipotong ke sekitar kedua blok), dan ../data/resor/batas_resor_2026.geojson. */
 (function () {
   'use strict';
@@ -146,7 +146,7 @@
       '<div class="peta-legenda"><div class="lg-grup"><b>Status bidang</b>' + lg + '</div>' +
       '<div class="lg-grup"><b>Lapisan</b><span><i class="baru"></i>Pembukaan baru 2026</span><span><i class="api"></i>Areal terbakar 2026</span><span><i class="resor"></i>Batas resor 2026</span><span><i class="zona"></i>Zonasi (dapat ditampilkan)</span></div></div></div>' +
       '<p class="kartu-catatan">Batas bidang adalah delineasi lahan terbuka dari citra (angka indikatif). Areal terbakar yang ditampilkan adalah poligon yang beririsan dengan atau berjarak hingga 1 km dari bidang garapan. Pilih lapisan dan peta dasar lewat tombol di pojok kanan atas peta.</p>',
-      T.n + ' bidang lahan terbuka hasil aktualisasi (kode L001–L146), diwarnai menurut riwayat penggunaan dalam isian pulbaket. Arahkan kursor atau ketuk bidang untuk melihat rinciannya.');
+      T.n + ' bidang lahan terbuka hasil aktualisasi (kode L001–L146), diwarnai menurut riwayat penggunaan dalam isian pulbaket. Arahkan kursor atau ketuk bidang untuk melihat rinciannya, termasuk nama pengguna dan pihak yang menyewakan.');
 
     /* 02 status identifikasi */
     var rowsBlok = r.blok.map(function (b) { return { nm: b.nama, sub: 'Resor ' + b.resor + ' · ' + b.n_id + ' dari ' + b.n + ' bidang teridentifikasi', n: b.n, ha: b.ha, status: b.status }; });
@@ -179,7 +179,7 @@
         '<div><span>Luas menurut keterangan</span><b>' + fmt(r.klaim.klaim_ha, 2) + ' <i>ha</i></b><small>pada ' + r.klaim.n + ' bidang So Tompo; luas peta ' + ha(r.klaim.peta_ha) + '</small></div></div>' +
         '<div class="prosa" style="margin-top:14px"><p>Batas bidang pada peta adalah delineasi lahan terbuka dari citra, sehingga satu bidang dapat memuat garapan lebih dari satu pengguna atau lahan bera dan bekas terbakar. ' +
         'Pengukuran batas garapan bersama pengguna dan pencatatan kode lahan yang konsisten pada SMART Mobile diperlukan sebelum penyelesaian per bidang.</p></div>', 'timbang') + '</div>',
-      'Isian pulbaket mencatat ' + P.nama + ' nama pengguna lahan; ' + P.buka_sendiri + ' di antaranya menyatakan membuka lahan sendiri. Nama tidak ditampilkan di halaman ini.');
+      'Isian pulbaket mencatat ' + P.nama + ' nama pengguna lahan; ' + P.buka_sendiri + ' di antaranya menyatakan membuka lahan sendiri. Nama tiap bidang bisa dilihat di peta atau dicari lewat menu Keterangan.');
 
     /* 04 peralihan dan pembukaan baru */
     var temuan = '<ul class="temuan">' + r.baru.map(function (b) {
@@ -240,7 +240,14 @@
       fmt(p.luas, 2) + ' ha · ' + swatch(p.status) + (p.pengguna ? ' · ' + p.pengguna + ' pengguna' : '') +
       (p.ganda ? '<br>Keterangan pengguna ganda' : '') +
       (p.terbakar > 0 ? '<br>Beririsan areal terbakar 2026: ' + fmt(p.terbakar, 2) + ' ha' : '') +
-      (p.baru ? '<span class="baru">' + esc(p.baru) + '</span>' : '');
+      (p.baru ? '<span class="baru">' + esc(p.baru) + '</span>' : '') + daftarOrang(p.orang);
+  }
+  function daftarOrang(o) {
+    if (!o || !o.length) return '';
+    return '<span class="orang">' + o.map(function (x) {
+      return '<span><b>' + esc(x.nama || 'Pengguna belum diketahui') + '</b>' +
+        [x.riwayat, x.menyewakan ? 'disewakan/dijual oleh ' + x.menyewakan : '', x.tahun ? 'sejak ' + x.tahun : '', x.ket].filter(Boolean).map(esc).join(' · ') + '</span>';
+    }).join('') + '</span>';
   }
   function gaya(f) {
     var k = f.properties.status;
@@ -337,8 +344,9 @@
       onAdd: function () {
         var d = L.DomUtil.create('div', 'ket leaflet-bar');
         var buka = window.matchMedia && window.matchMedia('(min-width: 900px)').matches;
-        d.innerHTML = '<button type="button" class="ket-tombol" aria-expanded="' + buka + '" aria-controls="ketIsi">' + ikon('info') + '<span>Keterangan</span></button>' +
-          '<div class="ket-isi" id="ketIsi"' + (buka ? '' : ' hidden') + '></div>';
+        d.innerHTML = '<button type="button" class="ket-tombol" aria-expanded="' + buka + '" aria-controls="ketIsiWadah">' + ikon('info') + '<span>Keterangan</span></button>' +
+          '<div class="ket-isi" id="ketIsiWadah"' + (buka ? '' : ' hidden') + '><label class="ket-cari"><span>Cari nama atau kode lahan</span>' +
+          '<input type="search" id="ketCari" placeholder="mis. Frengki atau L003" autocomplete="off"></label><ul class="ket-hasil" id="ketHasil"></ul><div id="ketIsi"></div></div>';
         L.DomEvent.disableClickPropagation(d);
         L.DomEvent.disableScrollPropagation(d);
         d.querySelector('.ket-tombol').addEventListener('click', function () {
@@ -346,7 +354,10 @@
           isi.hidden = !terbuka;
           b.setAttribute('aria-expanded', String(terbuka));
         });
+        d.querySelector('#ketCari').addEventListener('input', function () { cariNama(this.value); });
         d.addEventListener('click', function (e) {
+          var h = e.target.closest('[data-kode-cari]');
+          if (h) { tunjukBidang(h.getAttribute('data-kode-cari')); return; }
           var t = e.target.closest('[data-ket]');
           if (!t) return;
           var v = t.getAttribute('data-ket');
@@ -363,10 +374,32 @@
     });
     S.ket = new Ket().addTo(map);
     // Panel tidak melebihi tinggi peta (menyisakan tombol zoom dan skala).
-    var tinggi = function () { var el = document.getElementById('ketIsi'); if (el) el.style.maxHeight = Math.max(160, map.getSize().y - 150) + 'px'; };
+    var tinggi = function () { var el = document.getElementById('ketIsiWadah'); if (el) el.style.maxHeight = Math.max(160, map.getSize().y - 150) + 'px'; };
     map.on('resize', tinggi);
     tinggi();
     isiKeterangan();
+  }
+  function normal(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  function cariNama(q) {
+    var ul = document.getElementById('ketHasil'), t = normal(q).trim();
+    if (!t) { ul.innerHTML = ''; return; }
+    var hasil = S.bidang.features.filter(function (f) {
+      var p = f.properties;
+      return normal(p.kode).indexOf(t) >= 0 || (p.orang || []).some(function (o) { return normal(o.nama).indexOf(t) >= 0 || normal(o.menyewakan).indexOf(t) >= 0; });
+    }).slice(0, 30);
+    ul.innerHTML = hasil.length ? hasil.map(function (f) {
+      var p = f.properties, nm = (p.orang || []).map(function (o) { return o.nama + (o.menyewakan ? ' (dari ' + o.menyewakan + ')' : ''); }).join('; ');
+      return '<li><button type="button" data-kode-cari="' + esc(p.kode) + '"><i style="background:' + WARNA[p.status] + '"></i><b>' + esc(p.kode) + '</b> ' + esc(nm || NAMA[p.status]) + '</button></li>';
+    }).join('') : '<li class="redup">Tidak ditemukan.</li>';
+  }
+  function tunjukBidang(kode) {
+    var l = S.indeks[kode];
+    if (!l || !S.map) return;
+    if (!S.lapis.bidang.hasLayer(l)) { aturStatus(l.feature.properties.status, true); isiKeterangan(); }
+    S.map.flyToBounds(l.getBounds(), { maxZoom: 17, padding: [60, 60], duration: .8 });
+    if (S.terbuka && S.terbuka !== l) S.terbuka.closeTooltip();
+    S.terbuka = l;
+    setTimeout(function () { l.openTooltip(l.getBounds().getCenter()); }, 950);
   }
   function aturStatus(k, tampil) {
     S.sembunyi[k] = !tampil;
@@ -453,6 +486,8 @@
       if (!l) return;
       if (!S.lapis.bidang.hasLayer(l)) { aturStatus(l.feature.properties.status, true); isiKeterangan(); }
       $('#peta').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      tunjukBidang(b.getAttribute('data-kode'));
+      return;
       S.map.flyToBounds(l.getBounds(), { maxZoom: 17, padding: [60, 60], duration: .8 });
       if (S.terbuka && S.terbuka !== l) S.terbuka.closeTooltip();
       S.terbuka = l;
