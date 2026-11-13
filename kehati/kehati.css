@@ -48,6 +48,10 @@ main .tombol span, .unduhan .tombol span { display: inline; }
 .tombol--utama:hover { background: var(--emas-2); color: #1a1406; border-color: transparent; }
 .tombol:disabled { opacity: .45; cursor: not-allowed; }
 .tombol:disabled:hover { border-color: var(--garis-2); color: var(--teks); }
+select, input[type="file"], input[type="checkbox"], input[type="radio"], .leaflet-control-layers label { cursor: pointer; }
+select:disabled, input:disabled { cursor: not-allowed; }
+/* tanda tekan: geser 1 px tanpa animasi */
+.tombol:active:not(:disabled), .pilih:active, a.chip:active, .urut:active, .sub-tab a:active, .teks-tautan:active { transform: translateY(1px); }
 .tombol[aria-pressed="true"] { background: var(--emas-2); border-color: transparent; color: #1a1406; }
 a.chip { text-decoration: none; }
 a.chip:hover { border-color: var(--emas); color: var(--teks); }
