@@ -797,6 +797,12 @@
     SATKUN: ['transek', 'titik'], GC: ['vegetasi', 'indeks'], KEHATI: ['vegetasi', 'indeks'], TUMPEN: ['vegetasi', 'indeks'], IAS: ['vegetasi', 'indeks'], ANGGREK: ['indeks', 'penduga'],
     LEPAS: ['indeks', 'penduga', 'vegetasi'], KARBON: ['karbon', 'vegetasi'], UMAANI: ['indeks'], REKAP: ['mcp']
   };
+  // Alamat generator setiap jenis kegiatan di PEH-Tambora (id kegiatan di belakang tanda #)
+  var PEH_URL = 'https://kopluck8.github.io/PEH-Tambora/';
+  var GEN_PEH = {
+    RAPTOR: 'raptor', ELFLO: 'elang-flores', RUSA: 'rusa-timor', GC: 'ground-check', ANGGREK: 'anggrek', IAS: 'jenis-invasif', BURUNG: 'burung',
+    TUMPEN: 'tumbuhan-penting', SATKUN: 'satwa-kunci', LEPAS: 'pelepasliaran', KARBON: 'stok-karbon', REKAP: 'rekap-elang-flores', UMAANI: 'uma-ani', KEHATI: 'kehati-tinggi'
+  };
   K.rute.generator = {
     judul: 'Generator RPK dan LPK',
     muat: function (isi) {
@@ -808,9 +814,9 @@
         keg.forEach(function (k) { if (k.kode === 'SMART') return; var o = m[k.kode]; if (!o) { o = m[k.kode] = { kode: k.kode, metode: k.metode, n: 0, th: {} }; urut.push(o); } o.n++; o.th[k.tahun] = 1; });
         urut.sort(function (a, b) { return b.n - a.n; });
         isi.innerHTML = '<section class="bagian bagian--awal"><h1 class="judul-hal">Generator RPK dan LPK teknis</h1>' +
-          '<p class="lede">Generator menyusun naskah Rencana dan Laporan Pelaksanaan Kegiatan dari data lapangan, lengkap dengan narasi metode, rumus, tabel, dan lampiran. Saat ini tersedia untuk dua jenis kegiatan. Untuk kegiatan lain, hitungannya sudah bisa dikerjakan dengan kalkulator, dan generator naskahnya dibuat bertahap per metode.</p>' +
+          '<p class="lede">Generator menyusun naskah Rencana dan Laporan Pelaksanaan Kegiatan dari data lapangan, lengkap dengan narasi metode, rumus, tabel, dan lampiran. Generator untuk ke-14 jenis kegiatan teknis di arsip ada di PEH-Tambora, dan tautan di tabel membuka generator jenis kegiatan itu.</p>' +
           '<div class="grid grid-2s gen-ada">' +
-          '<a class="kartu gen-kartu" href="https://kopluck8.github.io/PEH-Tambora/" rel="noopener"><span class="gen-judul">Generator LPK inventarisasi dan sebaran raptor' + K.ikon.luar + '</span><span class="gen-ket">Kalkulator analisis data dan penyusun LPK raptor, dari isian tabel atau ekspor patroli SMART dengan kategori Metode Teknis. Dibuka di PEH-Tambora.</span></a>' +
+          '<a class="kartu gen-kartu" href="' + PEH_URL + '" rel="noopener"><span class="gen-judul">Generator RPK dan LPK kegiatan teknis PEH' + K.ikon.luar + '</span><span class="gen-ket">Kalkulator analisis data dan penyusun RPK dan LPK untuk 14 jenis kegiatan teknis, dari isian tabel atau ekspor patroli SMART dengan kategori Metode Teknis. Dibuka di PEH-Tambora.</span></a>' +
           '<a class="kartu gen-kartu" href="https://kopluck8.github.io/SMART_Report_generator/" rel="noopener"><span class="gen-judul">Generator LPK dan RPK SMART Patrol' + K.ikon.luar + '</span><span class="gen-ket">Penyusun laporan dan rencana patroli dari ekspor SMART, termasuk temuan satwa dan tumbuhan selama patroli.</span></a></div></section>' +
           '<section class="bagian"><div class="bagian-kepala"><span class="bagian-no">01</span><h2>Kegiatan teknis di arsip LPK dan kesiapan alatnya</h2><p>' + K.n(keg.length - 1) + ' kegiatan dari ' + urut.length + ' jenis kegiatan, 2020 sampai 2026. Tautan kalkulator membuka hitungan yang dipakai jenis kegiatan itu.</p></div>' +
           '<div class="tabel-wadah" tabindex="0" role="region" aria-label="Kegiatan teknis dan kesiapan alat"><table><thead><tr><th scope="col">Jenis kegiatan</th><th scope="col" class="n">LPK di arsip</th><th scope="col">Tahun</th><th scope="col">Kalkulator yang dipakai</th><th scope="col">Generator naskah</th></tr></thead><tbody>' +
@@ -818,9 +824,9 @@
             var th = Object.keys(o.th).sort();
             return '<tr><th scope="row">' + esc(o.metode) + '</th><td class="n">' + o.n + '</td><td class="sempit">' + (th.length > 1 ? th[0] + ' sampai ' + th[th.length - 1] : th[0]) + '</td><td><span class="chip-deret">' +
               (KALK_METODE[o.kode] || []).map(function (id) { var c = cariKalk(id); return c ? '<a class="chip" href="#/kalkulator/' + id + '">' + esc(c.nama) + '</a>' : ''; }).join('') + '</span></td><td>' +
-              (o.kode === 'RAPTOR' ? '<a href="https://kopluck8.github.io/PEH-Tambora/" rel="noopener">Tersedia di PEH-Tambora</a>' : '<span class="redup">Menyusul</span>') + '</td></tr>';
+              (GEN_PEH[o.kode] ? '<a href="' + PEH_URL + '#' + GEN_PEH[o.kode] + '" rel="noopener">Buka generator</a>' : '<span class="redup">Menyusul</span>') + '</td></tr>';
           }).join('') + '</tbody></table></div>' +
-          '<p class="kartu-catatan">Urutan pembuatan generator berikutnya mengikuti jumlah LPK di arsip, dimulai dari monitoring elang flores dan monitoring rusa timor. Data model SMART untuk kategori Metode Teknis ada di repo PEH-Tambora.</p></section>';
+          '<p class="kartu-catatan">Data model SMART kategori Metode Teknis, dengan satu kategori level 1 untuk setiap jenis kegiatan, ada di repo PEH-Tambora.</p></section>';
       }).catch(function (e) { if (g === K.giliran) K.galat(isi, e, K.muatUlang); });
     }
   };
