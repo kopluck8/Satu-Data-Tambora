@@ -10,7 +10,7 @@ Domain diatur lewat file `CNAME` di repo ini dan DNS di Hostinger. Alamat lama `
 
 Tampilannya meniru layar utama konsol PS5:
 
-- **Deretan ubin** di atas: Beranda, satu ubin per tema (Profil Kawasan, Resor Pengelolaan, SMART Patrol, RBM, Kebakaran Hutan, Perlindungan Kawasan, Wisata & Pelayanan, Aset BMN, Kepegawaian), dan Pustaka. Memilih ubin mengganti foto latar, sorotan, dan baris kartu di bawahnya.
+- **Deretan ubin** di atas: Beranda, satu ubin per tema (Profil Kawasan, Resor Pengelolaan, Keanekaragaman Hayati, SMART Patrol, RBM, Kebakaran Hutan, Perlindungan Kawasan, Wisata & Pelayanan, Aset BMN, Kepegawaian), dan Pustaka. Memilih ubin mengganti foto latar, sorotan, dan baris kartu di bawahnya.
 - **Sorotan tema**: judul, ringkasan, tombol **Buka** untuk isi utama tema, dan menu **⋯** (buka di tab baru, lihat kode di GitHub, salin tautan).
 - **Angka langsung** dari aplikasi lain: capaian RBM, observasi SMART Patrol, areal terbakar, skor potensi tiap resor, serta jumlah pegawai dan pengingat kepegawaian terdekat.
 - **Pustaka**: semua isi dalam satu daftar, dengan pencarian dan saringan jenis/tema.
@@ -94,6 +94,34 @@ Tab **Resor Pengelolaan** membuka halaman [`resor/`](resor/index.html): ikhtisar
 
 Foto profil resor diatur di [`data/resor/foto.json`](data/resor/foto.json). Setiap resor punya enam tempat foto bertema; foto pertama yang bertanda `utama` menjadi sampul. Isi `src` dengan path di repo (misalnya `assets/foto/resor/piong-savana.jpg`) atau link file Google Drive yang dibagikan **Siapa saja yang memiliki link: Pelihat**. Tempat yang masih kosong tampil sebagai bingkai bertuliskan temanya.
 
+## Keanekaragaman Hayati
+
+Tab **Keanekaragaman Hayati** membuka halaman [`kehati/`](kehati/index.html). Susunannya mengikuti kerangka empat cabang: potensi kehati, kalkulator dan generator teknis PEH, perencanaan inventarisasi, dan data masuk.
+
+- **Potensi kehati** (`kehati/index.html#/`): peta temuan per kelompok, daftar jenis dengan status perlindungan (P.106/2018, IUCN, CITES), dan model sebaran habitat MaxEnt. Setiap takson punya halaman sendiri, misalnya `#/jenis/nisaetus-floris`.
+- **Kamus metode dan rumus** (`#/kamus`): 69 metode inventarisasi dan perhitungan kehati dalam 9 kelompok. Setiap metode memuat kegunaan, kebutuhan data, dan sumbernya; rumus, simbol, dan cara membaca hasil dicantumkan bila ada. Isinya tidak terbatas pada metode yang dipakai di LPK dan RPK.
+- **Kalkulator teknis** (`#/kalkulator`): 14 kalkulator. Data bisa ditempel dari Excel, dibaca dari CSV, dari ekspor SMART (kueri CSV atau patroli XML dan ZIP), atau dimuat dari data terkurasi tab ini. Semua hitungan berjalan di browser.
+- **Generator RPK dan LPK** (`#/generator`): saat ini tersedia generator raptor di [PEH-Tambora](https://github.com/kopluck8/PEH-Tambora) dan generator SMART Patrol. Generator metode lain dibuat bertahap, diurutkan menurut jumlah LPK di arsip.
+- **Perencanaan inventarisasi** (`#/perencanaan`): grid 1 km di atas kawasan, sel yang sudah dan belum terjamah survei, prioritas survei, penduga kekayaan jenis, dan jumlah jenis yang habitatnya sesuai menurut model di setiap sel.
+- **Data masuk** (`#/data`): tabel temuan per kategori daftar kehati (Aves, Mamalia, Flora, Anggrek, Tipe Ekosistem, ditambah Fauna lain dan Belum terkelompok), register kegiatan, baris yang dibuang saat kurasi beserta letaknya di berkas sumber, nama yang perlu ditinjau, dan buku kerja [`data/kehati/Data_Masuk_Kehati_TN_Tambora.xlsx`](data/kehati/Data_Masuk_Kehati_TN_Tambora.xlsx).
+
+Sumber dan kurasi:
+
+- **Sumber**: 81 LPK teknis PEH 2020 sampai 2026 dari folder Drive kehati (77 di antaranya punya tabel temuan yang terbaca) dan temuan satwa, tumbuhan, spesies invasif, serta ground check dari SMART Patrol 3 Februari sampai 3 Oktober 2026 (data repo Dashboard SMART per 27 Oktober 2026). Zip arsip yang terpotong di Drive tidak diunduh ulang; berkas yang masih utuh di dalamnya tetap dibaca.
+- **Kurasi**: dari 8.282 baris, 6.587 lolos (5.866 berkoordinat) dan 1.337 dibuang. Temuan yang berada lebih dari 1 km di luar batas kawasan dibuang; titik sampai 1 km di luar batas tetap masuk. Data ganda (koordinat, jenis, tanggal, dan jumlah sama) dibuang. Pengamatan ulang pada tanggal berbeda disimpan, tetapi dihitung satu lokasi di peta dan model. Temuan tanpa koordinat masuk tabel, tidak ikut peta dan model.
+- **Nama jenis** diseragamkan ke daftar induk kehati TN Tambora dan kamus data model SMART. Nama di sumber yang tidak cocok persis (873 nama) dicatat di lembar *Nama perlu tinjau* beserta cara penyeragamannya, untuk dikoreksi pada pengolahan berikutnya.
+- **Batas kawasan, resor, dan grid 1 km** diambil dari repo Dashboard SMART, jadi tab ini memakai enam resor yang sama dengan data SMART Patrol, bukan batas tujuh resor 2026 di tab Resor Pengelolaan.
+
+Model MaxEnt:
+
+- **Peubah lingkungan** dari landscape FlamMap 10 m `tambora_20261111_10m.lcp`: elevasi, kemiringan lereng, arah lereng (utara atau selatan dan timur atau barat), posisi topografi, tutupan kanopi, tinggi kanopi, dan kelas tutupan lahan, diolah ke sel 50 m.
+- **Ambang data**: jenis dengan 10 lokasi unik atau lebih mendapat model penuh, 5 sampai 9 lokasi mendapat model sederhana yang hanya indikatif, kurang dari 5 lokasi hanya ditampilkan titiknya. Saat ini 124 jenis dimodelkan (94 penuh, 30 sederhana). Habitat sesuai memakai ambang P10.
+- **Hasil** ada di `data/kehati/maxent/` (satu raster WebP per jenis, ditambah peta jumlah jenis) dengan ringkasan di `data/kehati/maxent.json`.
+
+Data halaman ada di `data/kehati/` (`temuan.json`, `taksa.json`, `kegiatan.json`, `buang.json`, `nama_tinjau.json`, `celah.json`, `batas.json`, `smart_jenis.json`, `ringkasan.json`). Skrip pengolahan (pembacaan arsip Drive, kurasi, MaxEnt, grid, dan ekspor) tidak disimpan di repo ini. Untuk pembaruan, olah ulang lalu ganti seluruh isi `data/kehati/`; halaman langsung memakai angka baru tanpa perubahan kode.
+
+> Koordinat temuan, termasuk jenis dilindungi, disimpan apa adanya di `data/kehati/`. Selama repo dan GitHub Pages publik, file itu bisa dibuka siapa saja yang tahu alamatnya.
+
 ## Penanganan Konflik Tenurial
 
 Tab **Perlindungan Kawasan** memuat kartu *Penanganan Konflik Tenurial Karya Sari dan So Tompo* yang membuka halaman [`tenurial/`](tenurial/index.html): rangkuman hasil pengumpulan bahan keterangan (pulbaket) penggunaan lahan dalam SMART Patrol berdasarkan Surat Tugas Nomor ST.1452/T.41/TU/DIPA/10/2026 (14–18 Oktober 2026). Isinya peta 146 bidang garapan, status identifikasi pengguna per blok dan lokasi, asal pengguna, sewa dan jual beli lahan, pembukaan baru 2026, irisan dengan areal terbakar 2026, rekomendasi tindak lanjut, dan metode.
@@ -122,7 +150,7 @@ Pengingat berlaku umum untuk semua pegawai, tidak per akun. Browser membaca DE-B
 
 ## Login
 
-Situs ini, termasuk halaman `resor/`, `tenurial/`, dan `kepegawaian/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
+Situs ini, termasuk halaman `resor/`, `kehati/`, `tenurial/`, dan `kepegawaian/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
 
 > Gerbang ini menutup tampilan, bukan file. Selama repo dan GitHub Pages publik, file data (misalnya `data/resor/*.json`, `data/tenurial/*.geojson`) dan aplikasi lain di `kopluck8.github.io` tetap bisa dibuka langsung oleh siapa pun yang tahu alamatnya, dan isi repo terlihat di GitHub. Data yang benar-benar rahasia jangan disimpan di repo publik; sajikan lewat Apps Script yang memeriksa login. Halaman diberi `noindex` dan `robots.txt` agar tidak muncul di mesin pencari.
 
@@ -161,6 +189,8 @@ data/Konten_Satu_Data_Tambora.xlsx spreadsheet awal untuk diunggah ke Google Dri
 resor/                             halaman Resor Pengelolaan (ikhtisar, profil per resor, metode)
 data/resor/                        batas resor 2026, isi Laporan Kajian, hasil analisis, tempat foto
 tools/resor/                       skrip analisis potensi dan ancaman per resor beserta ujinya
+kehati/                            halaman Keanekaragaman Hayati (potensi, kamus, kalkulator, generator, perencanaan, data masuk)
+data/kehati/                       temuan terkurasi, daftar takson, register kegiatan, grid 1 km, raster MaxEnt, buku kerja Data Masuk
 tenurial/                          halaman Penanganan Konflik Tenurial Karya Sari dan So Tompo
 kepegawaian/                       halaman Kepegawaian De-Bora (DE-BORA dibaca langsung oleh browser, tidak disimpan di repo)
 data/tenurial/                     rangkuman pulbaket ST.1452, peta bidang beserta nama pengguna, areal terbakar, zonasi

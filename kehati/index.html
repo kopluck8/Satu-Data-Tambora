@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Keanekaragaman Hayati · TN Gunung Tambora</title>
+<meta name="description" content="Potensi keanekaragaman hayati Taman Nasional Gunung Tambora dari LPK 2020 sampai 2026 dan SMART Patrol 2026: peta temuan, model sebaran habitat MaxEnt, kamus metode dan rumus, kalkulator teknis, celah survei, dan tabel data masuk.">
+<meta name="theme-color" content="#0b1510">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2313241b'/%3E%3Cpath d='M12 5.5 8.2 10.7h2L7.5 15h9l-2.7-4.3h2zM12 15v3' fill='none' stroke='%23d9a944' stroke-width='1.5' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="../resor/resor.css">
+<link rel="stylesheet" href="kehati.css">
+<script src="../data/sumber.js"></script>
+<script src="../assets/gerbang.js"></script>
+</head>
+<body>
+<a class="lompat" href="#isi">Langsung ke isi</a>
+<header class="kepala">
+  <div class="kepala-baris">
+    <a class="merek" href="#/" aria-label="Potensi keanekaragaman hayati">
+      <span class="merek-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3.5 6.8 10.6h2.8L5.8 16.6h12.4l-3.8-6h2.8z"/><path d="M12 16.6v3.9"/></svg></span>
+      <span class="merek-teks"><b>Keanekaragaman Hayati</b><small>Taman Nasional Gunung Tambora</small></span>
+    </a>
+    <div class="kepala-aksi">
+      <span class="kepala-data" id="kepalaData"></span>
+      <a class="tombol tombol--hantu" href="../index.html" title="Kembali ke beranda Satu Data Tambora" aria-label="Kembali ke beranda Satu Data Tambora">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12h-15M10.5 6l-6 6 6 6"/></svg>
+        <span>Satu Data Tambora</span>
+      </a>
+    </div>
+  </div>
+  <nav class="tab" id="tab" aria-label="Cabang Keanekaragaman Hayati">
+    <a href="#/" data-rute="potensi">Potensi kehati</a>
+    <span class="tab-pisah" aria-hidden="true"></span>
+    <a href="#/kamus" data-rute="kamus">Kamus metode dan rumus</a>
+    <a href="#/kalkulator" data-rute="kalkulator">Kalkulator teknis</a>
+    <a href="#/generator" data-rute="generator">Generator RPK dan LPK</a>
+    <span class="tab-pisah" aria-hidden="true"></span>
+    <a href="#/perencanaan" data-rute="perencanaan">Perencanaan inventarisasi</a>
+    <a href="#/data" data-rute="data">Data masuk</a>
+  </nav>
+</header>
+<main id="isi" tabindex="-1">
+  <div class="memuat" role="status"><span class="memuat-cincin" aria-hidden="true"></span>Memuat data keanekaragaman hayati…</div>
+  <noscript><div class="galat"><h2>JavaScript belum aktif</h2><p>Halaman ini mengolah data di browser. Aktifkan JavaScript lalu muat ulang.</p></div></noscript>
+</main>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<footer class="kaki">
+  <p>Disusun dari <b>Laporan Pelaksanaan Kegiatan (LPK) teknis PEH 2020 sampai 2026</b> dan <b>temuan SMART Patrol 2026</b>. Data sudah dikurasi: temuan yang berada lebih dari 1 km di luar kawasan dan data ganda tidak dimasukkan. Koordinat ditampilkan apa adanya untuk keperluan internal pengelolaan kawasan.</p>
+  <p class="kaki-kecil" id="kakiData"></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="inti.js"></script>
+<script src="kamus-data.js"></script>
+<script src="potensi.js"></script>
+<script src="kamus.js"></script>
+<script src="kalkulator.js"></script>
+<script src="rencana.js"></script>
+<script src="data.js"></script>
+</body>
+</html>
