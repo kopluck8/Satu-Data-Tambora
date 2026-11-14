@@ -776,7 +776,7 @@
         bt.querySelector('button').addEventListener('click', function () { K.simpanBerkas(r.unduhan.nama, r.unduhan.isi, r.unduhan.tipe); });
         hasil.appendChild(bt);
       }
-      var atas = document.querySelector('.kepala').offsetHeight + 12;
+      var atas = K.tinggiAtas() + 12;
       window.scrollTo({ top: hasil.getBoundingClientRect().top + window.pageYOffset - atas, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
     }
   }
