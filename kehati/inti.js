@@ -1,5 +1,5 @@
 /* Keanekaragaman Hayati · inti: pembantu, pemuat data, rute, penulis rumus, tabel, unduhan, dan peta dasar.
-   Data dibaca dari ../data/kehati/ (hasil kurasi LPK 2020 sampai 2026 dan SMART Patrol 2026). */
+   Data dibaca dari ../data/kehati/ (hasil kurasi LPK teknis PEH dan temuan SMART Patrol). */
 (function () {
   'use strict';
 
@@ -32,6 +32,14 @@
     if (!m) return s;
     var b = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][+m[2] - 1];
     return (m[3] ? +m[3] + ' ' : '') + b + ' ' + m[1];
+  };
+  /* tahun temuan SMART Patrol yang ada di data, dibaca dari ringkasan.json: '2026', '2025 dan 2026', atau '2024 sampai 2026' */
+  K.smartTahun = function (r) {
+    var th = ((r && r.smart) || []).map(function (s) { return s.tahun; });
+    if (!th.length) return '';
+    if (th.length === 1) return String(th[0]);
+    if (th.length === 2) return th[0] + ' dan ' + th[1];
+    return th[0] + ' sampai ' + th[th.length - 1];
   };
   /* tinggi kepala halaman yang menempel di atas, untuk jarak saat menggulir ke suatu bagian */
   K.tinggiAtas = function () { var t = document.querySelector('.topbar'); return t ? t.offsetHeight : 0; };
@@ -553,7 +561,7 @@
   K.muatUlang = function () { var n = aktif; aktif = null; if (n && K.rute[n] && K.rute[n].lepas) K.rute[n].lepas(); arah(); };
   K.kepala = function (r) {
     var kd = document.getElementById('kepalaData'), kk = document.getElementById('kakiData');
-    var t = 'Data LPK ' + r.periode[0] + ' sampai ' + r.periode[1] + ' dan SMART Patrol per ' + K.tgl(r.smart_per);
+    var t = 'Data LPK ' + r.periode[0] + ' sampai ' + r.periode[1] + ' dan SMART Patrol per ' + K.tgl(r.smart_lembar || r.smart_per);
     if (kd) kd.innerHTML = K.esc(t) + '<br>Diolah ' + K.esc(K.tgl(r.dibuat));
     if (kk) kk.textContent = t + '. Diolah ' + K.tgl(r.dibuat) + '.';
   };
