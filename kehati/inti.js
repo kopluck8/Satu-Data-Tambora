@@ -33,6 +33,8 @@
     var b = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'][+m[2] - 1];
     return (m[3] ? +m[3] + ' ' : '') + b + ' ' + m[1];
   };
+  /* tinggi kepala halaman yang menempel di atas, untuk jarak saat menggulir ke suatu bagian */
+  K.tinggiAtas = function () { var t = document.querySelector('.topbar'); return t ? t.offsetHeight : 0; };
   K.el = function (html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
   K.ikon = {
     info: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.6v.2"/></svg>',
@@ -198,7 +200,10 @@
   K.tabel = function (o) {
     var keadaan = { hal: 0, urut: o.urut ? o.urut.id : null, turun: o.urut ? !!o.urut.turun : false, baris: o.baris || [] };
     var per = o.perHal || 25;
-    var wadah = K.el('<div class="tabel-kom"><div class="tabel-wadah" tabindex="0" role="region" aria-label="' + K.esc(o.label || 'Tabel') + '"><table><thead><tr></tr></thead><tbody></tbody></table></div><div class="tabel-kaki"></div></div>');
+    // nama wilayah tabel diawali "Tabel" agar tidak sama dengan judul bagian yang memuatnya
+    var lbl = o.label || 'Tabel';
+    if (!/^tabel/i.test(lbl)) lbl = 'Tabel ' + (/^[A-Z][a-z]/.test(lbl) ? lbl.charAt(0).toLowerCase() + lbl.slice(1) : lbl);
+    var wadah = K.el('<div class="tabel-kom"><div class="tabel-wadah" tabindex="0" role="region" aria-label="' + K.esc(lbl) + '"><table><thead><tr></tr></thead><tbody></tbody></table></div><div class="tabel-kaki"></div></div>');
     var trh = wadah.querySelector('thead tr'), tb = wadah.querySelector('tbody'), kaki = wadah.querySelector('.tabel-kaki');
     o.kolom.forEach(function (k) {
       var th = document.createElement('th');
@@ -335,20 +340,31 @@
   };
 
   /* ---------- petunjuk melayang ---------- */
+  /* menu kiri hanya butuh petunjuk saat menyempit jadi deretan ikon; di lebar lain namanya sudah terbaca */
+  var modeIkon = window.matchMedia('(min-width: 761px) and (max-width: 1099px)');
+  function cariTip(e) {
+    var el = e.target.closest && e.target.closest('[data-tip]');
+    if (el && el.closest('.pustaka') && !modeIkon.matches) return null;
+    return el;
+  }
   function tampilTip(el, x, y) {
     var t = el.getAttribute('data-tip'); if (!t) return;
     var p = t.split('|');
     tip.innerHTML = (p.length > 1 ? '<b>' + K.esc(p[0]) + '</b>' + K.esc(p.slice(1).join('|')) : K.esc(t));
     tip.hidden = false;
-    var r = el.getBoundingClientRect();
-    if (x === undefined) { x = r.left + r.width / 2; y = r.top; }
-    var w = tip.offsetWidth, h = tip.offsetHeight;
-    var kiri = Math.min(window.innerWidth - w - 8, Math.max(8, x - w / 2)), atas = y - h - 12;
-    if (atas < 8) atas = y + 18;
+    var r = el.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight, kiri, atas;
+    if (el.closest('.pustaka')) {
+      /* di deretan ikon, petunjuk muncul di kanan ikon seperti nama daftar putar di Spotify */
+      kiri = r.right + 10; atas = Math.max(8, r.top + r.height / 2 - h / 2);
+    } else {
+      if (x === undefined) { x = r.left + r.width / 2; y = r.top; }
+      kiri = Math.min(window.innerWidth - w - 8, Math.max(8, x - w / 2)); atas = y - h - 12;
+      if (atas < 8) atas = y + 18;
+    }
     tip.style.left = kiri + 'px'; tip.style.top = atas + 'px';
   }
-  document.addEventListener('mousemove', function (e) { var el = e.target.closest && e.target.closest('[data-tip]'); if (el) tampilTip(el, e.clientX, e.clientY); else tip.hidden = true; });
-  document.addEventListener('focusin', function (e) { var el = e.target.closest && e.target.closest('[data-tip]'); if (el) tampilTip(el); });
+  document.addEventListener('mousemove', function (e) { var el = cariTip(e); if (el) tampilTip(el, e.clientX, e.clientY); else tip.hidden = true; });
+  document.addEventListener('focusin', function (e) { var el = cariTip(e); if (el) tampilTip(el); });
   document.addEventListener('focusout', function () { tip.hidden = true; });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') tip.hidden = true; });
 
@@ -458,27 +474,82 @@
   function arah() {
     K.giliran++;
     var p = urai(), nama = p[0] || 'potensi', arg = p.slice(1);
-    if (nama === 'jenis') { nama = 'potensi'; arg = ['jenis'].concat(p.slice(1)); }
     var r = K.rute[nama];
-    Array.prototype.forEach.call(document.querySelectorAll('#tab a'), function (a) {
-      if (a.getAttribute('data-rute') === nama) { a.setAttribute('aria-current', 'page'); if (a.scrollIntoView) a.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+    /* menu kiri, tombol beranda di kepala, dan navigasi bawah ponsel ditandai bersama */
+    Array.prototype.forEach.call(document.querySelectorAll('a[data-rute]'), function (a) {
+      if (a.getAttribute('data-rute') === nama) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');
     });
+    document.body.setAttribute('data-rute', r ? nama : 'galat');
+    document.body.removeAttribute('data-kel');
+    tutupLaci(false);
     tip.hidden = true;
+    var jaga = K.jagaFokus; K.jagaFokus = false;
     if (!r) {
       aktif = null;
       document.title = 'Halaman tidak ditemukan · Keanekaragaman Hayati';
-      isi.innerHTML = '<div class="galat"><h1 style="font-family:var(--serif);font-size:24px;margin-bottom:8px">Halaman tidak ditemukan</h1><p>Alamat <code>' + K.esc(location.hash) + '</code> tidak ada di tab Keanekaragaman Hayati. Tautan mungkin salah ketik atau sudah berganti nama.</p><p style="margin-top:14px"><a class="tombol" href="#/">Buka Potensi kehati</a></p></div>';
+      isi.innerHTML = '<div class="galat"><h1 style="font-size:24px;margin-bottom:8px">Halaman tidak ditemukan</h1><p>Alamat <code>' + K.esc(location.hash) + '</code> tidak ada di tab Keanekaragaman Hayati. Tautan mungkin salah ketik atau sudah berganti nama.</p><p style="margin-top:14px"><a class="tombol" href="#/">Buka Potensi kehati</a></p></div>';
       return;
     }
     document.title = r.judul + ' · Keanekaragaman Hayati · TN Gunung Tambora';
-    if (aktif === nama && r.ubah) { r.ubah(arg); return; }
+    if (aktif === nama && r.ubah) { r.ubah(arg, jaga); return; }
     if (aktif && K.rute[aktif] && K.rute[aktif].lepas) K.rute[aktif].lepas();
     aktif = nama;
     window.scrollTo(0, 0);
     r.muat(isi, arg);
-    isi.focus({ preventScroll: true });
+    /* saat pindah karena mengetik di kotak cari, fokus tetap di kotak cari */
+    if (!jaga) isi.focus({ preventScroll: true });
   }
+
+  /* ---------- laci menu di ponsel ---------- */
+  var tombolMenu = document.getElementById('tabMenu'), tampilan = document.querySelector('.tampilan');
+  var modePonsel = window.matchMedia('(max-width: 760px)');
+  function bukaLaci() {
+    document.body.classList.add('laci-buka');
+    if (tombolMenu) tombolMenu.setAttribute('aria-expanded', 'true');
+    /* isi halaman tertutup laci, jadi dibuat tidak bisa difokus supaya Tab tidak tersesat ke baliknya */
+    if (tampilan) tampilan.inert = true;
+    var a = document.querySelector('#tab a[aria-current="page"]') || document.querySelector('#tab a');
+    if (a) a.focus();
+  }
+  function tutupLaci(kembalikan) {
+    if (!document.body.classList.contains('laci-buka')) return;
+    document.body.classList.remove('laci-buka');
+    if (tombolMenu) tombolMenu.setAttribute('aria-expanded', 'false');
+    if (tampilan) tampilan.inert = false;
+    if (kembalikan && tombolMenu) tombolMenu.focus();
+  }
+  if (tombolMenu) tombolMenu.addEventListener('click', function () { if (document.body.classList.contains('laci-buka')) tutupLaci(true); else bukaLaci(); });
+  var tombolTutup = document.getElementById('pustakaTutup');
+  if (tombolTutup) tombolTutup.addEventListener('click', function () { tutupLaci(true); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('laci-buka')) tutupLaci(true); });
+  var gantiMode = function () { if (!modePonsel.matches) tutupLaci(false); };
+  if (modePonsel.addEventListener) modePonsel.addEventListener('change', gantiMode); else if (modePonsel.addListener) modePonsel.addListener(gantiMode);
+
+  /* ---------- kotak cari jenis di kepala halaman ---------- */
+  var formCari = document.getElementById('cariForm'), kotakCari = document.getElementById('cariJenis');
+  K.cari = '';
+  function keKamus() {
+    K.cari = kotakCari.value;
+    var di = urai();
+    if (di[0] === 'jenis' && !di[1] && aktif === 'jenis' && K.rute.jenis && K.rute.jenis.cari) K.rute.jenis.cari(K.cari);
+    else { K.jagaFokus = true; location.hash = '#/jenis'; }
+  }
+  if (formCari && kotakCari) {
+    formCari.addEventListener('submit', function (e) {
+      e.preventDefault(); keKamus();
+      /* Enter memindahkan fokus ke hasil pertama supaya bisa langsung dibuka */
+      setTimeout(function () { var a = document.querySelector('.kj-kisi a'); if (a) a.focus(); }, 0);
+    });
+    kotakCari.addEventListener('input', keKamus);
+  }
+  var tombolCari = document.getElementById('tabCari');
+  if (tombolCari && kotakCari) tombolCari.addEventListener('click', function () {
+    tutupLaci(false);
+    var di = urai();
+    if (!(di[0] === 'jenis' && !di[1])) { K.jagaFokus = true; location.hash = '#/jenis'; }
+    kotakCari.focus();
+  });
   K.muatUlang = function () { var n = aktif; aktif = null; if (n && K.rute[n] && K.rute[n].lepas) K.rute[n].lepas(); arah(); };
   K.kepala = function (r) {
     var kd = document.getElementById('kepalaData'), kk = document.getElementById('kakiData');

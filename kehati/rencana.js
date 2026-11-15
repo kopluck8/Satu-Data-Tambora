@@ -412,7 +412,7 @@
     c.nama_pita.forEach(function (pita, i) {
       var baris = pakai.filter(function (s) { return Math.floor(s.kode / 10) === i; });
       if (!baris.length) return;
-      h += '<h4 class="sub-judul">Elevasi ' + esc(pita) + '</h4><ul class="dumbel">' + baris.map(function (s) {
+      h += '<h3 class="sub-judul">Elevasi ' + esc(pita) + '</h3><ul class="dumbel">' + baris.map(function (s) {
         var a = Math.min(x(s.bagian_luas), x(s.bagian_upaya)), b = Math.max(x(s.bagian_luas), x(s.bagian_upaya));
         var rinci = 'luas ' + K.n(s.bagian_luas, 1) + ' % kawasan (' + K.n(s.luas_ha) + ' ha), upaya ' + K.n(s.bagian_upaya, 1) + ' % (' + K.n(s.sel_upaya) + ' sel 50 m), rasio ' + K.n(s.rasio, 2);
         return '<li class="dumbel-baris" data-tip="' + esc(s.tutupan + ' pada ' + pita + '|' + rinci) + '"><span class="nm">' + esc(s.tutupan) + '</span>' +

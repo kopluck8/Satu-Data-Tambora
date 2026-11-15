@@ -160,8 +160,8 @@
     if (f) f(w, arg[1]);
     else w.innerHTML = '<section class="bagian bagian--rapat"><div class="galat galat--dalam" role="alert"><h2>Bagian tidak ditemukan</h2><p>Data masuk tidak punya bagian <code>' + esc(sub) + '</code>. Tautan mungkin salah ketik. Pilih salah satu bagian di atas.</p></div></section>';
     if (pindah) {
-      var nav = akar.isi.querySelector('#dmTab'), kepala = document.querySelector('.kepala');
-      if (nav.getBoundingClientRect().top < (kepala ? kepala.offsetHeight : 0)) K.gulirKe(nav);
+      var nav = akar.isi.querySelector('#dmTab');
+      if (nav.getBoundingClientRect().top < K.tinggiAtas()) K.gulirKe(nav);
       var h2 = w.querySelector('h2');
       if (h2) { h2.tabIndex = -1; h2.focus({ preventScroll: true }); }
     }

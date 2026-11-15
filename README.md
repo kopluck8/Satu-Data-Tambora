@@ -96,9 +96,10 @@ Foto profil resor diatur di [`data/resor/foto.json`](data/resor/foto.json). Seti
 
 ## Keanekaragaman Hayati
 
-Tab **Keanekaragaman Hayati** membuka halaman [`kehati/`](kehati/index.html). Susunannya mengikuti kerangka empat cabang: potensi kehati, kalkulator dan generator teknis PEH, perencanaan inventarisasi, dan data masuk.
+Tab **Keanekaragaman Hayati** membuka halaman [`kehati/`](kehati/index.html). Susunannya mengikuti kerangka empat cabang: potensi kehati, kalkulator dan generator teknis PEH, perencanaan inventarisasi, dan data masuk. Ketujuh menunya ada di panel kiri, yang di layar sedang menyempit menjadi deret ikon. Di ponsel, menu dibuka dari tombol **Menu** di bilah bawah. Kotak cari di kepala halaman mencari jenis di Kamus jenis.
 
-- **Potensi kehati** (`kehati/index.html#/`): peta temuan per kelompok, daftar jenis dengan status perlindungan (P.106/2018, IUCN, CITES), dan model sebaran habitat MaxEnt. Setiap takson punya halaman sendiri, misalnya `#/jenis/nisaetus-floris`.
+- **Potensi kehati** (`kehati/index.html#/`): peta temuan per kelompok, daftar jenis dengan status perlindungan (P.106/2018, IUCN, CITES), dan model sebaran habitat MaxEnt.
+- **Kamus jenis** (`#/jenis`): 373 jenis yang tercatat sampai tingkat jenis, masing-masing dengan foto dan keterangan. Daftarnya bisa disaring per kelompok, diurutkan, dan dicari dari nama Indonesia, nama lokal, nama ilmiah, nama Inggris, atau famili. Setiap jenis punya halaman sendiri, misalnya `#/jenis/nisaetus-floris`, berisi foto, keterangan beserta sumbernya, status perlindungan, peta temuan, dan model sebaran bila ada.
 - **Kamus metode dan rumus** (`#/kamus`): 69 metode inventarisasi dan perhitungan kehati dalam 9 kelompok. Setiap metode memuat kegunaan, kebutuhan data, dan sumbernya; rumus, simbol, dan cara membaca hasil dicantumkan bila ada. Isinya tidak terbatas pada metode yang dipakai di LPK dan RPK.
 - **Kalkulator teknis** (`#/kalkulator`): 14 kalkulator. Data bisa ditempel dari Excel, dibaca dari CSV, dari ekspor SMART (kueri CSV atau patroli XML dan ZIP), atau dimuat dari data terkurasi tab ini. Semua hitungan berjalan di browser.
 - **Generator RPK dan LPK** (`#/generator`): generator untuk 14 jenis kegiatan teknis di [PEH-Tambora](https://github.com/kopluck8/PEH-Tambora) dan generator SMART Patrol. Setiap baris tabel kegiatan menautkan ke generator jenis kegiatannya.
@@ -118,7 +119,14 @@ Model MaxEnt:
 - **Ambang data**: jenis dengan 10 lokasi unik atau lebih mendapat model penuh, 5 sampai 9 lokasi mendapat model sederhana yang hanya indikatif, kurang dari 5 lokasi hanya ditampilkan titiknya. Saat ini 124 jenis dimodelkan (94 penuh, 30 sederhana). Habitat sesuai memakai ambang P10.
 - **Hasil** ada di `data/kehati/maxent/` (satu raster WebP per jenis, ditambah peta jumlah jenis) dengan ringkasan di `data/kehati/maxent.json`.
 
-Data halaman ada di `data/kehati/` (`temuan.json`, `taksa.json`, `kegiatan.json`, `buang.json`, `nama_tinjau.json`, `celah.json`, `batas.json`, `smart_jenis.json`, `ringkasan.json`). Skrip pengolahan (pembacaan arsip Drive, kurasi, MaxEnt, grid, dan ekspor) tidak disimpan di repo ini. Untuk pembaruan, olah ulang lalu ganti seluruh isi `data/kehati/`; halaman langsung memakai angka baru tanpa perubahan kode.
+Isi Kamus jenis:
+
+- **Keterangan** diambil lebih dulu dari dokumen Balai, yaitu draf buku burung 2025, buku kupu-kupu, dan Buku Saku Penamaan Flora Multibahasa (113 jenis). Jenis yang tidak ada di dokumen Balai diberi keterangan yang ditulis ulang dari Wikipedia bahasa Indonesia dan Inggris, iNaturalist, GBIF, dan WCVP. Jenis yang bahannya tidak cukup mendapat keterangan singkat yang disusun dari daftar induk kehati dan data GBIF, iNaturalist, atau WCVP. Sumber setiap keterangan tercantum di halaman jenisnya.
+- **Foto** diambil dari dokumen Balai bila ada (125 jenis): buku burung, buku saku flora, serta bahan presentasi Pohon dan Tumbuhan Bawah TN Tambora. Foto di dokumen itu yang diberi kredit pihak luar tidak dipakai. Foto lainnya dari iNaturalist dan GBIF (247 jenis), hanya yang berlisensi CC0, CC BY, CC BY-SA, atau CC BY-NC, dengan nama pemotret, lisensi, dan tautan asal di bawah foto. Foto CC BY-NC tidak boleh dipakai untuk keperluan komersial.
+- **Nama yang dibetulkan**: Kleinhovia flava dicari sebagai Kleinhovia hospita, dan Rhomboda cretata sebagai Rhomboda cristata. Halaman kedua jenis itu memuat catatan bahwa identitas temuannya perlu dicek ulang dengan laporan sumber. Canarium argentea belum ketemu padanannya, jadi belum berfoto.
+- **Berkas**: `data/kehati/kamus_jenis.json`, foto dengan sisi terpanjang 720 px di `data/kehati/jenis/`, dan gambar kecil 240 px di `data/kehati/jenis/k/`.
+
+Data halaman ada di `data/kehati/` (`temuan.json`, `taksa.json`, `kegiatan.json`, `buang.json`, `nama_tinjau.json`, `celah.json`, `batas.json`, `smart_jenis.json`, `ringkasan.json`, `kamus_jenis.json`, dan folder `jenis/`). Skrip pengolahan (pembacaan arsip Drive, kurasi, MaxEnt, grid, kamus jenis, dan ekspor) tidak disimpan di repo ini. Untuk pembaruan, olah ulang lalu ganti seluruh isi `data/kehati/`; halaman langsung memakai angka baru tanpa perubahan kode.
 
 > Koordinat temuan, termasuk jenis dilindungi, disimpan apa adanya di `data/kehati/`. Selama repo dan GitHub Pages publik, file itu bisa dibuka siapa saja yang tahu alamatnya.
 
@@ -189,8 +197,8 @@ data/Konten_Satu_Data_Tambora.xlsx spreadsheet awal untuk diunggah ke Google Dri
 resor/                             halaman Resor Pengelolaan (ikhtisar, profil per resor, metode)
 data/resor/                        batas resor 2026, isi Laporan Kajian, hasil analisis, tempat foto
 tools/resor/                       skrip analisis potensi dan ancaman per resor beserta ujinya
-kehati/                            halaman Keanekaragaman Hayati (potensi, kamus, kalkulator, generator, perencanaan, data masuk)
-data/kehati/                       temuan terkurasi, daftar takson, register kegiatan, grid 1 km, raster MaxEnt, buku kerja Data Masuk
+kehati/                            halaman Keanekaragaman Hayati (potensi, kamus jenis, kamus metode, kalkulator, generator, perencanaan, data masuk)
+data/kehati/                       temuan terkurasi, daftar takson, kamus jenis dan fotonya, register kegiatan, grid 1 km, raster MaxEnt, buku kerja Data Masuk
 tenurial/                          halaman Penanganan Konflik Tenurial Karya Sari dan So Tompo
 kepegawaian/                       halaman Kepegawaian De-Bora (DE-BORA dibaca langsung oleh browser, tidak disimpan di repo)
 data/tenurial/                     rangkuman pulbaket ST.1452, peta bidang beserta nama pengguna, areal terbakar, zonasi

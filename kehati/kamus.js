@@ -82,7 +82,7 @@
     /* posisi digulir ulang setelah fon termuat, karena tinggi baris berubah saat fon berganti */
     var gulir = function () {
       if (!el.isConnected) return;
-      el.style.scrollMarginTop = (document.querySelector('.kepala').offsetHeight + 12) + 'px';
+      el.style.scrollMarginTop = (K.tinggiAtas() + 12) + 'px';
       try { el.scrollIntoView({ block: 'start', behavior: 'instant' }); } catch (e) { el.scrollIntoView(true); }
     };
     gulir();

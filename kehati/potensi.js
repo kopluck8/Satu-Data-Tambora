@@ -30,7 +30,7 @@
   }
   function lencana(x) { var h = K.lencanaStatus(x); return h ? '<span class="status-deret">' + h + '</span>' : ''; }
   function gulirKe(el) {
-    el.style.scrollMarginTop = (document.querySelector('.kepala').offsetHeight + 12) + 'px';
+    el.style.scrollMarginTop = (K.tinggiAtas() + 12) + 'px';
     el.scrollIntoView({ block: 'start', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
 
@@ -471,24 +471,63 @@
   function halJenis(isi, tid) {
     var g = K.giliran;
     K.memuat(isi, 'Memuat temuan jenis ini…');
-    Promise.all([K.siapTemuan(), K.semua(['batas.json', 'maxent.json'])]).then(function (h) {
+    Promise.all([K.siapTemuan(), K.semua(['batas.json', 'maxent.json']), K.siapKamusJenis().catch(function () { return { kamus: null }; })]).then(function (h) {
       if (g !== K.giliran) return;
       var T = h[0], x = T.tid[tid];
       if (!x) {
         document.title = 'Jenis tidak ditemukan · Keanekaragaman Hayati';
-        isi.innerHTML = '<div class="galat"><h1 style="font-family:var(--serif);font-size:24px;margin-bottom:8px">Jenis tidak ditemukan</h1><p>Tidak ada takson dengan kode "' + esc(tid || '') + '" di data terkurasi. Tautan mungkin salah ketik, atau namanya berubah setelah data diolah ulang.</p><p style="margin-top:14px"><a class="tombol" href="#/">Buka daftar jenis</a></p></div>';
+        isi.innerHTML = '<div class="galat"><h1 style="font-size:24px;margin-bottom:8px">Jenis tidak ditemukan</h1><p>Tidak ada takson dengan kode "' + esc(tid || '') + '" di data terkurasi. Tautan mungkin salah ketik, atau namanya berubah setelah data diolah ulang.</p><p style="margin-top:14px"><a class="tombol" href="#/jenis">Buka kamus jenis</a></p></div>';
         return;
       }
-      gambarJenis(isi, T, x, h[1][0], h[1][1]);
+      var kamus = h[2].kamus;
+      gambarJenis(isi, T, x, h[1][0], h[1][1], kamus && kamus.jenis ? kamus.jenis[x.tid] || null : null, (kamus && kamus.pustaka) || {});
     }).catch(function (e) { K.galat(isi, e, K.muatUlang); });
   }
 
-  function gambarJenis(isi, T, x, batas, mx) {
+  /* ---------- bagian "Tentang jenis ini": keterangan, foto, dan sumbernya dari kamus jenis ---------- */
+  var LISENSI = { 'cc0': 'CC0', 'cc-by': 'CC BY', 'cc-by-sa': 'CC BY-SA', 'cc-by-nc': 'CC BY-NC' };
+  function tautLuar(u, teks) { return '<a href="' + esc(u) + '" target="_blank" rel="noopener">' + teks + '</a>'; }
+  function sumberJenis(s, pustaka) {
+    var p = pustaka[s.k] || {};
+    if (p.balai) return '<li><i>' + esc(p.j) + '</i>, ' + esc(p.t) + (s.hl ? ', ' + esc(s.hl) : '') + '</li>';
+    return '<li>' + esc(p.j || s.k) + (s.u ? ': ' + tautLuar(s.u, esc(s.j || s.u.replace(/^https?:\/\//, ''))) : '') + '</li>';
+  }
+  function kreditFoto(f, pustaka) {
+    var asal = pustaka[f.a] || {};
+    if (asal.balai) return 'Foto dari dokumen Balai TN Tambora: <i>' + esc(asal.j) + '</i>' + (f.hl ? ', ' + esc(f.hl) : '') + '.';
+    return 'Foto: ' + esc(f.p || 'pemotret tidak dicantumkan di sumber') + ' · ' + esc(LISENSI[f.l] || f.l) + (f.u ? ' · ' + tautLuar(f.u, esc(asal.j || 'sumber foto')) : '') + (f.ket ? '<br>' + esc(f.ket) : '');
+  }
+  function tentang(x, kj, pustaka, judul, no) {
+    var h = '<section class="bagian" aria-labelledby="j-tentang"><div class="bagian-kepala"><span class="bagian-no">' + no + '</span><h2 id="j-tentang">Tentang jenis ini</h2></div>';
+    if (!kj) return h + '<div class="catatan-data">' + K.ikon.info + '<div><p><b>Keterangan dan foto belum termuat.</b></p><p>Berkas data/kehati/kamus_jenis.json tidak terbaca. Muat ulang halaman untuk melihat keterangan dan foto jenis ini.</p></div></div></section>';
+    var kiri = '', kanan;
+    if (kj.d && kj.d.length) kiri += '<div class="tentang-teks">' + kj.d.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</div>';
+    else kiri += '<div class="catatan-data">' + K.ikon.info + '<div><p><b>Belum ada keterangan untuk jenis ini.</b></p><p>Jenis ini tidak dibahas di dokumen Balai, dan belum ada sumber terbuka yang memuat keterangannya saat kamus ini disusun.</p></div></div>';
+    if (kj.c && kj.c.length) kiri += '<div class="catatan-data tentang-catatan">' + K.ikon.info + '<div><p><b>Catatan</b></p><ul>' + kj.c.map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('') + '</ul></div></div>';
+    if (kj.sama) kiri += '<p style="margin-top:12px"><a class="chip" href="#/jenis/' + encodeURIComponent(kj.sama) + '">Buka halaman <span class="ilmiah">' + esc(kj.samaNama || kj.sama) + '</span></a></p>';
+    if (kj.ds && kj.ds.length) kiri += '<div class="tentang-sumber"><b>Sumber keterangan</b><ul>' + kj.ds.map(function (s) { return sumberJenis(s, pustaka); }).join('') + '</ul></div>';
+    if (kj.tl && kj.tl.length) kiri += '<p class="chip-deret" style="margin-top:16px">' + kj.tl.map(function (t) { return '<a class="chip" href="' + esc(t[1]) + '" target="_blank" rel="noopener">' + esc(t[0]) + '</a>'; }).join('') + '</p>';
+    var f = kj.f;
+    if (f) kanan = '<figure class="foto-jenis"><img src="' + esc(K.DASAR + f.s) + '" alt="Foto ' + esc(x.n ? x.n + ' (' + x.i + ')' : judul) + '" width="' + f.w + '" height="' + f.h + '" fetchpriority="high" decoding="async"><figcaption>' + kreditFoto(f, pustaka) + '</figcaption></figure>';
+    else kanan = '<div class="catatan-data">' + K.ikon.info + '<div><p><b>Belum ada foto.</b></p><p>Dokumen Balai belum memuat foto jenis ini, dan belum ditemukan foto berlisensi CC0, CC BY, CC BY-SA, atau CC BY-NC di iNaturalist, GBIF, maupun Wikimedia Commons. Foto dari kegiatan lapangan berikutnya bisa ditambahkan ke kamus.</p></div></div>';
+    return h + '<div class="tentang"><div>' + kiri + '</div>' + kanan + '</div></section>';
+  }
+
+  function gambarJenis(isi, T, x, batas, mx, kj, pustaka) {
     var C = T.C, Q = T.Q, idx = T.perTakson[x._i] || [], m = null, i;
     mx.model.forEach(function (o) { if (o.tid === x.tid) m = o; });
     var grup = K.kelompokDari[x.k] || K.KELOMPOK[4];
     var judul = x.i ? namaPolos(x) : (x.n || x.tid);
-    document.title = judul + ' · Potensi kehati · TN Gunung Tambora';
+    /* jenis berjudul nama Indonesia seperti kartu di kamus jenis; nama ilmiah di bawahnya */
+    var namaUtama = x.t === 'jenis' ? (x.n || (x.l && x.l[0]) || '') : '';
+    document.title = (namaUtama || judul) + ' · Kamus jenis · TN Gunung Tambora';
+    /* warna kepala halaman mengikuti kelompok jenis */
+    var ka = (kj && kj.ka) || x.ka;
+    var kel = { Aves: 'burung', Mamalia: 'satwa', Reptil: 'satwa', Serangga: 'satwa', 'Fauna lain': 'satwa', Flora: 'tumbuhan', Anggrek: 'tumbuhan' }[ka || x.k];
+    if (kel) document.body.setAttribute('data-kel', kel);
+    var labelKel = (K.namaKelJenis && K.namaKelJenis[ka]) || K.NAMA_KAT[x.k] || x.k;
+    var no = 0;
+    function nomor() { no++; return (no < 10 ? '0' : '') + no; }
     var individu = 0, adaJumlah = 0, perTahun = {}, kegSet = {}, perResor = {}, perTemuan = {};
     idx.forEach(function (i) {
       if (C.j[i] !== null) { individu += C.j[i]; adaJumlah++; }
@@ -501,19 +540,25 @@
     var namaLain = [x.i ? x.n : '', x.e].concat(x.l || []).filter(function (v, j, a) { return v && v !== judul && a.indexOf(v) === j; });
     var tingkat = { jenis: 'Teridentifikasi sampai jenis', marga: 'Teridentifikasi sampai marga', 'nama lokal': 'Baru bernama lokal, nama ilmiah belum dipastikan', kelompok: 'Tercatat sebagai kelompok, bukan jenis' }[x.t] || x.t;
 
-    var h = '<section class="bagian bagian--awal"><p class="remah"><a href="#/">' + K.ikon.kembali + '<span>Potensi kehati</span></a></p>' +
-      '<h1 class="judul-hal">' + K.namaTakson(x) + (namaLain.length ? '<small>' + esc(namaLain.join(' · ')) + '</small>' : '') + '</h1>' +
-      '<p class="jenis-status">' + (lencana(x) || '') + '<span class="chip">' + esc(K.NAMA_KAT[x.k] || x.k) + '</span>' + (x.f ? '<span class="chip">' + esc(x.f) + '</span>' : '') + '<span class="chip">' + esc(tingkat) + '</span></p>' +
+    var h = '<section class="bagian bagian--awal"><p class="remah"><a href="#/jenis">' + K.ikon.kembali + '<span>Kamus jenis</span></a></p>' +
+      '<div class="jenis-kepala">' + (x.t === 'jenis' ? '<figure class="jenis-sampul">' + K.sampulJenis(x, kj, false) + '</figure>' : '') +
+      '<div class="jenis-kepala-teks"><p class="jenis-jenis">' + esc([labelKel, x.f].filter(Boolean).join(' · ')) + '</p>' +
+      (namaUtama ? '<h1 class="judul-hal">' + esc(namaUtama) + '<small><span class="ilmiah">' + esc(x.i) + '</span>' +
+        (namaLain.filter(function (v) { return v !== namaUtama; }).length ? ' · ' + esc(namaLain.filter(function (v) { return v !== namaUtama; }).join(' · ')) : '') + '</small></h1>'
+        : '<h1 class="judul-hal">' + K.namaTakson(x) + (namaLain.length ? '<small>' + esc(namaLain.join(' · ')) + '</small>' : '') + '</h1>') +
+      '<p class="jenis-status">' + (lencana(x) || '') + '<span class="chip">' + esc(tingkat) + '</span></p></div></div>' +
       '<div class="angka-deret">' +
       kartu('Temuan', K.n(x.nr), K.n(x.nk) + ' berkoordinat') +
       kartu('Lokasi unik', K.n(x.nl), 'sel 50 m berbeda') +
       kartu('Resor', K.n(x.res.length), x.res.length ? esc(x.res.join(', ')) : 'resor tidak tercatat') +
-      kartu('Tahun', rentang(x.th), K.n(Object.keys(kegSet).length) + ' kegiatan') +
+      kartu('Tahun', x.th ? (x.th[0] === x.th[1] ? String(x.th[0]) : x.th[0] + '–' + x.th[1]) : '-', K.n(Object.keys(kegSet).length) + ' kegiatan') +
       (adaJumlah ? kartu('Individu tercatat', K.nd(individu, 0), 'jumlah dari ' + K.n(adaJumlah) + ' temuan yang mencatat angka') : '') +
       '</div></section>';
 
+    if (x.t === 'jenis') h += tentang(x, kj, pustaka, judul, nomor());
+
     /* peta dan model */
-    h += '<section class="bagian" aria-labelledby="j-sebar"><div class="bagian-kepala"><span class="bagian-no">01</span><h2 id="j-sebar">' + (m ? 'Sebaran temuan dan kesesuaian habitat' : 'Sebaran temuan') + '</h2>' +
+    h += '<section class="bagian" aria-labelledby="j-sebar"><div class="bagian-kepala"><span class="bagian-no">' + nomor() + '</span><h2 id="j-sebar">' + (m ? 'Sebaran temuan dan kesesuaian habitat' : 'Sebaran temuan') + '</h2>' +
       '<p>' + (m ? 'Titik menunjukkan lokasi temuan. Lapisan warna menunjukkan kesesuaian habitat menurut model ' + (m.m === 'penuh' ? 'penuh' : 'sederhana yang hanya indikatif') + ' dari ' + K.n(m.n) + ' lokasi unik.'
         : (berkoordinat.length ? 'Titik menunjukkan lokasi temuan berkoordinat.' : 'Temuan takson ini berasal dari daftar jenis di laporan yang tidak mencantumkan koordinat, jadi tidak ada titik untuk dipetakan.')) + '</p></div>';
     var adaPeta = !!m || berkoordinat.length > 0;
@@ -557,7 +602,7 @@
     /* temuan */
     var thn = Object.keys(perTahun).map(Number).sort(), deretTahun = [];
     if (thn.length) for (i = thn[0]; i <= thn[thn.length - 1]; i++) deretTahun.push(i);
-    h += '<section class="bagian" aria-labelledby="j-temuan"><div class="bagian-kepala"><span class="bagian-no">02</span><h2 id="j-temuan">Semua temuan</h2>' +
+    h += '<section class="bagian" aria-labelledby="j-temuan"><div class="bagian-kepala"><span class="bagian-no">' + nomor() + '</span><h2 id="j-temuan">Semua temuan</h2>' +
       '<p>' + K.n(idx.length) + ' temuan dari ' + K.n(Object.keys(kegSet).length) + ' kegiatan. Nama di sumber ditampilkan apa adanya supaya bisa dicocokkan kembali dengan laporannya.</p></div>' +
       (idx.length > 1 ? '<div class="grid grid-2" style="margin-bottom:18px">' +
         (deretTahun.length > 1 ? '<div class="kartu"><h3 class="kartu-judul">' + K.ikon.grafik + 'Temuan per tahun</h3>' +
@@ -572,6 +617,8 @@
     /* identitas */
     var fakta = [];
     if (x.f) fakta.push(['Famili', esc(x.f)]);
+    if (kj && kj.nu) fakta.push(['Nama Inggris', esc(kj.nu)]);
+    if (kj && kj.nt) fakta.push(['Nama diterima menurut GBIF', '<span class="ilmiah">' + esc(kj.nt) + '</span>']);
     if (x.l && x.l.length) fakta.push(['Nama lokal', esc(x.l.join(', '))]);
     if (x.sin && x.sin.length) fakta.push(['Nama lain di sumber data', esc(x.sin.join(', '))]);
     if (x.iucn) fakta.push(['Daftar Merah IUCN', esc((K.IUCN[x.iucn] || x.iucn) + ' (' + x.iucn + ')')]);
@@ -582,7 +629,7 @@
     if (x.inv) fakta.push(['Jenis asing invasif', 'Ya, menurut daftar induk']);
     fakta.push(['Rujukan nama', esc({ 'daftar induk': 'Daftar induk kehati TN Tambora', 'data model SMART': 'Kamus data model SMART Balai TN Tambora', 'sumber data': 'Nama dari sumber data, belum ada di daftar induk' }[x.sn] || x.sn)]);
     if (x.rj) fakta.push(['Rujukan status', /^https?:\/\//.test(x.rj) ? '<a href="' + esc(x.rj) + '" rel="noopener">' + esc(x.rj.replace(/^https?:\/\//, '').split('/')[0]) + '</a>' : esc(x.rj)]);
-    h += '<section class="bagian" aria-labelledby="j-id"><div class="bagian-kepala"><span class="bagian-no">03</span><h2 id="j-id">Identitas dan status</h2></div>' +
+    h += '<section class="bagian" aria-labelledby="j-id"><div class="bagian-kepala"><span class="bagian-no">' + nomor() + '</span><h2 id="j-id">Identitas dan status</h2></div>' +
       '<dl class="fakta" style="max-width:860px">' + fakta.map(function (f) { return '<dt>' + f[0] + '</dt><dd>' + f[1] + '</dd>'; }).join('') + '</dl>' +
       '<p class="kartu-catatan">Status perlindungan dan Daftar Merah diambil dari daftar induk kehati yang disusun Balai. Takson yang tidak ada di daftar induk belum punya status di sini.</p></section>';
 
@@ -670,9 +717,10 @@
     legenda(); muatRaster();
   }
 
+  K.potensi = { halJenis: halJenis, lepas: lepas };
   K.rute.potensi = {
     judul: 'Potensi kehati',
-    muat: function (isi, arg) { if (arg[0] === 'jenis') halJenis(isi, arg[1]); else ikhtisar(isi); },
+    muat: function (isi) { ikhtisar(isi); },
     ubah: function (arg) { var isi = document.getElementById('isi'); lepas(); window.scrollTo(0, 0); this.muat(isi, arg); isi.focus({ preventScroll: true }); },
     lepas: lepas
   };
