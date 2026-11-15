@@ -114,7 +114,7 @@
 
     var h = '<section class="bagian bagian--awal"><h1 class="judul-hal">Potensi keanekaragaman hayati TN Gunung Tambora</h1>' +
       '<p class="lede"><b>' + K.n(R.lolos) + ' temuan</b> terkurasi dari ' + K.n(R.kegiatan.berdata) + ' laporan kegiatan teknis PEH (LPK) tahun ' + R.periode[0] + ' sampai ' + R.periode[1] +
-      ' dan dari SMART Patrol 2026. Dari temuan itu, <b>' + K.n(J.total) + ' jenis</b> teridentifikasi sampai tingkat jenis, dan <b>' + K.n(R.model.jumlah) + ' jenis</b> punya cukup lokasi untuk dimodelkan sebaran habitatnya dengan MaxEnt.</p>' +
+      ' dan dari SMART Patrol ' + esc(K.smartTahun(R)) + '. Dari temuan itu, <b>' + K.n(J.total) + ' jenis</b> teridentifikasi sampai tingkat jenis, dan <b>' + K.n(R.model.jumlah) + ' jenis</b> punya cukup lokasi untuk dimodelkan sebaran habitatnya dengan MaxEnt.</p>' +
       '<div class="angka-deret">' +
       angka('Jenis teridentifikasi', K.n(J.total), K.n(pk.Aves) + ' burung, ' + K.n(pk.Mamalia) + ' mamalia, ' + K.n(pk.Flora) + ' flora, ' + K.n(pk.Anggrek) + ' anggrek, ' + K.n(pk['Fauna lain']) + ' fauna lain') +
       angka('Jenis dilindungi', K.n(J.dilindungi), 'Permen LHK P.106 tahun 2018') +
@@ -160,7 +160,7 @@
 
     /* 03 waktu, kelompok, resor */
     h += '<section class="bagian" aria-labelledby="j-waktu"><div class="bagian-kepala"><span class="bagian-no">03</span><h2 id="j-waktu">Temuan menurut tahun, kelompok, dan resor</h2>' +
-      '<p>Jumlah temuan mengikuti jumlah kegiatan pada tahun itu, bukan naik turunnya satwa atau tumbuhan. Tahun 2026 melonjak karena data SMART Patrol baru masuk mulai Februari 2026.</p></div>' +
+      '<p>Jumlah temuan mengikuti jumlah kegiatan pada tahun itu, bukan naik turunnya satwa atau tumbuhan. ' + (R.smart && R.smart.length ? 'Lonjakan sejak ' + R.smart[0].tahun + ' berasal dari SMART Patrol, yang temuannya tercatat mulai ' + K.tgl(R.smart[0].mulai) + '.' : '') + '</p></div>' +
       '<div class="grid grid-2"><div class="kartu"><h3 class="kartu-judul">' + K.ikon.grafik + 'Temuan per tahun menurut sumber</h3><div id="grTahun"></div></div>' +
       '<div class="kartu"><h3 class="kartu-judul">' + K.ikon.daun + 'Jenis teridentifikasi per kelompok</h3><div id="grKat"></div><p class="kartu-catatan">Hanya takson yang teridentifikasi sampai tingkat jenis. Mamalia baru tiga jenis karena kegiatan yang ada berfokus pada rusa timor, dan belum ada survei khusus mamalia kecil, kelelawar, reptil, atau amfibi.</p>' +
       '<h4 class="sub-judul">Takson tercatat menurut tingkat identifikasi</h4><div id="grTingkat"></div><p class="kartu-catatan">Nama lokal dan marga yang belum dipastikan jenisnya ada di <a href="#/data/nama">Data masuk</a> supaya bisa ditinjau.</p></div></div>' +
@@ -168,8 +168,8 @@
 
     /* 04 ekosistem */
     h += '<section class="bagian" aria-labelledby="j-eko"><div class="bagian-kepala"><span class="bagian-no">04</span><h2 id="j-eko">Tipe ekosistem dan tutupan lahan</h2>' +
-      '<p>Titik ground check tutupan lahan dan tipe ekosistem tahun 2023 dan 2024, ditambah catatan tutupan lahan dari SMART Patrol 2026. Penamaan mengikuti isian di lembar kerja sumbernya.</p></div>' +
-      '<div class="grid grid-2s"><div><h3 class="sub-judul">Tipe ekosistem (ground check)</h3><div id="tbEko"></div></div><div><h3 class="sub-judul">Tutupan lahan (SMART Patrol dan ground check)</h3><div id="tbTut"></div></div></div></section>';
+      '<p>Titik ground check tipe ekosistem dan tutupan lahan dari LPK 2023 dan 2024 serta dari SMART Patrol 2026. Baris ground check SMART Patrol 2025 tidak mengisi kolom klasifikasi, jadi belum masuk tabel ini. Klasifikasi yang tercatat pada temuan jenis ada di kolom Keterangan sumber di <a href="#/data">Data masuk</a>. Penamaan mengikuti isian di lembar kerja sumbernya.</p></div>' +
+      '<div class="grid grid-2s"><div><h3 class="sub-judul">Tipe ekosistem</h3><div id="tbEko"></div></div><div><h3 class="sub-judul">Tutupan lahan</h3><div id="tbTut"></div></div></div></section>';
 
     /* 05 model */
     var A = { tinggi: 0, berguna: 0, rendah: 0, indikatif: 0 };
@@ -190,7 +190,7 @@
     /* 06 metode */
     h += '<section class="bagian" aria-labelledby="j-metode"><div class="bagian-kepala"><span class="bagian-no">06</span><h2 id="j-metode">Cara data ini disusun dan batasannya</h2></div>' +
       '<div class="prosa kolom-2">' +
-      '<p><b>Sumber.</b> Tabel temuan dan koordinat dibaca dari arsip LPK teknis PEH ' + R.periode[0] + ' sampai ' + R.periode[1] + ' (shapefile, lembar kerja, dan lampiran naskah) dan dari temuan satwa serta tumbuhan di dashboard SMART Patrol per ' + K.tgl(R.smart_per) + '. ' + K.n(R.kegiatan.lpk - R.kegiatan.berdata) + ' dari ' + K.n(R.kegiatan.lpk) + ' LPK tidak punya tabel yang terbaca. Rinciannya ada di <a href="#/data">Data masuk</a>.</p>' +
+      '<p><b>Sumber.</b> Tabel temuan dan koordinat dibaca dari arsip LPK teknis PEH ' + R.periode[0] + ' sampai ' + R.periode[1] + ' (shapefile, lembar kerja, dan lampiran naskah) dan dari temuan satwa serta tumbuhan SMART Patrol: ' + (R.smart_lembar ? 'spreadsheet rekap temuan SMART (dibaca ' + K.tgl(R.smart_lembar) + ') dan ' : '') + 'berkas patroli di dashboard SMART Patrol per ' + K.tgl(R.smart_per) + '.' + (R.smart_lembar ? ' Temuan yang tercatat di keduanya dihitung sekali.' : '') + ' ' + K.n(R.kegiatan.lpk - R.kegiatan.berdata) + ' dari ' + K.n(R.kegiatan.lpk) + ' LPK tidak punya tabel yang terbaca. Rinciannya ada di <a href="#/data">Data masuk</a>.</p>' +
       '<p><b>Kurasi.</b> Dari ' + K.n(R.masuk) + ' baris yang masuk, ' + K.n(R.lolos) + ' lolos. Temuan dengan koordinat lebih dari 1 km di luar kawasan dibuang, begitu juga temuan ganda (koordinat, jenis, tanggal, dan jumlah yang sama). Temuan berulang pada tanggal berbeda tetap disimpan, tetapi dihitung satu lokasi di peta dan di model.</p>' +
       '<p><b>Nama jenis.</b> Nama di sumber dicocokkan ke daftar induk kehati TN Tambora dan kamus data model SMART. Nama yang belum bisa dipastikan sampai jenis disimpan sebagai marga, nama lokal, atau kelompok, dan tidak ikut dihitung sebagai jenis.</p>' +
       '<p><b>Model.</b> Lapisan lingkungan diturunkan dari data lanskap 10 m (elevasi, lereng, arah lereng, kelas tutupan, tutupan dan tinggi kanopi) lalu dirata-ratakan ke sel 50 m. Titik latar diambil mengikuti kerapatan upaya survei kelompok yang sama supaya model tidak sekadar meniru lokasi yang sering didatangi. Keandalan diuji dengan validasi silang blok ruang. Rumus dan rujukannya ada di Kamus: <a href="#/kamus/maxent">MaxEnt</a>, <a href="#/kamus/auc">AUC</a>, <a href="#/kamus/ambang-p10">ambang P10</a>, dan <a href="#/kamus/potensi-tumpuk">peta jumlah jenis</a>.</p>' +

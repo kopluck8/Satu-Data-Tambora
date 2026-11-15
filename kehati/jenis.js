@@ -55,7 +55,9 @@
     var f = kj && kj.f;
     if (f) {
       var src = K.DASAR + (kecil ? f.k : f.s);
-      return '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async" width="' + (kecil ? 240 : f.w) + '" height="' + (kecil ? 240 : f.h) + '">';
+      /* gambar kecil di kisi berdampingan dengan namanya, jadi alt kosong; foto besar di kepala halaman jenis dimuat lebih dulu dan diberi alt */
+      if (kecil) return '<img src="' + esc(src) + '" alt="" loading="lazy" decoding="async" width="240" height="240">';
+      return '<img src="' + esc(src) + '" alt="' + esc('Foto ' + (x.n ? x.n + ' (' + x.i + ')' : x.i)) + '" fetchpriority="high" decoding="async" width="' + f.w + '" height="' + f.h + '">';
     }
     var marga = (x.i || '').split(' ')[0];
     return '<span class="kj-tanpa" style="--kh:' + (hueKel[(kj && kj.ka) || x.ka] || 0) + '"><b>' + esc(marga) + '</b><span>Belum ada foto</span></span>';
@@ -92,7 +94,7 @@
     var adaKamus = !!d.kamus;
     var h = '<section class="bagian bagian--awal">' +
       '<h1 class="judul-hal">Kamus jenis</h1>' +
-      '<p class="lede">Semua jenis yang sudah teridentifikasi sampai tingkat jenis dan tercatat di data terkurasi, dari LPK teknis PEH 2020 sampai 2026 dan SMART Patrol 2026. ' +
+      '<p class="lede">Semua jenis yang sudah teridentifikasi sampai tingkat jenis dan tercatat di data terkurasi, dari LPK teknis PEH 2020 sampai 2026 serta SMART Patrol 2025 dan 2026. ' +
       'Keterangan dan foto diambil dulu dari dokumen Balai TN Tambora. Jenis yang tidak ada di dokumen Balai memakai sumber terbuka, dengan nama pemotret, lisensi, dan tautan sumbernya di halaman jenis.</p>' +
       '<div class="angka-deret">' +
       angka('Jenis tercatat', K.n(D.length), K.n(Object.keys(hit).length) + ' kelompok') +

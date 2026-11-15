@@ -121,7 +121,7 @@
     ];
     var hit = { temuan: R.lolos, kegiatan: T.keg.length, dibuang: R.dibuang };
     isi.innerHTML = '<section class="bagian bagian--awal"><h1 class="judul-hal">Data masuk</h1>' +
-      '<p class="lede">Temuan kehati dari <b>' + K.n(R.kegiatan.lpk) + ' LPK teknis PEH ' + R.periode[0] + ' sampai ' + R.periode[1] + '</b> dan <b>SMART Patrol 2026</b> dalam satu format. Nama jenis diseragamkan dengan daftar induk kehati TN Tambora, dan kategorinya mengikuti daftar itu, dari burung sampai tipe ekosistem. Setiap baris sudah dikurasi: titik yang lebih dari 1 km di luar kawasan dan data ganda tidak dimasukkan.</p>' +
+      '<p class="lede">Temuan kehati dari <b>' + K.n(R.kegiatan.lpk) + ' LPK teknis PEH ' + R.periode[0] + ' sampai ' + R.periode[1] + '</b> dan <b>SMART Patrol ' + esc(K.smartTahun(R)) + '</b> dalam satu format. Nama jenis diseragamkan dengan daftar induk kehati TN Tambora, dan kategorinya mengikuti daftar itu, dari burung sampai tipe ekosistem. Setiap baris sudah dikurasi: titik yang lebih dari 1 km di luar kawasan dan data ganda tidak dimasukkan.</p>' +
       '<div class="angka-deret">' +
       angka('Baris masuk', K.n(R.masuk), 'dari tabel LPK dan SMART Patrol') +
       angka('Lolos kurasi', K.n(R.lolos), K.n(R.berkoordinat) + ' berkoordinat, ' + K.n(R.tanpa_koordinat) + ' tanpa koordinat') +
@@ -351,7 +351,7 @@
   /* ================= REGISTER KEGIATAN ================= */
   function subKegiatan(w) {
     var T = K.T, R = akar.R, semua = T.keg;
-    var lpk = semua.filter(function (k) { return k.kode !== 'SMART'; }), sm = semua.filter(function (k) { return k.kode === 'SMART'; })[0];
+    var lpk = semua.filter(function (k) { return k.kode !== 'SMART'; }), sm = semua.filter(function (k) { return k.kode === 'SMART'; });
     var tanpa = lpk.filter(function (k) { return !k.n; }), perMetode = {}, perTahun = {}, metodeSemua = {}, resorSemua = {}, tahunSemua = {};
     lpk.forEach(function (k) { perMetode[k.metode] = (perMetode[k.metode] || 0) + 1; perTahun[k.tahun] = (perTahun[k.tahun] || 0) + 1; });
     semua.forEach(function (k) { metodeSemua[k.metode] = (metodeSemua[k.metode] || 0) + 1; resorSemua[k.resor || ''] = (resorSemua[k.resor || ''] || 0) + 1; tahunSemua[k.tahun] = 1; });
@@ -359,7 +359,7 @@
     var tahun = Object.keys(perTahun).sort();
 
     w.innerHTML = '<section class="bagian bagian--rapat" aria-labelledby="j-kg">' + kepalaSub('j-kg', 'Register kegiatan',
-      '<p>' + K.n(lpk.length) + ' LPK teknis PEH ' + R.periode[0] + ' sampai ' + R.periode[1] + (sm ? ' dan temuan SMART Patrol ' + esc(rentangTgl(sm.mulai, sm.selesai)) : '') +
+      '<p>' + K.n(lpk.length) + ' LPK teknis PEH ' + R.periode[0] + ' sampai ' + R.periode[1] + (sm.length ? ' dan temuan SMART Patrol ' + esc(rentangTgl(sm[0].mulai, sm[sm.length - 1].selesai)) : '') +
       '. Kode kegiatan dipakai di tabel temuan, baris dibuang, dan buku kerja. Klik angka di kolom Temuan atau Dibuang untuk membuka barisnya.</p>' +
       (tanpa.length ? '<p>' + K.n(tanpa.length) + ' LPK belum punya tabel temuan yang bisa dibaca, jadi tidak menyumbang temuan: ' + tanpa.map(function (k) { return esc(k.judul); }).join('; ') + '.</p>' : '')) +
       '<div class="kartu"><div class="dua-kolom kegiatan-batang">' +
