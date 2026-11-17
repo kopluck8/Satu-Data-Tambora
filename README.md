@@ -132,6 +132,21 @@ Data halaman ada di `data/kehati/` (`temuan.json`, `taksa.json`, `kegiatan.json`
 
 > Koordinat temuan, termasuk jenis dilindungi, disimpan apa adanya di `data/kehati/`. Selama repo dan GitHub Pages publik, file itu bisa dibuka siapa saja yang tahu alamatnya.
 
+## Penyuluhan dan Pemberdayaan Masyarakat
+
+Tab **Penyuluhan & Pemberdayaan** membuka halaman [`penyuluhan/`](penyuluhan/index.html), hasil kurasi 274 berkas di folder Drive penyuluhan dan pemberdayaan menjadi 260 laporan kegiatan 2020 sampai 2026.
+
+- **Ringkasan**: angka kunci, kegiatan per tahun menurut jenisnya, dan sebaran kegiatan per resort.
+- **Kelompok binaan** (`penyuluhan/index.html#kelompok`): riwayat kondisi 43 kelompok per tahun (aktif, kurang aktif, tidak aktif, baru dibentuk), bidang usaha, kendala yang paling sering muncul, dan kelompok yang paling sering didampingi. Riwayat satu kelompok bisa dibuka langsung, misalnya `#kelompok/k03`.
+- **Program** (`#penyuluhan`): 15 jenis kegiatan, masing-masing dengan tujuan, isi laporan, desa, laporan per tahun, dan daftar semua laporannya. Juga peserta tercatat, desa yang paling sering dikunjungi, dan sekolah Tambora Goes To School.
+- **Laporan** (`#laporan`): pencarian semua laporan dengan ringkasan, temuan, kendala, rekomendasi, dan tautan ke berkas aslinya di Drive.
+- **Kegiatan teknis PEH tidak diulang di sini**; hasilnya ada di tab Keanekaragaman Hayati.
+- **Resort** mengikuti yang tertulis di laporan (enam resort sebelum pemekaran Doro Tabe), bukan batas tujuh resor 2026.
+
+Data ada di `data/penyuluhan/`: `dashboard.json` (dibaca halaman), serta `penyuluhan.csv`, `kelompok.csv`, `kelompok_riwayat.csv`, dan `sumber_penyuluhan.csv` untuk diunduh. Ekstraksi laporan, skrip pengolahan, dan penjelasan lengkap per topik ada di repo [Penyuluh_BTNT](https://github.com/kopluck8/Penyuluh_BTNT). Untuk pembaruan, jalankan `scripts/build_data.py` di repo itu, lalu salin `data/dashboard.json` (tanpa bagian teknis) dan keempat CSV ke `data/penyuluhan/`.
+
+> Ringkasan laporan bisa memuat nama ketua kelompok atau petugas seperti tertulis di laporan aslinya. Selama repo publik, file ini bisa dibuka siapa saja yang tahu alamatnya.
+
 ## Penanganan Konflik Tenurial
 
 Tab **Perlindungan Kawasan** memuat kartu *Penanganan Konflik Tenurial Karya Sari dan So Tompo* yang membuka halaman [`tenurial/`](tenurial/index.html): rangkuman hasil pengumpulan bahan keterangan (pulbaket) penggunaan lahan dalam SMART Patrol berdasarkan Surat Tugas Nomor ST.1452/T.41/TU/DIPA/10/2026 (14–18 Oktober 2026). Isinya peta 146 bidang garapan, status identifikasi pengguna per blok dan lokasi, asal pengguna, sewa dan jual beli lahan, pembukaan baru 2026, irisan dengan areal terbakar 2026, rekomendasi tindak lanjut, dan metode.
@@ -160,7 +175,7 @@ Pengingat berlaku umum untuk semua pegawai, tidak per akun. Browser membaca DE-B
 
 ## Login
 
-Situs ini, termasuk halaman `resor/`, `kehati/`, `tenurial/`, dan `kepegawaian/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
+Situs ini, termasuk halaman `resor/`, `kehati/`, `penyuluhan/`, `tenurial/`, dan `kepegawaian/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
 
 > Gerbang ini menutup tampilan, bukan file. Selama repo dan GitHub Pages publik, file data (misalnya `data/resor/*.json`, `data/tenurial/*.geojson`) dan aplikasi lain di `kopluck8.github.io` tetap bisa dibuka langsung oleh siapa pun yang tahu alamatnya, dan isi repo terlihat di GitHub. Data yang benar-benar rahasia jangan disimpan di repo publik; sajikan lewat Apps Script yang memeriksa login. Halaman diberi `noindex` dan `robots.txt` agar tidak muncul di mesin pencari.
 
@@ -202,6 +217,8 @@ tools/resor/                       skrip analisis potensi dan ancaman per resor 
 kehati/                            halaman Keanekaragaman Hayati (potensi, kamus jenis, kamus metode, kalkulator, generator, perencanaan, data masuk)
 data/kehati/                       temuan terkurasi, daftar takson, kamus jenis dan fotonya, register kegiatan, grid 1 km, raster MaxEnt, buku kerja Data Masuk
 tenurial/                          halaman Penanganan Konflik Tenurial Karya Sari dan So Tompo
+penyuluhan/                        halaman Penyuluhan dan Pemberdayaan Masyarakat (kelompok binaan, 15 program, laporan)
+data/penyuluhan/                   data kurasi laporan penyuluhan dan pemberdayaan (JSON dan CSV)
 kepegawaian/                       halaman Kepegawaian De-Bora (DE-BORA dibaca langsung oleh browser, tidak disimpan di repo)
 data/tenurial/                     rangkuman pulbaket ST.1452, peta bidang beserta nama pengguna, areal terbakar, zonasi
 apps-script/                       backend Tanya Data (Google Apps Script) dan panduan pemasangannya
