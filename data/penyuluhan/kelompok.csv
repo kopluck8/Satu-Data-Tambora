@@ -1,0 +1,44 @@
+id,nama,desa,resort,wilayah,jenis,usaha,dibentuk,dasar_pembentukan,tahun_terakhir,status_terakhir,tahun_dilaporkan
+k00,Fokus Tambora PD,Doropeti,Doropeti,SPTN Wilayah II Pekat,Kelompok wisata alam,Wisata alam,2018,SK kelompok dari Desa Doropeti; SK lama sedang ditelusuri dan direncanakan diperbarui,2024,tidak aktif,2020; 2022; 2023; 2024
+k01,KPA Algura,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok pecinta alam,Wisata alam,2022,Keputusan Kepala Desa Kawinda To’i No. 06 Tahun 2016 tanggal 13 Juni 2016,2026,kurang aktif,2020; 2021; 2022; 2023; 2024; 2025; 2026
+k02,River Tubing Oi Marai,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok wisata alam,Wisata alam,2022,Keputusan Kepala Desa Kawinda To’i No. 08 Tahun 2018 tanggal 1 Oktober 2018,2026,aktif,2020; 2021; 2022; 2023; 2024; 2026
+k03,Citra Madu Lestari,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok tani hutan & madu,Madu hutan,2016,Keputusan Kepala Desa Kawinda To’i No. 06 Tahun 2016 tanggal 13 Juni 2016,2026,tidak disebut,2020; 2021; 2022; 2023; 2024; 2025; 2026
+k04,Oi Saro Kreatif,Oi Saro,Piong,SPTN Wilayah I Kore,Kelompok usaha & ekonomi kreatif,Olahan pangan & HHBK,2019,"Disebut terdapat perjanjian kerja sama antara TN Tambora dan Kelompok Oi Saro Kreatif, tetapi nomor dan tanggalnya tidak",2026,kurang aktif,2020; 2021; 2022; 2023; 2024; 2025; 2026
+k05,Moti La Halo,Piong,Piong,SPTN Wilayah I Kore,Kelompok pecinta alam,Wisata alam,2018,"SK Kepala Desa Piong No. 07 Tahun 2018, tanggal 17 Januari 2018",2026,kurang aktif,2020; 2021; 2022; 2023; 2024; 2026
+k06,Madu Putih,Piong,Piong,SPTN Wilayah I Kore,Kelompok tani hutan & madu,Wisata alam,2018,Berita Acara pengukuhan pengurus dari Kepala Desa Piong No. 474/410/2001/2018 tanggal 12 Oktober 2018,2024,kurang aktif,2020; 2021; 2022; 2023; 2024
+k08,Sorinomo Berkarya,Sorinomo,Doropeti,SPTN Wilayah II Pekat,Kelompok usaha & ekonomi kreatif,Pertanian & agroforestri,2020,"SK kelompok disebut sebagai persyaratan penerimaan bantuan, tetapi nomor SK tidak tercantum.",2026,kurang aktif,2020; 2022; 2023; 2024; 2025; 2026
+k09,Kali Wangi Sorinomo,Sorinomo,Doropeti,SPTN Wilayah II Pekat,Kelompok usaha & ekonomi kreatif,Kerajinan & ekonomi kreatif,2020,Surat keputusan Kepala Desa Sorinomo direncanakan; nomor belum disebutkan.,2020,baru dibentuk,2020
+k10,Kelompok Tani Karyasari,Sori Tatanga,Doropeti,SPTN Wilayah II Pekat,Kelompok tani mitra konservasi,Pertanian & agroforestri,2021,SK Kepala Desa Sori Tatanga Nomor 207/DSTT/II/2021 tentang Pembentukan Pengurus Kelompok Tani Karyasari; PKS Kemitraan K,2026,tidak disebut,2020; 2021; 2022; 2023; 2024; 2025; 2026
+k11,ALPATAR,Oi Bura,Pancasila,SPTN Wilayah II Pekat,Kelompok pecinta alam,Wisata alam,2019,SK Kepala Desa Oi Bura No. 141.02/PA/14/05/Tahun 2019 tanggal 9 September 2019; perubahan susunan pengurus dan anggota m,2026,tidak aktif,2020; 2021; 2022; 2023; 2024; 2025; 2026
+k12,Nente Jara,Sori Tatanga,Doro Ncanga,SPTN Wilayah II Pekat,Kelompok wisata alam,Wisata alam,2021,SK Kepala Desa Sori Tatanga Nomor 1493/DSTT/XI/2021 tentang perubahan SK Nomor 163/DSTT/II/2021; kelompok juga disebut t,2024,kurang aktif,2021; 2022; 2023; 2024
+k13,Tambora Hijau,Sori Tatanga,Doro Ncanga,SPTN Wilayah II Pekat,Kelompok usaha & ekonomi kreatif,Wisata alam,2017,Dibentuk melalui musyawarah masyarakat Desa Sori Tatanga dan Taman Nasional Tambora; nomor dasar hukum tidak disebutkan.,2026,kurang aktif,2021; 2022; 2023; 2024; 2025; 2026
+k14,So Sori Tula,Sori Tatanga,Doro Ncanga,SPTN Wilayah II Pekat,Kelompok usaha & ekonomi kreatif,Lainnya,2022,,2023,aktif,2021; 2023
+k15,Kelompok Madu Tambora Desa Piong,Piong,Piong,SPTN Wilayah I Kore,Kelompok tani hutan & madu,Madu hutan,,,2022,tidak disebut,2022
+k16,Kelompok Madu Tambora Desa Oi Katupa,Oi Katupa,Oi Katupa,SPTN Wilayah I Kore,Kelompok tani hutan & madu,Madu hutan,,,2022,tidak disebut,2022
+k17,Kelompok Madu Tambora Desa Kawinda Toi,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok tani hutan & madu,Madu hutan,,,2022,tidak disebut,2022
+k18,Oi Jara,Piong,Piong,SPTN Wilayah I Kore,Kelompok wisata alam,Wisata alam,2017,,2024,tidak aktif,2022; 2023; 2024
+k19,Sanggar Offroad,Piong,Piong,SPTN Wilayah I Kore,Kelompok wisata alam,Wisata alam,2022,SK kelompok ditandatangani/disahkan oleh Kepala Desa Piong; nomor SK tidak disebut,2026,baru dibentuk,2022; 2023; 2024; 2025; 2026
+k20,PALTAM,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok pecinta alam,Wisata alam,2019,Disebut dalam Kesepakatan Konservasi Desa; nomor kesepakatan tidak dicantumkan,2026,kurang aktif,2022; 2023; 2024; 2025; 2026
+k21,MPA Cincin Tambora,Oi Katupa,Oi Katupa,SPTN Wilayah I Kore,Kader & relawan konservasi,Konservasi & lingkungan,,,2022,tidak disebut,2021; 2022
+k23,Madu Merah,Oi Katupa,Oi Katupa,SPTN Wilayah I Kore,Kelompok tani hutan & madu,Madu hutan,2018,SK pembentukan; nomor tidak disebutkan,2025,tidak disebut,2022; 2023; 2024; 2025
+k24,Madu Lestari Lereng Tambora,Oi Katupa,Oi Katupa,SPTN Wilayah I Kore,Kelompok tani hutan & madu,Madu hutan,2020,Arsip SK/berita acara pembentukan tersedia; nomor tidak disebutkan,2026,kurang aktif,2022; 2023; 2024; 2025; 2026
+k25,Boro Maju Bersama,Boro,Piong,SPTN Wilayah I Kore,Kelompok usaha & ekonomi kreatif,Lainnya,2020,SK Kepala Desa tahun 2020; nomor tidak disebutkan,2024,tidak aktif,2022; 2023; 2024
+k39,Oi Katebe,Tolokalo,Doro Ncanga,SPTN Wilayah II Pekat,Kelompok tani hutan & madu,Madu hutan,2018,,2024,aktif,2022; 2023; 2024
+k42,Kader Konservasi SPTN II Pekat/Kempo,,Tidak disebut,Tidak disebut,Kader & relawan konservasi,Konservasi & lingkungan,2022,,2022,baru dibentuk,2022
+k43,K-PATA,Tambora,Pancasila,SPTN Wilayah II Pekat,Kelompok pecinta alam,Wisata alam,2018,SK kelompok; nomor tidak disebut,2026,aktif,2022; 2023; 2024; 2025; 2026
+k44,Kelompok Tani So Tompo Jaya,Tolokalo,Doro Ncanga,SPTN Wilayah II Pekat,Kelompok tani mitra konservasi,Pertanian & agroforestri,2022,"SK Kepala Desa telah ada; nomor tidak disebut. Draft PKS disusun dan dibahas, tetapi nomor PKS masih kosong.",2026,tidak disebut,2022; 2023; 2024; 2025; 2026
+k50,PEPA,Sandue,Tidak disebut,Tidak disebut,Kader & relawan konservasi,Konservasi & lingkungan,2020,,2023,aktif,2023
+k51,KPA Pok Darwis,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok wisata alam,Konservasi & lingkungan,,,2023,tidak disebut,2023
+k52,Elang Katulistiwa,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok pecinta alam,Konservasi & lingkungan,,,2023,tidak disebut,2023
+k53,Atap Langit,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok pecinta alam,Konservasi & lingkungan,,,2023,tidak disebut,2023
+k56,Kader Konservasi Balai TN Tambora wilayah kerja SPTN I Kore,,Kawinda Toi,SPTN Wilayah I Kore,Kader & relawan konservasi,Konservasi & lingkungan,,Tidak disebut; kader konservasi merupakan mitra binaan Balai TN Tambora.,2024,kurang aktif,2024
+k59,Kelompok Pemuda Duabanga,Calabai,Pancasila,SPTN Wilayah II Pekat,Kelompok usaha & ekonomi kreatif,Kerajinan & ekonomi kreatif,2019,SK Kepala Desa Calabai No. 141.02/PA/14/05/Tahun 2019 tanggal 9 September 2019; perubahan susunan pengurus dan anggota b,2024,kurang aktif,2022; 2023; 2024
+k60,Sama Weki,Sori Tatanga,Doropeti,SPTN Wilayah II Pekat,Kelompok usaha & ekonomi kreatif,Peternakan,2023,SK Desa Nomor 04/D.STT/I/2023 dan Berita Acara Musyawarah pembentukan susunan kepengurusan dan keanggotaan,2026,kurang aktif,2023; 2025; 2026
+k62,Bajang Girang,Sorinomo,Doropeti,SPTN Wilayah II Pekat,Kelompok usaha & ekonomi kreatif,Kerajinan & ekonomi kreatif,,,2026,aktif,2025; 2026
+k67,Gunung Sari,Doropeti,Doropeti,SPTN Wilayah II Pekat,Kelompok usaha & ekonomi kreatif,Lainnya,2023,SK Kepala Desa Sorinomo; nomor tidak disebutkan,2026,tidak aktif,2023; 2024; 2026
+k68,TAMBORA RIDERZ,Tambora,Tidak disebut,Tidak disebut,Kelompok wisata alam,Wisata alam,,SK Kepala Desa Tambora; nomor tidak disebutkan.,2026,aktif,2026
+k70,Dharma Bhakti Masyarakat Pecinta Alam (Dharmapala),Pekat,Tidak disebut,Tidak disebut,Kelompok pecinta alam,Konservasi & lingkungan,,SK/legalitas kelompok dan berita acara pembentukan kelompok telah disiapkan; nomor tidak disebutkan,2026,tidak disebut,2026
+k71,Doro Ncanga Offroad (DC Offroad),Sori Tatanga,Doro Ncanga,SPTN Wilayah II Pekat,Kelompok wisata alam,Wisata alam,2023,SK kelompok disebut dalam nama berkas/lampiran; nomor tidak tercantum dalam teks dokumen,2026,tidak disebut,2023; 2025; 2026
+k74,Mitra Bersatu,Kawinda Toi,Kawinda Toi,SPTN Wilayah I Kore,Kelompok tani mitra konservasi,Pertanian & agroforestri,,,2026,kurang aktif,2026
+k75,Sakawanabakti,Kadindi,Doro Ncanga,SPTN Wilayah II Pekat,Kader & relawan konservasi,Konservasi & lingkungan,2022,,2025,tidak disebut,2023; 2025
+k76,Bintang Sembilan,Oi Katupa,Oi Katupa,SPTN Wilayah I Kore,Lainnya,Lainnya,,,2023,tidak disebut,2023
