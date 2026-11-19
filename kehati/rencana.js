@@ -14,7 +14,9 @@
     3: { warna: '#ae7d00', alasan: 'Strata kurang terwakili' },
     4: { warna: '#7a4f00', alasan: 'Belum terjamah, tanpa alasan khusus' }
   };
-  /* jumlah jenis (potensi model dan jenis tercatat): satu rona hijau, makin terang makin banyak */
+  /* potensi menurut model: empat kelas dari jenjang warna peta MaxEnt (hijau, kuning, jingga, merah), sama dengan menu Potensi kehati */
+  var MODEL = [0, 4, 5, 8].map(function (i) { return K.JENJANG[i]; });
+  /* jenis tercatat: satu rona hijau, makin terang makin banyak */
   var HIJAU = ['#3a5e48', '#4a8a61', '#6fb980', '#b3e3af'];
   /* status survei: dua warna kategori yang lolos uji buta warna; sel yang belum pernah didatangi hanya bergaris */
   var STATUS = { terjamah: '#199e70', patroli: '#d95926' };
@@ -236,7 +238,7 @@
       else if (mode === 'status') x = '<div class="lg-grup"><b>Status survei</b>' + kotak(STATUS.terjamah, 'terjamah') + kotak(STATUS.patroli, 'belum terjamah, pernah dilewati patroli SMART') + kosong('belum pernah didatangi') + '</div>';
       else if (mode === 'potensi') {
         var q = D.kuartil;
-        x = '<div class="lg-grup"><b>Potensi menurut model, jenis per sel</b>' + kotak(HIJAU[0], 'di bawah ' + K.n(q[0], 1)) + kotak(HIJAU[1], K.n(q[0], 1) + ' sampai ' + K.n(q[1], 1)) + kotak(HIJAU[2], K.n(q[1], 1) + ' sampai ' + K.n(q[2], 1)) + kotak(HIJAU[3], K.n(q[2], 1) + ' atau lebih (kuartil atas)') + '</div>';
+        x = '<div class="lg-grup"><b>Potensi menurut model, jenis per sel</b>' + kotak(MODEL[0], 'di bawah ' + K.n(q[0], 1)) + kotak(MODEL[1], K.n(q[0], 1) + ' sampai ' + K.n(q[1], 1)) + kotak(MODEL[2], K.n(q[1], 1) + ' sampai ' + K.n(q[2], 1)) + kotak(MODEL[3], K.n(q[2], 1) + ' atau lebih (kuartil atas)') + '</div>';
       } else x = '<div class="lg-grup"><b>Jenis tercatat</b>' + kotak(HIJAU[0], '1 sampai 4') + kotak(HIJAU[1], '5 sampai 14') + kotak(HIJAU[2], '15 sampai 29') + kotak(HIJAU[3], '30 atau lebih') + kosong('belum ada temuan sampai jenis') + '</div>';
       lg.innerHTML = x + '<div class="lg-grup"><b>Batas</b><span><i class="batas" style="border-color:#f0cf7e"></i>Kawasan</span><span><i class="batas putus" style="border-color:#eee8d5"></i>Resor</span></div>';
     }
@@ -244,7 +246,7 @@
       var s = { color: '#0a140f', weight: 0.6, opacity: 0.6, fill: true, fillColor: '#000000', fillOpacity: 0 }, w = null;
       if (mode === 'prioritas') w = o.prioritas ? PRIO[o.prioritas].warna : null;
       else if (mode === 'status') w = o.terjamah ? STATUS.terjamah : (o.patroli_km > 0 ? STATUS.patroli : null);
-      else if (mode === 'potensi') w = o.pot === null ? null : HIJAU[kelasPot(o.pot)];
+      else if (mode === 'potensi') w = o.pot === null ? null : MODEL[kelasPot(o.pot)];
       else { var k = kelasCatat(o.jenis); w = k < 0 ? null : HIJAU[k]; }
       if (w) { s.fillColor = w; s.fillOpacity = opa; }
       else if (mode !== 'potensi') { s.color = GARIS_KOSONG; s.opacity = 0.42; s.weight = 0.8; }

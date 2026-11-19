@@ -85,8 +85,11 @@
   }
   /* dipakai juga oleh halaman Perencanaan inventarisasi */
   K.langkahRapi = langkahRapi; K.grafikBatang = grafikBatang; K.batangDatar = batangDatar; K.gulirKe = gulirKe;
-  function pitaJenjang(kiri, kanan, tanda) {
-    return '<span class="jenjang"><em>' + esc(kiri) + '</em><span class="jenjang-pita" style="background:linear-gradient(90deg,' + K.JENJANG.join(',') + ')">' +
+  /* pita legenda jenjang warna model; mulai (0 sampai 1) dipakai bila peta hanya menampilkan bagian atas jenjang, misalnya di atas ambang P10 */
+  function pitaJenjang(kiri, kanan, tanda, mulai) {
+    var a = mulai || 0, warna = [];
+    for (var k = 0; k <= 8; k++) warna.push('rgb(' + K.warnaJenjang(a + (1 - a) * k / 8).join(',') + ')');
+    return '<span class="jenjang"><em>' + esc(kiri) + '</em><span class="jenjang-pita" style="background:linear-gradient(90deg,' + warna.join(',') + ')">' +
       (tanda !== undefined ? '<i style="left:' + (tanda * 100).toFixed(1) + '%"></i>' : '') + '</span><em>' + esc(kanan) + '</em></span>';
   }
 
@@ -680,7 +683,7 @@
     function legenda(mode) {
       lg.innerHTML = '<div class="lg-grup"><b>Temuan</b><span><i style="background:' + (grup.kotak ? '#929381' : grup.warna) + '"></i>' + K.n(Object.keys(titik).length) + ' titik</span></div>' +
         '<div class="lg-grup"><b>Batas</b><span><i class="batas" style="border-color:#f0cf7e"></i>Kawasan</span><span><i class="batas putus" style="border-color:#eee8d5"></i>Resor</span></div>' +
-        (m && lapisModel ? '<div class="lg-grup"><b>' + (mode === 'p10' ? 'Kesesuaian di atas ambang P10' : 'Kesesuaian habitat') + '</b>' + (mode === 'p10' ? pitaJenjang(K.n(m.p10, 2), '1') : pitaJenjang('0', '1', m.p10)) + (mode === 'p10' ? '' : '<span class="redup">garis: ambang P10 ' + K.n(m.p10, 2) + '</span>') + '</div>' : '');
+        (m && lapisModel ? '<div class="lg-grup"><b>' + (mode === 'p10' ? 'Kesesuaian di atas ambang P10' : 'Kesesuaian habitat') + '</b>' + (mode === 'p10' ? pitaJenjang(K.n(m.p10, 2), '1', undefined, m.p10) : pitaJenjang('0', '1', m.p10)) + (mode === 'p10' ? '' : '<span class="redup">garis: ambang P10 ' + K.n(m.p10, 2) + '</span>') + '</div>' : '');
     }
     if (!m) { legenda(); return; }
     var form = isi.querySelector('#jsKendali'), hasil = isi.querySelector('#jsHasil');

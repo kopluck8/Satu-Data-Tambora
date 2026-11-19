@@ -436,8 +436,9 @@
   };
 
   /* ---------- raster MaxEnt: WebP tanpa susut dibaca pikselnya lalu diwarnai di browser ---------- */
-  /* jenjang warna satu rona emas, makin terang makin tinggi; dipilih agar tetap terbaca di atas citra satelit */
-  K.JENJANG = ['#3a2b0d', '#5a3c00', '#7a4f00', '#966400', '#ae7d00', '#c2982f', '#d1b471', '#dfd0ac', '#f9eac6'];
+  /* jenjang warna model: hijau untuk 0, kuning di tengah, merah untuk 1. Ujung merah dibuat lebih gelap daripada ujung hijau
+     supaya nilai rendah dan tinggi tetap terbedakan lewat terang-gelapnya oleh pembaca buta warna merah-hijau */
+  K.JENJANG = ['#3fa84e', '#73bf49', '#aad347', '#dcdd40', '#fede23', '#f9a726', '#e16c10', '#c43512', '#a20711'];
   K.warnaJenjang = function (t) {
     var J = K.JENJANG, x = Math.max(0, Math.min(1, t)) * (J.length - 1), a = Math.floor(x), b = Math.min(J.length - 1, a + 1), f = x - a;
     function h(c, k) { return parseInt(c.substr(1 + k * 2, 2), 16); }
