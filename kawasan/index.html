@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Profil Kawasan · TN Gunung Tambora</title>
+<meta name="description" content="Profil Taman Nasional Gunung Tambora dari hasil analisis yang sudah ada di Satu Data Tambora: sebaran jenis, model habitat satwa dan tumbuhan, daftar jenis terverifikasi, desa binaan, aksesibilitas, dan kondisi fisik kawasan.">
+<meta name="theme-color" content="#04060b">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2304060b'/%3E%3Cpath d='M3.5 18 9 9.5l2.6 3.6L14.5 8l6 10z' fill='none' stroke='%236cc4ff' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="kawasan.css">
+<script src="../data/sumber.js"></script>
+<script src="../assets/gerbang.js"></script>
+</head>
+<body>
+<a class="lompat" href="#isi">Langsung ke isi</a>
+<header class="kepala">
+  <div class="kepala-baris">
+    <a class="merek" href="#/" aria-label="Ringkasan Profil Kawasan">
+      <span class="merek-ikon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3.5 18 9 9.5l2.6 3.6L14.5 8l6 10z"/></svg></span>
+      <span class="merek-teks"><b>Profil Kawasan</b><small>Taman Nasional Gunung Tambora</small></span>
+    </a>
+    <a class="balik" href="../index.html" title="Kembali ke beranda Satu Data Tambora">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 12h-15M10.5 6l-6 6 6 6"/></svg><span>Satu Data Tambora</span>
+    </a>
+  </div>
+  <nav class="tab" id="tab" aria-label="Bagian profil kawasan">
+    <a href="#/" data-rute="">Ringkasan</a>
+    <a href="#/sebaran" data-rute="sebaran">Sebaran per jenis</a>
+    <a href="#/satwa" data-rute="satwa">Habitat satwa liar</a>
+    <a href="#/tumbuhan" data-rute="tumbuhan">Distribusi tumbuhan</a>
+    <a href="#/jenis" data-rute="jenis">Jenis terverifikasi</a>
+    <a href="#/desa" data-rute="desa">Desa binaan</a>
+    <a href="#/akses" data-rute="akses">Aksesibilitas</a>
+    <a href="#/fisik" data-rute="fisik">Kondisi fisik</a>
+  </nav>
+</header>
+<main id="isi" tabindex="-1">
+  <div class="memuat" role="status"><span class="memuat-cincin" aria-hidden="true"></span>Memuat profil kawasan…</div>
+  <noscript><div class="galat"><h2>JavaScript belum aktif</h2><p>Halaman ini mengolah data di browser. Aktifkan JavaScript lalu muat ulang.</p></div></noscript>
+</main>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+<footer class="kaki">
+  <p>Halaman ini tidak menyimpan data sendiri. Semua angka dibaca langsung dari hasil analisis tab lain di Satu Data Tambora: <b>Keanekaragaman Hayati</b> (LPK teknis PEH dan SMART Patrol, model MaxEnt), <b>Resor Pengelolaan</b> (Laporan Hasil Kajian Wilayah Kerja Resor 2026 dan SMART Patrol), <b>Penyuluhan</b> (kelompok binaan dan laporan), dan <b>Konflik Tenurial</b> (zonasi). Bila data di tab itu diperbarui, halaman ini ikut berubah.</p>
+  <p class="kaki-kecil" id="kakiData"></p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="kawasan.js"></script>
+</body>
+</html>
