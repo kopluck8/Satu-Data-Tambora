@@ -81,6 +81,22 @@ Bila salah satu sumber tidak terbaca, kartunya menulis *Belum bisa dimuat* dan b
 
 Delineasi areal terbakar cukup diunggah sebagai zip SHP ke folder Drive `Simulasi API Tambora/delineasi`, dengan tanggal di nama file. Rekap dan [peta areal terbakar](https://kopluck8.github.io/Simulasi-API-Tambora/peta_terbakar.html) diperbarui otomatis paling lama satu jam kemudian. Panduan: [PANDUAN_DELINEASI.md](https://github.com/kopluck8/Simulasi-API-Tambora/blob/main/docs/PANDUAN_DELINEASI.md).
 
+## Profil Kawasan
+
+Tab **Profil Kawasan** membuka halaman [`kawasan/`](kawasan/index.html). Halaman ini tidak punya data sendiri: setiap kartu membaca hasil analisis tab lain, jadi ikut berubah bila data tab itu diperbarui.
+
+| Kartu | Alamat | Sumber data |
+|---|---|---|
+| Sebaran per Jenis | `kawasan/index.html#/sebaran` (satu jenis: `#/sebaran/<id-jenis>`) | `data/kehati/temuan.json`, `taksa.json`, `maxent/` |
+| Distribusi Habitat Satwa Liar | `#/satwa` | `data/kehati/maxent.json`, `maxent/potensi_fauna.webp`, `data/resor/analisis.json` |
+| Distribusi Tumbuhan | `#/tumbuhan` | `data/kehati/maxent.json`, `maxent/potensi_flora.webp`, `data/resor/analisis.json` |
+| Daftar Jenis Terverifikasi | `#/jenis` | `data/kehati/taksa.json` (takson tingkat jenis yang punya temuan) |
+| Desa Binaan | `#/desa` | `data/resor/kajian_2026.json`, `data/penyuluhan/kelompok.csv`, `penyuluhan.csv` |
+| Aksesibilitas ke Dalam Kawasan | `#/akses` | `data/resor/kajian_2026.json`, `analisis.json`, `peta.geojson` (sel patroli) |
+| Kondisi Fisik Kawasan | `#/fisik` | `data/resor/kajian_2026.json`, `analisis.json`, `data/kehati/maxent.json`, `data/tenurial/zonasi.geojson` |
+
+Peta di halaman ini memakai batas kawasan dan batas resor yang sama dengan tab Keanekaragaman Hayati; batas resor 2026 tidak digambar.
+
 ## Resor Pengelolaan
 
 Tab **Resor Pengelolaan** membuka halaman [`resor/`](resor/index.html): ikhtisar tujuh resor, satu profil per resor (`resor/index.html#/piong`, `#/oi-katupa`, `#/kawinda-toi`, `#/doro-tabe`, `#/doroncanga`, `#/doropeti`, `#/pancasila`), dan halaman metode (`#/metode`).
