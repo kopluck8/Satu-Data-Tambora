@@ -30,7 +30,7 @@ Langkah lengkap ada di lembar **Petunjuk** file Excel. Ringkasnya:
 1. Unggah file Excel ke Google Drive, buka, lalu **File > Simpan sebagai Google Spreadsheet**.
 2. **Ekstensi > Apps Script**: buat berkas `Code`, `Sumber`, `Unduh`, tempel isinya, lalu ganti `appsscript.json` (centang dulu "Tampilkan file manifes" di Setelan proyek).
 3. Muat ulang spreadsheet, lalu jalankan menu **Mesin Data > 1. Siapkan tab dan cek pengaturan**. 🔐 Google meminta otorisasi (spreadsheet, Drive, akses internet, pemicu). Nama tab yang terpotong 31 huruf oleh Excel dipulihkan di langkah ini.
-4. **3. Perbarui data sumber lain sekarang** mengisi sumber yang butuh akun Google kantor (rekap laporan kejadian, rekap karhut, kunjungan, laporan RBM).
+4. **3. Perbarui data sumber lain sekarang** mengisi sumber yang butuh akun Google kantor (rekap laporan kejadian 2026, rekap karhut, rekap kunjungan wisata) dan membaca laporan form RBM untuk kolom capaian.
 5. **4. Pasang pemicu otomatis**: file patroli tiap jam, sumber lain tiap hari sekitar pukul 05.00.
 6. **Terapkan > Deployment baru > Aplikasi web**, Jalankan sebagai: Saya, Yang memiliki akses: Siapa saja. 🔐 Izinkan. Tempel URL `/exec` di tab `Pengaturan` Sheet konten hub dengan kunci `unduh_data` (atau di `UNDUH_DATA` pada `data/sumber.js`).
 7. Perbarui juga deployment Tanya Data ke versi baru: aksi `siapa` di `apps-script/TanyaData.gs` memberi tahu Mesin Data peran pemakai (admin atau pegawai).
