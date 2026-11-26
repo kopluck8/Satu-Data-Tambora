@@ -20,7 +20,7 @@
  */
 
 var KOLOM_KATALOG = ['id', 'judul', 'tab', 'induk', 'tema', 'keterangan', 'akses', 'kolom_admin', 'tampil', 'jumlah_baris',
-  'tahun_awal', 'tahun_akhir', 'kolom', 'faset', 'diperbarui'];
+  'tahun_awal', 'tahun_akhir', 'kolom', 'faset', 'diperbarui', 'jumlah_titik'];
 /** Kolom katalog yang diisi admin; tidak ditimpa saat katalog dihitung ulang. */
 var KOLOM_KATALOG_ISIAN = ['judul', 'tema', 'keterangan', 'akses', 'kolom_admin', 'tampil'];
 /** Kolom yang nilainya ditawarkan sebagai pilihan saring di hub (bila ada di tab). */
@@ -99,15 +99,25 @@ function tahunBaris_(r, iTh, iTg, zona) {
   return m ? Number(m[1]) : 0;
 }
 
-/** Ringkasan isi satu tab: jumlah baris, rentang tahun, judul kolom, dan hitungan nilai kolom pilihan saring. */
+/** Baris punya koordinat X (bujur) dan Y (lintang): keduanya terisi angka dan bukan 0,0. Sama dengan aturan Shapefile di hub. */
+function adaKoordinat_(x, y) {
+  if (x === '' || y === '' || x === null || y === null || x === undefined || y === undefined) return false;
+  var a = Number(x), b = Number(y);
+  return isFinite(a) && isFinite(b) && !(a === 0 && b === 0);
+}
+
+/**
+ * Ringkasan isi satu tab: jumlah baris, rentang tahun, judul kolom, hitungan nilai kolom pilihan saring,
+ * dan jumlah baris berkoordinat (untuk GeoJSON dan Shapefile).
+ */
 function ringkasTab_(sh, zona) {
   var n = Math.max(0, sh.getLastRow() - 1), lc = sh.getLastColumn();
-  var ring = { jumlah: n, kolom: [], faset: {}, tahun: ['', ''] };
+  var ring = { jumlah: n, kolom: [], faset: {}, tahun: ['', ''], titik: 0 };
   if (lc < 1) return ring;
   var v = sh.getRange(1, 1, n + 1, lc).getValues();
   var h = v.shift().map(function (x) { return String(x).trim(); });
   ring.kolom = h.filter(String);
-  var iTh = h.indexOf('Tahun'), iTg = h.indexOf('Tanggal'), idx = {}, hit = {}, hitTahun = {};
+  var iTh = h.indexOf('Tahun'), iTg = h.indexOf('Tanggal'), iX = h.indexOf('X'), iY = h.indexOf('Y'), idx = {}, hit = {}, hitTahun = {};
   FASET_UNDUH.forEach(function (f) { var i = h.indexOf(f); if (i >= 0) { idx[f] = i; hit[f] = {}; } });
   v.forEach(function (r) {
     Object.keys(idx).forEach(function (f) {
@@ -117,6 +127,7 @@ function ringkasTab_(sh, zona) {
     });
     var th = tahunBaris_(r, iTh, iTg, zona);
     if (th) hitTahun[th] = (hitTahun[th] || 0) + 1;
+    if (iX >= 0 && iY >= 0 && adaKoordinat_(r[iX], r[iY])) ring.titik++;
   });
   Object.keys(hit).forEach(function (f) {
     var urut = Object.keys(hit[f]).sort(function (a, b) { return hit[f][b] - hit[f][a]; }).slice(0, 150), o = {};
@@ -155,7 +166,8 @@ function perbaruiKatalog_(M, semua) {
     var r = lama[d.nama] || {}, o = {}, k;
     for (k in r) o[k] = r[k];
     var n = Math.max(0, d.sh.getLastRow() - 1);
-    var hitung = semua || !lama[d.nama] || diubah[d.nama] || Number(r.jumlah_baris) !== n || !r.kolom;
+    var hitung = semua || !lama[d.nama] || diubah[d.nama] || Number(r.jumlah_baris) !== n || !r.kolom ||
+      r.jumlah_titik === undefined || r.jumlah_titik === '';
     o.id = r.id || idKatalog_(d.nama, dipakai);
     o.tab = d.nama;
     o.induk = d.induk || r.induk || '';
@@ -180,6 +192,7 @@ function perbaruiKatalog_(M, semua) {
       var f = JSON.stringify(ring.faset);
       if (f.length > 32000) f = JSON.stringify({ Tahun: ring.faset.Tahun || {} });
       o.faset = f;
+      o.jumlah_titik = ring.titik;
       o.diperbarui = sekarang;
     }
     return kepala.map(function (h) { return o[h] === undefined || o[h] === null ? '' : amanSel_(o[h]); });
@@ -388,7 +401,9 @@ function katalogUntuk_(M, sesi) {
       d.kolom = r.daftarKolom.filter(function (h) { return !tolak[h]; });
       d.faset = r.isiFaset;
       d.waktu = r.daftarKolom.indexOf('Tanggal') >= 0 || r.daftarKolom.indexOf('Tahun') >= 0;
-      d.titik = r.daftarKolom.indexOf('X') >= 0 && r.daftarKolom.indexOf('Y') >= 0;
+      // Ada kolom X dan Y, dan (bila sudah dihitung) sedikitnya satu baris berkoordinat.
+      d.titik = r.daftarKolom.indexOf('X') >= 0 && r.daftarKolom.indexOf('Y') >= 0 &&
+        (r.jumlah_titik === '' || r.jumlah_titik === undefined || Number(r.jumlah_titik) > 0);
       d.khususAdmin = Object.keys(tolak).filter(function (h) { return tolak[h] === 'admin'; });
     }
     return d;

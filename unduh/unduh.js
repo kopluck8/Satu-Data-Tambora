@@ -2,7 +2,7 @@
    Daftar data dibaca dari aplikasi web Mesin Data (apps-script/mesin-data), spreadsheet tempat seluruh data
    Satu Data Tambora berkumpul. Login memakai sesi Tanya Data (assets/gerbang.js); Mesin Data memeriksa token dan
    peran pemakai ke Tanya Data, jadi kolom data pribadi hanya ikut terunduh oleh akun admin.
-   Berkas Excel, CSV, dan GeoJSON disusun di browser (SheetJS dimuat hanya saat dibutuhkan).
+   Berkas Excel, CSV, GeoJSON, dan Shapefile disusun di browser (SheetJS dimuat hanya saat dibutuhkan).
    Alamat aplikasi web: window.SUMBER.UNDUH_DATA, atau baris berkunci "unduh_data" di tab Pengaturan Sheet konten.
    Tautan langsung: #tema=<kode induk> (mis. #tema=kehati), #data=<id>[,<id>], #peta. */
 (function () {
@@ -40,6 +40,8 @@
   };
   var PUTAR = '<span class="memuat-cincin kecil" aria-hidden="true"></span>';
   var POLA_TGL = /^(\d{4})-(\d{2})-(\d{2})(?: (\d{2}):(\d{2})(?::(\d{2}))?)?$/;
+  // Format yang hanya memuat baris berkoordinat.
+  var FORMAT_PETA = { geojson: 'GeoJSON', shp: 'Shapefile' };
 
   var S = {
     api: '', kat: null, byId: {}, pilih: {}, format: 'xlsx',
@@ -221,7 +223,7 @@
       var o = JSON.parse(localStorage.getItem(KUNCI_SIMPAN) || 'null');
       if (!o) return;
       (o.pilih || []).forEach(function (id) { if (S.byId[id] && !S.byId[id].terkunci) S.pilih[id] = true; });
-      if (['xlsx', 'csv', 'geojson'].indexOf(o.format) >= 0) S.format = o.format;
+      if (['xlsx', 'csv', 'geojson', 'shp'].indexOf(o.format) >= 0) S.format = o.format;
     } catch (e) { /* penyimpanan tidak tersedia */ }
   }
   function simpan() {
@@ -285,7 +287,7 @@
         '<aside class="tata-samping"><section class="kotak" id="bagUnduh" aria-labelledby="judulUnduh">' +
           '<div class="kotak-kepala"><h2 id="judulUnduh"><span class="langkah" aria-hidden="true">3</span>Unduh</h2></div>' +
           '<fieldset class="format"><legend>Format berkas</legend><div class="saklar">' +
-            pilihFormat('xlsx', 'Excel') + pilihFormat('csv', 'CSV') + pilihFormat('geojson', 'GeoJSON') +
+            pilihFormat('xlsx', 'Excel') + pilihFormat('csv', 'CSV') + pilihFormat('geojson', 'GeoJSON') + pilihFormat('shp', 'Shapefile') +
           '</div><p class="format-ket" id="formatKet">' + esc(KET_FORMAT[S.format]) + '</p></fieldset>' +
           '<ul class="rincian" id="rincian"></ul>' +
           '<div class="total" aria-live="polite"><span id="totalKet">Belum ada data dipilih</span><b id="totalAngka">0</b></div>' +
@@ -313,7 +315,8 @@
   var KET_FORMAT = {
     xlsx: 'Satu berkas .xlsx: satu lembar per data, ditambah lembar Keterangan berisi saringan dan sumber.',
     csv: 'Satu berkas per data, zip bila lebih dari satu. Pemisah koma, untuk QGIS, R, atau Python. Untuk dibuka di Excel, pilih format Excel.',
-    geojson: 'Titik dari data berkoordinat X dan Y (WGS 84), untuk peta di QGIS atau ArcGIS. Zip bila lebih dari satu data.'
+    geojson: 'Titik dari data berkoordinat X dan Y (WGS 84), untuk QGIS dan peta web. Zip bila lebih dari satu data.',
+    shp: 'Zip berisi .shp, .shx, .dbf, .prj, dan .cpg (WGS 84) untuk ArcGIS, QGIS, atau Google Earth Pro. Hanya baris berkoordinat; nama kolom dipendekkan menjadi 10 huruf dan padanannya ikut di zip.'
   };
   function pilihFormat(nilai, judul) {
     return '<label><input type="radio" name="format" value="' + nilai + '"' + (S.format === nilai ? ' checked' : '') + '><span>' + esc(judul) + '</span></label>';
@@ -509,14 +512,14 @@
   /* ---------- 3. ringkasan unduhan ---------- */
   function perbaruiRingkas() {
     if (!$('rincian')) return;
-    var ids = idTerpilih(), total = 0, tunggu = false, html = '', geo = S.format === 'geojson', adaTitik = false;
+    var ids = idTerpilih(), total = 0, tunggu = false, html = '', geo = FORMAT_PETA[S.format], adaTitik = false;
     ids.forEach(function (id) {
       var d = S.byId[id], h = hitungUntuk(id), ikut = !geo || d.titik;
       if (d.titik) adaTitik = true;
       if (!h) tunggu = true; else if (ikut) total += h.jumlah;
       var catatan = '';
       if (h && h.diabaikan && h.diabaikan.length) catatan += '<span class="lewat">Saringan ' + esc(daftarTeks(h.diabaikan.map(namaFaset))) + ' tidak berlaku untuk data ini.</span>';
-      if (!ikut) catatan += '<span class="lewat">Tanpa koordinat, tidak ikut GeoJSON.</span>';
+      if (!ikut) catatan += '<span class="lewat">Tanpa koordinat, tidak ikut ' + geo + '.</span>';
       html += '<li><span class="nm">' + esc(d.judul) + '</span><span class="nl">' + (h ? angka(h.jumlah) : PUTAR + '<span class="sr">menghitung</span>') + '</span>' + catatan + '</li>';
     });
     $('rincian').innerHTML = html;
@@ -654,7 +657,7 @@
   function unduh() {
     if (S.sibuk) return;
     var format = S.format, saring = saringKirim();
-    var ids = idTerpilih().filter(function (id) { return format !== 'geojson' || S.byId[id].titik; });
+    var ids = idTerpilih().filter(function (id) { return !FORMAT_PETA[format] || S.byId[id].titik; });
     if (!ids.length) return;
     var harap = 0;
     ids.forEach(function (id) { var h = hitungUntuk(id); harap += h ? h.jumlah : Number(S.byId[id].jumlah) || 0; });
@@ -662,7 +665,7 @@
     perbaruiRingkas();
     tampilKemajuan(0, 'Menyiapkan unduhan…');
     var hasil = [], selesai = 0;
-    var perluPustaka = format === 'xlsx' || ids.length > 1;
+    var perluPustaka = format === 'xlsx' || format === 'shp' || ids.length > 1;
     (perluPustaka ? muatSheetJS() : Promise.resolve()).then(function () {
       var rantai = Promise.resolve();
       ids.forEach(function (id) {
@@ -678,9 +681,18 @@
       tampilKemajuan(1, 'Menyusun berkas…');
       return new Promise(function (ok) { setTimeout(ok, 30); });
     }).then(function () {
-      var b = susunBerkas(hasil, format, saring);
+      var b = susunBerkas(hasil, format, saring), isi = angka(selesai) + ' baris';
+      if (FORMAT_PETA[format]) {
+        var titik = hasil.reduce(function (a, r) { return a + (r.titikAda || 0); }, 0);
+        if (!titik) {
+          $('kemajuan').hidden = true;
+          tampilStatus('Tidak ada baris berkoordinat yang lolos saringan, jadi berkas ' + FORMAT_PETA[format] + ' tidak dibuat. Ubah saringan, atau pilih Excel atau CSV.', true);
+          return;
+        }
+        isi = angka(titik) + ' titik' + (titik < selesai ? ' dari ' + angka(selesai) + ' baris' : '');
+      }
       simpanBerkas(b.blob, b.nama);
-      tampilKemajuan(1, 'Selesai: ' + b.nama + ' (' + ukuran(b.blob.size) + ', ' + angka(selesai) + ' baris). Periksa folder Unduhan.');
+      tampilKemajuan(1, 'Selesai: ' + b.nama + ' (' + ukuran(b.blob.size) + ', ' + isi + '). Periksa folder Unduhan.');
     }).catch(function (e) {
       if (e.masuk) { tampilStatus('Sesi berakhir. Masuk lagi lalu tekan Unduh.', true); return; }
       $('kemajuan').hidden = true;
@@ -735,6 +747,21 @@
 
   function susunBerkas(hasil, format, saring) {
     if (format === 'xlsx') return { blob: bukuExcel(hasil, infoUnduhan(hasil, saring, format)), nama: namaBerkas(hasil, 'xlsx') };
+    if (format === 'shp') {
+      var isiShp = [], dasarDipakai = {}, dipotong = 0, lebih = 0;
+      hasil.forEach(function (r) {
+        var dasar = dasarShp(r.judul), d = dasar, n = 2;
+        while (dasarDipakai[d.toLowerCase()]) d = dasar + '_' + n++;
+        dasarDipakai[d.toLowerCase()] = true;
+        var s = shapefileData(r, d);
+        dipotong += s.dipotong;
+        lebih = Math.max(lebih, s.kolomLebih);
+        isiShp = isiShp.concat(s.berkas);
+      });
+      var infoShp = infoUnduhan(hasil, saring, format);
+      isiShp.push({ nama: 'KETERANGAN.txt', isi: '﻿' + infoShp.teks.concat([''], catatanShp(dipotong, lebih)).join('\r\n') + '\r\n' });
+      return { blob: zip(isiShp), nama: namaBerkas(hasil, 'shp.zip') };
+    }
     var berkas = hasil.map(function (r) {
       return format === 'csv' ? { nama: slug(r.judul) + '.csv', isi: csvTeks(r.kolom, r.baris), jenis: 'text/csv;charset=utf-8' } :
         { nama: slug(r.judul) + '.geojson', isi: JSON.stringify(geojson(r)), jenis: 'application/geo+json' };
@@ -759,7 +786,7 @@
     ];
     var tabel = [['Data', 'Baris', 'Saringan tidak berlaku', 'Kolom khusus admin yang tidak ikut', 'Keterangan']];
     hasil.forEach(function (r) {
-      var cat = format === 'geojson' ? r.titikAda + ' titik berkoordinat' : '';
+      var cat = FORMAT_PETA[format] ? r.titikAda + ' titik berkoordinat' : '';
       tabel.push([r.judul, r.baris.length, r.diabaikan.map(namaFaset).join(', '), r.khususAdmin.join(', '), [r.d.keterangan || '', cat].filter(String).join(' ')]);
     });
     var teks = umum.map(function (b) { return b.join(': '); }).concat([''], tabel.map(function (b) { return b.join(' | '); }));
@@ -821,14 +848,24 @@
     return '\ufeff' + out.join('\r\n') + '\r\n';
   }
 
-  function geojson(r) {
-    var iX = r.kolom.indexOf('X'), iY = r.kolom.indexOf('Y'), fitur = [];
+  /** Baris yang punya koordinat X (bujur) dan Y (lintang) WGS 84. */
+  function titikBaris(r) {
+    var iX = r.kolom.indexOf('X'), iY = r.kolom.indexOf('Y'), hasil = [];
+    if (iX < 0 || iY < 0) return hasil;
     r.baris.forEach(function (row) {
       var x = Number(row[iX]), y = Number(row[iY]);
-      if (row[iX] === '' || row[iY] === '' || !isFinite(x) || !isFinite(y) || (x === 0 && y === 0)) return;
+      if (row[iX] === '' || row[iY] === '' || row[iX] === null || row[iY] === null || !isFinite(x) || !isFinite(y) || (x === 0 && y === 0)) return;
+      hasil.push({ x: x, y: y, row: row });
+    });
+    return hasil;
+  }
+
+  function geojson(r) {
+    var iX = r.kolom.indexOf('X'), iY = r.kolom.indexOf('Y');
+    var fitur = titikBaris(r).map(function (t) {
       var p = {};
-      r.kolom.forEach(function (h, i) { if (i !== iX && i !== iY) p[h] = row[i] === '' ? null : row[i]; });
-      fitur.push({ type: 'Feature', geometry: { type: 'Point', coordinates: [x, y] }, properties: p });
+      r.kolom.forEach(function (h, i) { if (i !== iX && i !== iY) p[h] = t.row[i] === '' ? null : t.row[i]; });
+      return { type: 'Feature', geometry: { type: 'Point', coordinates: [t.x, t.y] }, properties: p };
     });
     r.titikAda = fitur.length;
     return { type: 'FeatureCollection', name: r.judul, features: fitur };
@@ -840,9 +877,310 @@
       var nama = f.nama, n = 2;
       while (dipakai[nama.toLowerCase()]) nama = f.nama.replace(/(\.[\w.]+)$/, '_' + n++ + '$1');
       dipakai[nama.toLowerCase()] = true;
-      CFB.utils.cfb_add(z, nama, enc.encode(f.isi), { mt: kini });
+      CFB.utils.cfb_add(z, nama, typeof f.isi === 'string' ? enc.encode(f.isi) : f.isi, { mt: kini });
     });
-    return new Blob([CFB.write(z, { fileType: 'zip', type: 'array', compression: true })], { type: 'application/zip' });
+    var isi = CFB.write(z, { fileType: 'zip', type: 'array', compression: true });
+    return new Blob([tanggalZip(isi instanceof Uint8Array ? isi : new Uint8Array(isi))], { type: 'application/zip' });
+  }
+  /** SheetJS hanya menulis tanggal berkas di kepala lokal zip; salin ke direktori pusat yang dibaca Windows dan 7-Zip. */
+  function tanggalZip(u8) {
+    var dv = new DataView(u8.buffer, u8.byteOffset, u8.byteLength), e = u8.length - 22;
+    while (e >= 0 && dv.getUint32(e, true) !== 0x06054b50) e--;
+    if (e < 0) return u8;
+    for (var i = 0, n = dv.getUint16(e + 10, true), o = dv.getUint32(e + 16, true); i < n && o + 46 <= u8.length; i++) {
+      if (dv.getUint32(o, true) !== 0x02014b50) break;
+      var lokal = dv.getUint32(o + 42, true);
+      if (lokal + 14 <= u8.length && dv.getUint32(lokal, true) === 0x04034b50) dv.setUint32(o + 12, dv.getUint32(lokal + 10, true), true);
+      o += 46 + dv.getUint16(o + 28, true) + dv.getUint16(o + 30, true) + dv.getUint16(o + 32, true);
+    }
+    return u8;
+  }
+
+  /* ---------- Shapefile (ArcGIS, QGIS, Google Earth Pro) ----------
+     Satu set .shp, .shx, .dbf, .prj, .cpg per jenis bentuk. Koordinat WGS 84, teks UTF-8.
+     Cincin luar poligon searah jarum jam dan lubang berlawanan arah, sesuai spesifikasi ESRI. */
+  var PRJ_WGS84 = 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]';
+  var TIPE_SHP = { titik: 1, garis: 3, poligon: 5, multititik: 8 };
+  var JENIS_FIELD = { C: 'teks', N: 'angka', D: 'tanggal' };
+  var POLA_TGL_SAJA = /^\d{4}-\d{2}-\d{2}$/;
+  var PENYANDI = null;
+
+  function dasarShp(judul) { return slug(judul).replace(/-/g, '_'); }
+  function utf8(s) { return (PENYANDI || (PENYANDI = new TextEncoder())).encode(s); }
+  function ascii(s) { var b = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i) & 0x7f; return b; }
+  function catatanShp(dipotong, lebih) {
+    return ['Shapefile',
+      '- Koordinat dalam derajat WGS 84 (EPSG:4326), tertulis di berkas .prj. Teks dalam UTF-8 (berkas .cpg).',
+      '- Hanya baris yang punya koordinat X dan Y yang ikut.',
+      '- Nama kolom dipendekkan menjadi paling banyak 10 huruf (aturan dBASE). Padanannya dengan nama kolom asli ada di berkas <nama data>_kolom.csv.',
+      '- Tanggal tanpa jam disimpan sebagai tanggal. Tanggal dengan jam, dan jam saja, disimpan sebagai teks.',
+      '- Ekstrak zip ini dulu, lalu buka berkas .shp (ArcGIS Pro: Add Data; QGIS: seret ke peta). Berkas .shp, .shx, .dbf, .prj, dan .cpg yang bernama sama harus tetap satu folder.'
+    ].concat(dipotong ? ['- ' + angka(dipotong) + ' isian teks lebih dari 254 byte dipotong (batas Shapefile). Teks lengkapnya ada di format Excel atau CSV.'] : [],
+      lebih ? ['- ' + lebih + ' kolom terakhir tidak ikut karena Shapefile paling banyak memuat 254 kolom.'] : []);
+  }
+
+  function koordinat(t) {
+    if (!Array.isArray(t) || t[0] === null || t[0] === '' || t[1] === null || t[1] === '') return null;
+    var x = Number(t[0]), y = Number(t[1]);
+    return isFinite(x) && isFinite(y) ? [x, y] : null;
+  }
+  function deretTitik(a) {
+    var out = [];
+    if (Array.isArray(a)) a.forEach(function (t) { var k = koordinat(t); if (k) out.push(k); });
+    return out;
+  }
+  function luasBertanda(c) {
+    var a = 0;
+    for (var i = 0; i < c.length - 1; i++) a += c[i][0] * c[i + 1][1] - c[i + 1][0] * c[i][1];
+    return a / 2;
+  }
+  function cincin(a, luar) {
+    var c = deretTitik(a), n = c.length;
+    if (n && (c[0][0] !== c[n - 1][0] || c[0][1] !== c[n - 1][1])) c.push([c[0][0], c[0][1]]);
+    if (c.length < 4) return null;
+    var l = luasBertanda(c);
+    if (luar ? l > 0 : l < 0) c.reverse();
+    return c;
+  }
+  /** Geometri GeoJSON menjadi { kelompok, bagian } untuk Shapefile, atau null bila kosong atau tidak didukung. */
+  function bentukShp(g) {
+    if (!g || !Array.isArray(g.coordinates)) return null;
+    var k = g.coordinates, bagian = [], t;
+    if (g.type === 'Point') {
+      t = koordinat(k);
+      return t ? { kelompok: 'titik', bagian: [[t]] } : null;
+    }
+    if (g.type === 'MultiPoint') {
+      t = deretTitik(k);
+      return t.length ? { kelompok: 'multititik', bagian: [t] } : null;
+    }
+    if (g.type === 'LineString' || g.type === 'MultiLineString') {
+      (g.type === 'LineString' ? [k] : k).forEach(function (l) { var d = deretTitik(l); if (d.length > 1) bagian.push(d); });
+      return bagian.length ? { kelompok: 'garis', bagian: bagian } : null;
+    }
+    if (g.type === 'Polygon' || g.type === 'MultiPolygon') {
+      (g.type === 'Polygon' ? [k] : k).forEach(function (p) {
+        if (!Array.isArray(p)) return;
+        var luar = cincin(p[0], true);
+        if (!luar) return;
+        bagian.push(luar);
+        for (var i = 1; i < p.length; i++) { var lubang = cincin(p[i], false); if (lubang) bagian.push(lubang); }
+      });
+      return bagian.length ? { kelompok: 'poligon', bagian: bagian } : null;
+    }
+    return null;
+  }
+
+  function kepalaShp(dv, tipe, panjang, k) {
+    dv.setInt32(0, 9994);
+    dv.setInt32(24, panjang / 2);
+    dv.setInt32(28, 1000, true);
+    dv.setInt32(32, tipe, true);
+    for (var j = 0; j < 4; j++) dv.setFloat64(36 + 8 * j, k[j], true);
+  }
+  /** Berkas .shp dan .shx untuk satu jenis bentuk. */
+  function tulisShp(tipe, daftar) {
+    var n = daftar.length, isi = new Array(n), total = 100, semua = [Infinity, Infinity, -Infinity, -Infinity];
+    daftar.forEach(function (b, i) {
+      var titik = 0, k = [Infinity, Infinity, -Infinity, -Infinity];
+      b.bagian.forEach(function (p) {
+        titik += p.length;
+        p.forEach(function (t) {
+          if (t[0] < k[0]) k[0] = t[0];
+          if (t[1] < k[1]) k[1] = t[1];
+          if (t[0] > k[2]) k[2] = t[0];
+          if (t[1] > k[3]) k[3] = t[1];
+        });
+      });
+      b.titik = titik;
+      b.kotak = k;
+      for (var j = 0; j < 2; j++) { semua[j] = Math.min(semua[j], k[j]); semua[j + 2] = Math.max(semua[j + 2], k[j + 2]); }
+      isi[i] = tipe === 1 ? 20 : tipe === 8 ? 40 + 16 * titik : 44 + 4 * b.bagian.length + 16 * titik;
+      total += 8 + isi[i];
+    });
+    if (!n) semua = [0, 0, 0, 0];
+    var shp = new DataView(new ArrayBuffer(total)), shx = new DataView(new ArrayBuffer(100 + 8 * n)), o = 100;
+    kepalaShp(shp, tipe, total, semua);
+    kepalaShp(shx, tipe, 100 + 8 * n, semua);
+    daftar.forEach(function (b, i) {
+      shx.setInt32(100 + 8 * i, o / 2);
+      shx.setInt32(104 + 8 * i, isi[i] / 2);
+      shp.setInt32(o, i + 1);
+      shp.setInt32(o + 4, isi[i] / 2);
+      shp.setInt32(o + 8, tipe, true);
+      o += 12;
+      if (tipe === 1) {
+        shp.setFloat64(o, b.bagian[0][0][0], true);
+        shp.setFloat64(o + 8, b.bagian[0][0][1], true);
+        o += 16;
+        return;
+      }
+      for (var j = 0; j < 4; j++) { shp.setFloat64(o, b.kotak[j], true); o += 8; }
+      if (tipe === 8) {
+        shp.setInt32(o, b.titik, true);
+        o += 4;
+      } else {
+        shp.setInt32(o, b.bagian.length, true);
+        shp.setInt32(o + 4, b.titik, true);
+        o += 8;
+        var awal = 0;
+        b.bagian.forEach(function (p) { shp.setInt32(o, awal, true); o += 4; awal += p.length; });
+      }
+      b.bagian.forEach(function (p) {
+        p.forEach(function (t) { shp.setFloat64(o, t[0], true); shp.setFloat64(o + 8, t[1], true); o += 16; });
+      });
+    });
+    return { shp: new Uint8Array(shp.buffer), shx: new Uint8Array(shx.buffer) };
+  }
+
+  /** Nama field dBASE: huruf, angka, garis bawah, paling banyak 10, diawali huruf, tidak kembar. */
+  function namaField(asli, dipakai) {
+    var s = String(asli || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9_]+/g, '_').replace(/_+/g, '_').replace(/^_+|_+$/g, '');
+    if (!/^[A-Za-z]/.test(s)) s = 'F_' + s;
+    s = s.slice(0, 10).replace(/_+$/, '') || 'F';
+    var nama = s, n = 2;
+    while (dipakai[nama.toUpperCase()]) {
+      var akhir = '_' + n++;
+      nama = s.slice(0, 10 - akhir.length).replace(/_+$/, '') + akhir;
+    }
+    dipakai[nama.toUpperCase()] = true;
+    return nama;
+  }
+  function desimal(v) {
+    if (Number.isInteger(v)) return 0;
+    var s = String(Math.abs(v)), e = s.indexOf('e');
+    if (e < 0) return Math.min(8, (s.split('.')[1] || '').length);
+    return Math.max(0, Math.min(8, (s.slice(0, e).split('.')[1] || '').length - Number(s.slice(e + 1))));
+  }
+  /** Rancangan satu field: angka (N), tanggal tanpa jam (D), selain itu teks (C, paling panjang 254 byte). */
+  function rancangField(nama, nilai) {
+    var n = nilai.length, angkaSaja = true, tglSaja = true, ada = false, des = 0, i, v, s;
+    for (i = 0; i < n && (angkaSaja || tglSaja); i++) {
+      v = nilai[i];
+      if (v === '' || v === null || v === undefined) continue;
+      ada = true;
+      if (typeof v === 'number' && isFinite(v) && Math.abs(v) < 1e15) { tglSaja = false; des = Math.max(des, desimal(v)); }
+      else { angkaSaja = false; if (typeof v !== 'string' || !POLA_TGL_SAJA.test(v)) tglSaja = false; }
+    }
+    var f = { nama: nama, jenis: 'C', lebar: 1, desimal: 0, isi: new Array(n), dipotong: 0 };
+    if (ada && angkaSaja) {
+      var teks = new Array(n), lebar = 1;
+      for (i = 0; i < n; i++) {
+        v = nilai[i];
+        teks[i] = typeof v === 'number' ? v.toFixed(des) : null;
+        if (teks[i] && teks[i].length > lebar) lebar = teks[i].length;
+      }
+      if (lebar <= 24) {
+        f.jenis = 'N'; f.lebar = lebar; f.desimal = des;
+        for (i = 0; i < n; i++) f.isi[i] = teks[i] ? ascii(teks[i]) : null;
+        return f;
+      }
+    } else if (ada && tglSaja) {
+      f.jenis = 'D'; f.lebar = 8;
+      for (i = 0; i < n; i++) { v = nilai[i]; f.isi[i] = typeof v === 'string' && v ? ascii(v.replace(/-/g, '')) : null; }
+      return f;
+    }
+    for (i = 0; i < n; i++) {
+      v = nilai[i];
+      if (v === '' || v === null || v === undefined) { f.isi[i] = null; continue; }
+      s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+      var b = utf8(s);
+      if (b.length > 254) {
+        var potong = 254;
+        while (potong > 0 && (b[potong] & 0xc0) === 0x80) potong--;
+        b = b.subarray(0, potong);
+        f.dipotong++;
+      }
+      f.isi[i] = b;
+      if (b.length > f.lebar) f.lebar = b.length;
+    }
+    return f;
+  }
+  /** Berkas .dbf (dBASE III) dari rancangan field. */
+  function tulisDbf(fields, n) {
+    var lebarRekam = 1;
+    fields.forEach(function (f) { lebarRekam += f.lebar; });
+    var kepala = 32 + 32 * fields.length + 1, total = kepala + n * lebarRekam + 1;
+    var u8 = new Uint8Array(total), dv = new DataView(u8.buffer), kini = new Date();
+    u8[0] = 3;
+    u8[1] = kini.getFullYear() - 1900;
+    u8[2] = kini.getMonth() + 1;
+    u8[3] = kini.getDate();
+    dv.setUint32(4, n, true);
+    dv.setUint16(8, kepala, true);
+    dv.setUint16(10, lebarRekam, true);
+    fields.forEach(function (f, j) {
+      var o = 32 + 32 * j;
+      for (var c = 0; c < f.nama.length; c++) u8[o + c] = f.nama.charCodeAt(c);
+      u8[o + 11] = f.jenis.charCodeAt(0);
+      u8[o + 16] = f.lebar;
+      u8[o + 17] = f.desimal;
+    });
+    u8[kepala - 1] = 0x0d;
+    u8.fill(0x20, kepala, total - 1);
+    for (var i = 0, o = kepala; i < n; i++, o += lebarRekam) {
+      var p = o + 1;
+      for (var j = 0; j < fields.length; j++) {
+        var f = fields[j], b = f.isi[i];
+        if (b) u8.set(b, f.jenis === 'N' ? p + f.lebar - b.length : p);
+        p += f.lebar;
+      }
+    }
+    u8[total - 1] = 0x1a;
+    return u8;
+  }
+
+  /** Set Shapefile dari daftar { bentuk, nilai } (nilai sejajar dengan kolom). Bentuk campuran dipecah per jenis. */
+  function setShapefile(dasar, kolom, fitur) {
+    var kelompok = {}, urut = [], pakai = kolom.slice(0, 254), berkas = [], peta = [];
+    var hasil = { berkas: berkas, jumlah: {}, dipotong: 0, kolomLebih: kolom.length - pakai.length };
+    fitur.forEach(function (f) {
+      var k = f.bentuk.kelompok;
+      if (!kelompok[k]) { kelompok[k] = []; urut.push(k); }
+      kelompok[k].push(f);
+    });
+    urut.forEach(function (k) {
+      var daftar = kelompok[k], nama = urut.length > 1 ? dasar + '_' + k : dasar, dipakai = {};
+      var fields = pakai.map(function (h, c) {
+        return rancangField(namaField(h, dipakai), daftar.map(function (f) { return f.nilai[c]; }));
+      });
+      if (!fields.length) fields = [rancangField('ID', daftar.map(function (f, i) { return i + 1; }))];
+      var g = tulisShp(TIPE_SHP[k], daftar.map(function (f) { return f.bentuk; }));
+      berkas.push({ nama: nama + '.shp', isi: g.shp }, { nama: nama + '.shx', isi: g.shx }, { nama: nama + '.dbf', isi: tulisDbf(fields, daftar.length) },
+        { nama: nama + '.prj', isi: PRJ_WGS84 }, { nama: nama + '.cpg', isi: 'UTF-8' });
+      hasil.jumlah[k] = daftar.length;
+      fields.forEach(function (f, c) {
+        hasil.dipotong += f.dipotong;
+        if (!peta[c]) peta[c] = [f.nama, pakai[c] === undefined ? 'nomor urut' : pakai[c], JENIS_FIELD[f.jenis] + ' (' + f.jenis + ' ' + f.lebar + (f.desimal ? '.' + f.desimal : '') + ')'];
+      });
+    });
+    if (urut.length) berkas.push({ nama: dasar + '_kolom.csv', isi: csvTeks(['Field', 'Kolom asli', 'Jenis'], peta) });
+    return hasil;
+  }
+
+  /** Data tabel: titik dari kolom X dan Y. Kolom X dan Y tetap ikut sebagai atribut. */
+  function shapefileData(r, dasar) {
+    var titik = titikBaris(r);
+    r.titikAda = titik.length;
+    return setShapefile(dasar, r.kolom, titik.map(function (t) { return { bentuk: { kelompok: 'titik', bagian: [[[t.x, t.y]]] }, nilai: t.row }; }));
+  }
+
+  /** Lapisan GeoJSON apa pun: atribut dari properti semua fitur, fitur tanpa bentuk dilewati. */
+  function shapefileGeojson(gj, dasar) {
+    var fitur = gj && Array.isArray(gj.features) ? gj.features : [], kolom = [], ada = {}, daftar = [], lewat = 0;
+    fitur.forEach(function (f) {
+      Object.keys((f && f.properties) || {}).forEach(function (k) { if (!ada[k]) { ada[k] = true; kolom.push(k); } });
+    });
+    fitur.forEach(function (f) {
+      var b = null;
+      try { b = bentukShp(f && f.geometry); } catch (e) { b = null; }
+      if (!b) { lewat++; return; }
+      var p = f.properties || {};
+      daftar.push({ bentuk: b, nilai: kolom.map(function (k) { return p[k] === null || p[k] === undefined ? '' : p[k]; }) });
+    });
+    var hasil = setShapefile(dasar, kolom, daftar);
+    hasil.lewat = lewat;
+    return hasil;
   }
 
   function simpanBerkas(blob, nama) {
@@ -857,26 +1195,48 @@
   }
 
   /* ---------- lapisan peta (berkas publik, tanpa Mesin Data) ---------- */
+  function statusLapisan(teks, galat) {
+    var s = $('statusLapisan');
+    if (!s) return;
+    s.textContent = teks;
+    s.classList.toggle('status--galat', !!galat);
+  }
+
   function gambarLapisan() {
     var ul = $('daftarLapisan');
     ul.innerHTML = LAPISAN.map(function (l, i) {
-      return '<li><b>' + esc(l.judul) + '</b><p>' + esc(l.ket) + '</p>' +
-        '<button type="button" class="tombol tombol--hantu tombol--kecil" data-lapisan="' + i + '" aria-label="Unduh ' + esc(l.judul) + ' (GeoJSON)">' + IKON.unduh + 'GeoJSON</button></li>';
+      return '<li><b>' + esc(l.judul) + '</b><p>' + esc(l.ket) + '</p><div class="lapisan-tombol">' +
+        '<button type="button" class="tombol tombol--hantu tombol--kecil" data-lapisan="' + i + '" data-format="geojson" aria-label="Unduh ' + esc(l.judul) + ' sebagai GeoJSON">' + IKON.unduh + 'GeoJSON</button>' +
+        '<button type="button" class="tombol tombol--hantu tombol--kecil" data-lapisan="' + i + '" data-format="shp" aria-label="Unduh ' + esc(l.judul) + ' sebagai Shapefile">' + IKON.unduh + 'Shapefile</button>' +
+        '</div></li>';
     }).join('');
     ul.addEventListener('click', function (e) {
       var b = e.target.closest('[data-lapisan]');
       if (!b || b.disabled) return;
-      var l = LAPISAN[Number(b.getAttribute('data-lapisan'))], asli = b.innerHTML;
+      var l = LAPISAN[Number(b.getAttribute('data-lapisan'))], shp = b.getAttribute('data-format') === 'shp', asli = b.innerHTML;
       b.disabled = true;
-      b.innerHTML = PUTAR + 'Mengunduh';
-      fetch(l.url, { cache: 'no-store' }).then(function (r) {
+      b.innerHTML = PUTAR + (shp ? 'Menyusun' : 'Mengunduh');
+      statusLapisan('');
+      var ambil = fetch(l.url, { cache: 'no-store' }).then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
-        return r.blob();
-      }).then(function (blob) {
+        return shp ? r.json() : r.blob();
+      });
+      var kerja = shp ? Promise.all([ambil, muatSheetJS()]).then(function (x) {
+        var dasar = l.berkas.replace(/\.geojson$/, ''), s = shapefileGeojson(x[0], dasar);
+        if (!s.berkas.length) throw new Error('lapisan ini tidak berisi bentuk yang bisa disimpan sebagai Shapefile');
+        var isi = Object.keys(s.jumlah).map(function (k) { return angka(s.jumlah[k]) + ' ' + k; });
+        s.berkas.push({ nama: 'KETERANGAN.txt', isi: '﻿' + [l.judul, '', 'Sumber: ' + new URL(l.url, location.href).href, 'Isi: ' + daftarTeks(isi) + (s.lewat ? ' (' + s.lewat + ' fitur tanpa bentuk dilewati)' : ''), '']
+          .concat(catatanShp(s.dipotong, s.kolomLebih).slice(1).filter(function (t) { return t.indexOf('X dan Y') < 0; })).join('\r\n') + '\r\n' });
+        simpanBerkas(zip(s.berkas), dasar + '.shp.zip');
+        statusLapisan(l.judul + ': ' + daftarTeks(isi) + ' disimpan sebagai ' + dasar + '.shp.zip.');
+      }).catch(function (err) {
+        statusLapisan('Shapefile ' + l.judul + ' gagal disusun: ' + err.message + '. Coba lagi, atau unduh GeoJSON-nya.', true);
+      }) : ambil.then(function (blob) {
         simpanBerkas(new Blob([blob], { type: 'application/geo+json' }), l.berkas);
       }).catch(function () {
         window.open(l.url, '_blank', 'noopener');
-      }).then(function () {
+      });
+      kerja.then(function () {
         b.disabled = false;
         b.innerHTML = asli;
       });

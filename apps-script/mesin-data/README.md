@@ -58,4 +58,4 @@ Hub mengirim `POST` berisi JSON (teks biasa, tanpa preflight CORS):
 
 ## Lembar Katalog
 
-Satu baris per tab data. Kolom `judul`, `tema`, `keterangan`, `akses`, `kolom_admin`, dan `tampil` boleh diubah dan dipertahankan. Kolom `jumlah_baris`, `tahun_awal`, `tahun_akhir`, `kolom`, `faset`, dan `diperbarui` dihitung ulang setiap kali data berubah (setelah proses file patroli dan pembaruan sumber), atau lewat menu **Perbarui katalog Unduh Data**.
+Satu baris per tab data. Kolom `judul`, `tema`, `keterangan`, `akses`, `kolom_admin`, dan `tampil` boleh diubah dan dipertahankan. Kolom `jumlah_baris`, `tahun_awal`, `tahun_akhir`, `kolom`, `faset`, `diperbarui`, dan `jumlah_titik` (baris yang punya koordinat X dan Y; data tanpa titik tidak ditawarkan sebagai GeoJSON atau Shapefile) dihitung ulang setiap kali data berubah (setelah proses file patroli dan pembaruan sumber), atau lewat menu **Perbarui katalog Unduh Data**.
