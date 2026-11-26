@@ -83,7 +83,7 @@ Akun yang sama dipakai untuk masuk ke seluruh situs Satu Data Tambora dan panel 
 |---|---|
 | `Username` | Singkat, tanpa spasi, misalnya NIP atau `deo.falsa`. Tidak membedakan huruf besar-kecil. |
 | `Nama` | Nama yang tampil di panel chat |
-| `Peran` | `pegawai` atau `admin`. Admin bisa membuka unduhan milik siapa pun. |
+| `Peran` | `pegawai` atau `admin`. Admin bisa membuka unduhan milik siapa pun, dan di tab Unduh Data ikut mengunduh kolom data pribadi (nama pelaku, nama pengguna lahan, dan sejenisnya). |
 | `Aktif` | `Ya` atau `Tidak`. Ubah ke `Tidak` untuk menonaktifkan tanpa menghapus. |
 | `Batas harian` | Kosongkan untuk memakai batas bawaan (20 pertanyaan per hari) |
 | `Password baru` | Lihat di bawah. Kolom ini selalu kosong setelah diproses. |
@@ -139,6 +139,10 @@ Jalankan **Tanya Data → Uji kecepatan**. Jendela hasilnya menunjukkan lama mem
 ## Bila muncul "Layanan AI sedang penuh"
 
 Server Gemini kadang menolak permintaan saat sedang ramai (HTTP 503), terutama untuk model yang baru rilis dan di tier gratis. Skrip mencoba ulang dua kali (jeda 2 dan 6 detik), lalu mengulang pertanyaan dengan `MODEL_GEMINI_CADANGAN`. Setelah itu model utama dilewati selama 10 menit, jadi pertanyaan berikutnya langsung dijawab model cadangan tanpa menunggu percobaan ulang. Bila keduanya tetap penuh, pegawai melihat pesan "Layanan AI sedang penuh" dan jatah pertanyaannya tidak berkurang. Bila sering terjadi, aktifkan penagihan (tier berbayar) atau ganti `MODEL_GEMINI` ke model yang lebih stabil.
+
+## Dipakai Mesin Data (Unduh Data)
+
+Tab Unduh Data mengambil data dari [Mesin Data](mesin-data/README.md), bukan dari Tanya Data. Mesin Data memeriksa token login hub ke aplikasi web ini lewat aksi `siapa` (jawabannya username, nama, dan peran) agar tahu apakah pemakai pegawai atau admin. Aksi `siapa` hanya menjawab untuk token sesi yang masih berlaku. Tanya Data yang belum diperbarui ke versi dengan aksi `siapa` tetap bisa dipakai; semua akun lalu dianggap pegawai.
 
 ## Memperbarui skrip
 

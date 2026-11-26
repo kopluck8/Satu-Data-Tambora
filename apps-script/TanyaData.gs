@@ -358,6 +358,8 @@ function doPost(e) {
     if (!sesi) return json_({ ok: false, galat: 'Sesi berakhir. Silakan masuk lagi.', masukLagi: true });
     if (m.aksi === 'keluar') { CacheService.getScriptCache().remove('sesi_' + m.token); return json_({ ok: true }); }
     if (m.aksi === 'sisa') return json_({ ok: true, sisa: sisaKuota_(sesi) });
+    // Dipakai Mesin Data (tab Unduh Data) untuk memeriksa token dan peran pemakai.
+    if (m.aksi === 'siapa') return json_({ ok: true, u: sesi.u, nama: sesi.nama, peran: sesi.peran });
     if (m.aksi === 'unduh') return json_(unduh_(sesi, m.id));
     if (m.aksi === 'tanya') return json_(tanya_(sesi, m));
     return json_({ ok: false, galat: 'Aksi tidak dikenal.' });

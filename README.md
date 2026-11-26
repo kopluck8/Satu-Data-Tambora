@@ -191,7 +191,7 @@ Pengingat berlaku umum untuk semua pegawai, tidak per akun. Browser membaca DE-B
 
 ## Login
 
-Situs ini, termasuk halaman `resor/`, `kehati/`, `penyuluhan/`, `tenurial/`, dan `kepegawaian/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
+Situs ini, termasuk halaman `resor/`, `kehati/`, `penyuluhan/`, `tenurial/`, `kepegawaian/`, dan `unduh/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
 
 > Gerbang ini menutup tampilan, bukan file. Selama repo dan GitHub Pages publik, file data (misalnya `data/resor/*.json`, `data/tenurial/*.geojson`) dan aplikasi lain di `kopluck8.github.io` tetap bisa dibuka langsung oleh siapa pun yang tahu alamatnya, dan isi repo terlihat di GitHub. Data yang benar-benar rahasia jangan disimpan di repo publik; sajikan lewat Apps Script yang memeriksa login. Halaman diberi `noindex` dan `robots.txt` agar tidak muncul di mesin pencari.
 
@@ -204,6 +204,19 @@ Tombol **Tanya Data** di pojok kanan bawah membuka panel chat. Pegawai masuk den
 - **Tombol baru tampil** setelah URL Web App diisi di `TANYA_DATA` pada [`data/sumber.js`](data/sumber.js).
 
 Panduan pemasangan, membuat akun pegawai, mengganti model, dan menambah dataset: [`apps-script/README.md`](apps-script/README.md).
+
+## Unduh Data
+
+Tab **Unduh Data** membuka halaman [`unduh/`](unduh/index.html) untuk mengunduh semua data yang terkumpul di **Mesin Data**, spreadsheet tempat file patroli SMART dari Drive dan sumber lain (LPK teknis PEH, rekap SMART, penyuluhan, pulbaket, titik panas, areal terbakar, RBM, drone, profil resor) dipecah ke tab per tema mengikuti peta konsep 2027.
+
+- **Pilih data** per tema (dikelompokkan seperti lembar Induk Mesin Data), lalu **saring** menurut tahun atau rentang tanggal, jenis kegiatan, resor, SPTN, kategori temuan, kelompok jenis, sumber data, dan kata kunci. Jumlah baris yang cocok dihitung sebelum diunduh.
+- **Format**: Excel (satu lembar per data, tanggal sebagai tanggal Excel, ditambah lembar Keterangan berisi saringan dan sumber), CSV (zip bila lebih dari satu data), atau GeoJSON titik untuk data berkoordinat. Berkas disusun di browser; SheetJS dimuat dari cdnjs hanya saat dibutuhkan.
+- **Lapisan peta** (batas kawasan, batas resor 2026, zonasi, jalan dan jalur, jalur patroli SMART 2026, areal terbakar 2026) bisa diunduh langsung tanpa Mesin Data.
+- **Privasi**: data dibaca lewat aplikasi web Apps Script yang memeriksa login Tanya Data, bukan dari file publik. Kolom data pribadi (nama pelaku, nama pengguna lahan, dan sejenisnya) hanya ikut bagi akun berperan admin, dan setiap unduhan dicatat di lembar Log Unduhan.
+- **Tautan langsung** untuk kartu di Sheet konten: `unduh/index.html#tema=kehati` (kode induk: `pp`, `karhut`, `kehati`, `peny`, `wisata`, `fitur`, `rbm`, `survei`), `#data=<id katalog>`, atau `#peta`.
+- **Menyambungkan (sekali saja)**: terapkan Mesin Data sebagai aplikasi web, lalu tempel URL `/exec` di tab `Pengaturan` Sheet konten dengan `kunci` = `unduh_data` (atau isi `UNDUH_DATA` di `data/sumber.js`). Sebelum tersambung, halaman menampilkan langkah ini.
+
+Kode dan panduan Mesin Data: [`apps-script/mesin-data/README.md`](apps-script/mesin-data/README.md).
 
 ## Foto
 
@@ -224,7 +237,7 @@ assets/gerbang.js                  halaman masuk (login) untuk seluruh situs
 assets/pegawai.js                  membaca dan mengolah spreadsheet DE-BORA di browser (tab Kepegawaian)
 assets/foto/                       foto latar
 assets/img/                        logo
-data/sumber.js                     link Google Sheets dan URL Web App Tanya Data
+data/sumber.js                     link Google Sheets dan URL Web App Tanya Data dan Mesin Data (Unduh Data)
 data/konten/*.csv                  salinan cadangan isi (sama dengan tab spreadsheet)
 data/Konten_Satu_Data_Tambora.xlsx spreadsheet awal untuk diunggah ke Google Drive
 resor/                             halaman Resor Pengelolaan (ikhtisar, profil per resor, metode)
@@ -236,8 +249,10 @@ tenurial/                          halaman Penanganan Konflik Tenurial Karya Sar
 penyuluhan/                        halaman Penyuluhan dan Pemberdayaan Masyarakat (kelompok binaan, 15 program, laporan)
 data/penyuluhan/                   data kurasi laporan penyuluhan dan pemberdayaan (JSON dan CSV)
 kepegawaian/                       halaman Kepegawaian De-Bora (DE-BORA dibaca langsung oleh browser, tidak disimpan di repo)
+unduh/                             halaman Unduh Data (data dari aplikasi web Mesin Data, lapisan peta publik)
 data/tenurial/                     rangkuman pulbaket ST.1452, peta bidang beserta nama pengguna, areal terbakar, zonasi
 apps-script/                       backend Tanya Data (Google Apps Script) dan panduan pemasangannya
+apps-script/mesin-data/            Mesin Data: Apps Script spreadsheet tempat seluruh data berkumpul (file patroli, sumber lain, Unduh Data)
 .github/workflows/resor.yml        pembaruan analisis resor harian
 ```
 
