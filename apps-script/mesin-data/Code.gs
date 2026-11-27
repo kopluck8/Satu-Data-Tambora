@@ -7,9 +7,14 @@
  *   2. jenis kegiatan dibaca dari mandat patroli (lembar "Mandat");
  *   3. nama jenis diseragamkan ke nama ilmiah baku, nama umum, dan nama lokal (lembar "Kamus Jenis");
  *   4. salah ketik label data model dibetulkan (lembar "Ejaan" dan kolom label_baku di "Label Data Model");
- *   5. data sebelum 2027 dan data tab lain (LPK PEH, penyuluhan, RBM, karhut, tenurial, drone) diperbarui dari
- *      sumbernya (lembar "Sumber", berkas Sumber.gs);
+ *   5. data sebelum 2027 dan data tab lain (LPK PEH, penyuluhan, RBM, karhut, pulbaket, drone) diseragamkan ke kategori
+ *      dan atribut data model 2027 lalu masuk ke rekap yang sama (lembar "Sumber", berkas Sumber.gs);
  *   6. tab "Unduh Data" di hub membaca data dari sini lewat aplikasi web (berkas Unduh.gs, lembar "Katalog").
+ *
+ * Peta konsep 2027 (perbaikan Deo 27-11-2026): 12 rekap berisi data mentah per kategori data model, terpisah dari hasil
+ * analisis. Kartu dan tab hub menyajikan data dari rekap ini. Rekap Temuan Satwa dan Temuan Tumbuhan juga dirute per
+ * atribut (seperti query atribut SMART): observasi kategori apa pun yang berisi jenis satwa/tumbuhan ikut masuk, hanya
+ * dengan kolom jenis dan jumlah. Tabel Survei Kehati Metode Teknis tetap lengkap di lembar survei (bahan Kalkulator Teknis).
  *
  * Skrip ini menempel pada spreadsheet Mesin Data (Ekstensi > Apps Script). File patroli di folder Drive tidak dipindah
  * atau diubah; berkas yang sudah diproses dicatat di "Log Berkas".
@@ -71,7 +76,6 @@ function onOpen() {
     .addSeparator()
     .addItem('Perbarui katalog Unduh Data', 'perbaruiKatalog')
     .addItem('Uji Unduh Data (tanpa hub)', 'ujiUnduhData')
-    .addItem('Hitung ulang rekap per resor', 'rekapPerResor')
     .addItem('Rapikan nama di semua rekap (setelah Kamus/Ejaan diubah)', 'rapikanSemuaRekap')
     .addItem('Proses ulang semua file patroli', 'prosesUlangSemua')
     .addItem('Hentikan pemicu otomatis', 'hapusPemicu')
@@ -128,11 +132,17 @@ function muatMesin_() {
     }
   });
   bacaTabel_(ss, LEMBAR.rute).forEach(function (r) {
-    if (r.kategori_hkey && r.nama_kategori) M.hkeyLabel[kunci_(r.nama_kategori)] = M.hkeyLabel[kunci_(r.nama_kategori)] || String(r.kategori_hkey);
+    if (r.kategori_hkey && r.nama_kategori && String(r.kategori_hkey).charAt(0) !== '@')
+      M.hkeyLabel[kunci_(r.nama_kategori)] = M.hkeyLabel[kunci_(r.nama_kategori)] || String(r.kategori_hkey);
     if (!r.kategori_hkey || !r.tab_tujuan) return;
-    M.rute.push({ hkey: String(r.kategori_hkey), penghubung: r.penghubung, tab: String(r.tab_tujuan), induk: r.induk,
+    var hk = String(r.kategori_hkey).trim();
+    M.rute.push({ hkey: hk, penghubung: r.penghubung, tab: String(r.tab_tujuan), induk: r.induk,
       atribut: String(r.atribut || '').split(',').map(function (s) { return s.trim(); }).filter(String),
-      syarat: String(r.syarat_jenis_kegiatan || '').split(',').map(function (s) { return kunci_(s); }).filter(String) });
+      syarat: String(r.syarat_jenis_kegiatan || '').split(',').map(function (s) { return kunci_(s); }).filter(String),
+      // "@a|b": rute per atribut (observasi kategori apa pun yang berisi atribut a atau b)
+      syaratAtribut: hk.charAt(0) === '@' ? hk.slice(1).split('|').map(function (s) { return s.trim(); }).filter(String) : null,
+      // atribut_lain "tidak": atribut di luar kolom atribut tidak ditulis (juga tidak ke kolom Atribut lain)
+      atributLain: String(r.atribut_lain || '').trim().toLowerCase() !== 'tidak' });
   });
   bacaTabel_(ss, LEMBAR.mandat).forEach(function (r) { M.mandat[kunci_(r.mandat)] = r.jenis_kegiatan; });
   bacaTabel_(ss, LEMBAR.kamus).forEach(function (r) {
@@ -497,11 +507,18 @@ function idObservasi_(o) {
   return 'ptr-' + md5_(JSON.stringify([o.tgl, o.waktu, o.x, o.y, o.hkey, atr])).slice(0, 16);
 }
 
-/** Rute yang cocok untuk satu observasi (awalan hkey + syarat jenis kegiatan); satu tab hanya sekali. */
-function cariRute_(M, hkey, jenis) {
+/**
+ * Rute yang cocok untuk satu observasi (awalan hkey + syarat jenis kegiatan); satu tab hanya sekali. Rute kategori
+ * didahulukan; rute per atribut ("@...") dipakai bila observasi berisi salah satu atribut syaratnya (adaAtribut:
+ * {kunci atribut: true}) dan tabnya belum terisi rute kategori.
+ */
+function cariRute_(M, hkey, jenis, adaAtribut) {
   var dipakai = {}, hasil = [];
-  M.rute.forEach(function (r) {
-    if (hkey.indexOf(r.hkey) !== 0) return;
+  var urut = M.rute.filter(function (r) { return !r.syaratAtribut; }).concat(M.rute.filter(function (r) { return r.syaratAtribut; }));
+  urut.forEach(function (r) {
+    if (r.syaratAtribut) {
+      if (!adaAtribut || !r.syaratAtribut.some(function (a) { return adaAtribut[a]; })) return;
+    } else if (hkey.indexOf(r.hkey) !== 0) return;
     if (r.syarat.length && r.syarat.indexOf(kunci_(jenis)) < 0) return;
     var k = r.induk + '|' + r.tab;
     if (dipakai[k]) return;
@@ -520,7 +537,9 @@ function catatTanpaRute_(M, hkey, nama, berkas) {
 function olahObservasi_(M, o, berkas, sekarang) {
   o.atr = alihKunci_(M, o.atr);
   var jenis = jenisKegiatan_(M, o.mandat);
-  var rute = cariRute_(M, o.hkey, jenis);
+  var ada = {};
+  Object.keys(o.atr).forEach(function (ak) { if (o.atr[ak] !== '' && o.atr[ak] !== null && o.atr[ak] !== undefined) ada[ak] = true; });
+  var rute = cariRute_(M, o.hkey, jenis, ada);
   var kat = labelKategori_(M, o.hkey);
   if (!rute.length) { catatTanpaRute_(M, o.hkey, kat.join(' > '), berkas); return []; }
   var tgl = tanggal_(o.tgl), resor = cariResor_(M, o.x, o.y);
@@ -546,7 +565,7 @@ function olahObservasi_(M, o, berkas, sekarang) {
         if (v !== '' && v !== null) lain.push(labelAtribut_(M, ak) + ': ' + v);
       }
     });
-    if (lain.length) b['Atribut lain'] = lain.join('; ');
+    if (lain.length && r.atributLain) b['Atribut lain'] = lain.join('; ');
     return { induk: r.induk, tab: r.tab, baris: b, urutAtribut: pilih.map(function (ak) { return judulAtribut_(M, ak); }) };
   });
 }
@@ -809,10 +828,7 @@ function prosesFileMasuk() {
       totalBaris += nBaris + nLeg;
     }
     simpanCatatan_(M);
-    if (totalBaris) {
-      rekapPerResor_(M);
-      perbaruiKatalog_(M);
-    }
+    if (totalBaris) perbaruiKatalog_(M);
     var sisa = antre.length - selesai;
     kabari_(selesai + ' berkas diproses, ' + totalBaris + ' baris rekap baru.' +
       (sisa ? ' ' + sisa + ' berkas lanjut di putaran berikutnya.' : ''));
@@ -845,63 +861,6 @@ function simpanCatatan_(M) {
   M.tanpaRute = {};
 }
 
-/* =========================== rekap per resor =========================== */
-
-function rekapPerResor() {
-  rekapPerResor_(muatMesin_());
-  kabari_('Rekap per resor diperbarui.');
-}
-
-function rekapPerResor_(M) {
-  var dari = String(M.atur.TAB_PER_RESOR_DARI || '').split(',').map(function (s) { return s.trim(); }).filter(String);
-  var sumber = [];
-  dari.forEach(function (id) {
-    var r = M.rute.filter(function (x) { return x.penghubung === id; })[0];
-    if (r) sumber.push({ judul: r.tab, induk: r.induk, tab: r.tab });
-  });
-  sumber.push({ judul: 'Leg patroli', induk: 'rbm', tab: String(M.atur.TAB_UPAYA || 'Rekap Upaya Patroli'), upaya: true });
-
-  var data = {};
-  function sel(resor, tahun) {
-    var k = resor + '|' + tahun;
-    return data[k] || (data[k] = { resor: resor, tahun: tahun, n: {}, km: 0, satwa: {}, tumbuhan: {} });
-  }
-  sumber.forEach(function (s) {
-    var sh;
-    try { sh = bukaInduk_(M, s.induk).getSheetByName(s.tab); } catch (e) { return; }
-    if (!sh || sh.getLastRow() < 2) return;
-    var v = sh.getDataRange().getValues(), h = v.shift();
-    var iR = h.indexOf('Resor'), iT = h.indexOf('Tahun'), iKm = h.indexOf('Panjang jalur (km)'),
-      iIlm = h.indexOf('Nama ilmiah baku'), iKel = h.indexOf('Kode jenis'), iKat = h.indexOf('Kategori 0');
-    v.forEach(function (r) {
-      var c = sel(r[iR] || 'Di luar batas resor', r[iT] || 'Tanpa tahun');
-      c.n[s.judul] = (c.n[s.judul] || 0) + 1;
-      if (s.upaya && iKm >= 0) c.km += Number(r[iKm]) || 0;
-      if (iIlm >= 0 && r[iIlm]) {
-        var tanda = (iKel >= 0 ? String(r[iKel]) : '') + ' ' + (iKat >= 0 ? String(r[iKat]) : '');
-        var grup = /tumbuhan|flora|anggrek/i.test(tanda) ? 'tumbuhan' : 'satwa';
-        c[grup][r[iIlm]] = true;
-      }
-    });
-  });
-  var judul = ['Resor', 'Tahun'].concat(sumber.map(function (s) { return s.judul; }),
-    ['Panjang jalur (km)', 'Jumlah jenis satwa', 'Jumlah jenis tumbuhan', 'Diperbarui']);
-  var sekarang = new Date();
-  var baris = Object.keys(data).sort().map(function (k) {
-    var c = data[k];
-    return [c.resor, c.tahun].concat(sumber.map(function (s) { return c.n[s.judul] || 0; }),
-      [Math.round(c.km * 100) / 100, Object.keys(c.satwa).length, Object.keys(c.tumbuhan).length, sekarang]);
-  });
-  var nama = String(M.atur.TAB_PER_RESOR || 'Rekap Potensi dan Ancaman per Resor');
-  var t = tabInduk_(M, 'rbm', nama, judul), sh = t.sh;
-  sh.clearContents();
-  sh.getRange(1, 1, 1, judul.length).setValues([judul]).setFontWeight('bold');
-  sh.setFrozenRows(1);
-  if (baris.length) sh.getRange(2, 1, baris.length, judul.length).setValues(baris.map(function (r) { return r.map(amanSel_); }));
-  t.kepala = judul;
-  M.diubah[nama] = true;
-}
-
 /* =========================== siapkan, rapikan, pemicu =========================== */
 
 /** Semua tab data yang dikenal: tab tujuan Rute, tab Sumber, tab rekap tetap. {nama: induk} */
@@ -913,16 +872,32 @@ function tabData_(M) {
     if (t && s.induk && !tab[t]) tab[t] = s.induk;
   });
   tab[String(M.atur.TAB_UPAYA || 'Rekap Upaya Patroli')] = 'rbm';
-  tab[String(M.atur.TAB_PER_RESOR || 'Rekap Potensi dan Ancaman per Resor')] = 'rbm';
   return tab;
 }
 
 /**
  * Siapkan tab rekap (tab survei metode teknis dibuat saat datanya pertama masuk), urutkan tab per induk, beri warna.
- * Induk yang kolom id_spreadsheet-nya diisi "baru" dipindah ke spreadsheet tersendiri (pilihan, untuk data besar).
+ * Lembar kendali diperbarui dulu dari Kendali.gs bila versinya lebih baru, lalu tab rekap lama yang isinya kini masuk
+ * ke 12 rekap dihapus. Induk yang kolom id_spreadsheet-nya diisi "baru" dipindah ke spreadsheet tersendiri.
  */
 function siapkanSpreadsheetInduk() {
+  var catatan = [], ssAktif = SpreadsheetApp.getActive(), naik = false;
+  // Lembar kendali bawaan (berkas Kendali.gs) dipasang dulu bila versinya lebih baru. Tab rekap lalu dikosongkan dan
+  // diisi ulang dengan susunan baru: menu 3 (sumber lain) dan menu 2 (semua file patroli dibaca lagi).
+  if (typeof kendaliPerluDiperbarui_ !== 'function') {
+    catatan.push('Berkas Kendali belum ada di proyek Apps Script, jadi lembar kendali tidak diperbarui ke peta konsep ' +
+      'terbaru. Buat berkas skrip Kendali, tempel Kendali.gs, lalu jalankan menu 1 lagi');
+  } else if (kendaliPerluDiperbarui_(ssAktif)) {
+    try {
+      var ui = SpreadsheetApp.getUi();
+      if (ui.alert('Perbarui Mesin Data ke peta konsep ' + VERSI_KENDALI + '?', 'Lembar Rute, Induk, Petunjuk, Pengaturan, dan ' +
+        'Sumber diperbarui (isian folder, alamat, dan status aktif yang sudah ada tetap). Tab rekap dikosongkan lalu diisi ' +
+        'ulang: jalankan menu 3, lalu menu 2. File patroli dan sumber aslinya tidak disentuh.', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
+    } catch (e) { /* dijalankan dari editor */ }
+    naik = perbaruiLembarKendali_(ssAktif, catatan);
+  }
   var M = muatMesin_(), sh = M.ss.getSheetByName(LEMBAR.induk), v = sh.getDataRange().getValues();
+  if (naik) catatan.push(kosongkanRekap_(M) + ' tab rekap dikosongkan dan Log Berkas dikosongkan: jalankan menu 3 lalu menu 2');
   samakanZona_(M.ss);
   var kepala = v[0].map(String), iId = kepala.indexOf('id_spreadsheet');
   var folder = M.atur.FOLDER_REKAP ? DriveApp.getFolderById(String(M.atur.FOLDER_REKAP)) : null;
@@ -930,6 +905,7 @@ function siapkanSpreadsheetInduk() {
   if (!folderPatroli_(M).length) pesan.push('FOLDER_PATROLI masih kosong');
   // tab rekap utama (bukan per tabel survei) dibuat kosong agar susunannya terlihat
   M.rute.forEach(function (r) { if (r.penghubung !== 'surveikehati') tabInduk_(M, r.induk, r.tab, KOLOM_DEPAN); });
+  hapusTabLama_(M, catatan);
   tabInduk_(M, 'rbm', String(M.atur.TAB_UPAYA || 'Rekap Upaya Patroli'), KOLOM_UPAYA);
   // induk yang diminta pindah ke spreadsheet sendiri
   var dipindah = 0;
@@ -954,7 +930,56 @@ function siapkanSpreadsheetInduk() {
   urutkanTab_(M);
   perbaruiKatalog_(M, true);
   kabari_('Tab siap' + (dipindah ? ', ' + dipindah + ' induk dipindah ke spreadsheet sendiri' : '') + '.' +
-    (pesan.length ? ' Perlu diisi: ' + pesan.join(', ') + '.' : ''));
+    (pesan.length ? ' Perlu diisi: ' + pesan.join(', ') + '.' : '') + (catatan.length ? ' ' + catatan.join('. ') + '.' : ''));
+}
+
+/**
+ * Tab rekap lama (sebelum peta konsep 27-11-2026) yang isinya kini masuk ke rekap lain. Tab itu dihapus bila sudah
+ * tidak dipakai Rute maupun Sumber, supaya tidak ada dua salinan data yang sama. Isinya terisi ulang di rekap baru
+ * lewat menu 3 (sumber lain) dan "Proses ulang semua file patroli".
+ */
+var TAB_LAMA = ['Rekap Tindakan dan Tindak Lanjut', 'Rekap Konflik Tenurial (Pulbaket)', 'Rekap Sanctuary Rusa Timor',
+  'Rekap Koleksi, Persemaian, dan Pemulihan Ekosistem', 'Rekap Kondisi Kelompok Binaan', 'Rekap Kegiatan Resor dan Capaian RBM',
+  'Rekap Potensi dan Ancaman per Resor', 'Titik Posisi Patroli', 'Titik Panas (Hotspot)', 'Areal Terbakar (Delineasi)',
+  'Penerbangan Drone', 'Profil Resor 2026', 'Register Kegiatan LPK PEH', 'Rencana dan Capaian RBM 2026'];
+
+function hapusTabLama_(M, catatan) {
+  var dipakai = tabData_(M), n = 0;
+  TAB_LAMA.forEach(function (t) {
+    if (dipakai[t]) return;
+    var sh = M.ss.getSheetByName(t) || M.ss.getSheetByName(t.slice(0, 31).trim());
+    if (!sh) return;
+    M.ss.deleteSheet(sh);
+    n++;
+  });
+  if (n) catatan.push(n + ' tab rekap lama dihapus (isinya kini masuk ke 12 rekap)');
+}
+
+/**
+ * Kosongkan tab rekap (tujuan Rute dan tab upaya) agar diisi ulang dengan susunan peta konsep yang baru, dan kosongkan
+ * Log Berkas agar semua file patroli dibaca lagi. Lembar acuan (daftar jenis, kelompok, rencana RBM) ditulis ulang
+ * utuh oleh sumbernya, jadi tidak disentuh. Mengembalikan jumlah tab yang dikosongkan.
+ */
+function kosongkanRekap_(M) {
+  var tab = {}, n = 0, upaya = String(M.atur.TAB_UPAYA || 'Rekap Upaya Patroli');
+  M.rute.forEach(function (r) { if (!tab[r.tab]) tab[r.tab] = r.induk; });
+  tab[upaya] = 'rbm';
+  Object.keys(tab).forEach(function (nama) {
+    var ss;
+    try { ss = bukaInduk_(M, tab[nama]); } catch (e) { return; }
+    var sh = ss.getSheetByName(nama);
+    if (!sh || sh.getLastRow() < 2) return;
+    var kolom = nama === upaya ? KOLOM_UPAYA : KOLOM_DEPAN;
+    sh.clearContents();
+    sh.getRange(1, 1, 1, kolom.length).setValues([kolom]).setFontWeight('bold');
+    n++;
+  });
+  var log = M.ss.getSheetByName(LEMBAR.log);
+  if (log && log.getLastRow() > 1) log.getRange(2, 1, log.getLastRow() - 1, log.getLastColumn()).clearContent();
+  M.tab = {};
+  M.idAda = {};
+  M.titikLain = {};
+  return n;
 }
 
 /** Lembar kendali di depan, lalu tab data per induk sesuai urutan lembar Induk, masing-masing diberi warna induk. */

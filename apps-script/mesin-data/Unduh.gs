@@ -5,14 +5,16 @@
  *   Terapkan > Deployment baru > Aplikasi web, Jalankan sebagai: Saya, Akses: Siapa saja.
  * URL /exec-nya ditempel ke tab Pengaturan Sheet konten hub (kunci unduh_data) atau ke data/sumber.js (UNDUH_DATA).
  *
- * Susunan unduhan mengikuti Garis Besar Peta Konsep Satu Data Tambora 2027: induk data > kategori (Kategori 0 data
- * model yang tersambung ke induk itu) > sub data (Kategori 1). Satu sub data = baris tab rekap yang Kategori 0 dan
- * Kategori 1-nya cocok (SUB_DATA di bawah), dengan kolom yang terisi saja. Tab di luar data model (titik panas,
- * daftar jenis, rencana RBM, dan sejenisnya) menjadi "data pendukung" di bawah induknya.
+ * Yang diunduh adalah data mentah 12 rekap Peta Konsep Satu Data Tambora 2027 (bukan hasil analisis): induk data >
+ * kategori (Kategori 0 data model) > sub data (Kategori 1). Satu sub data = baris tab rekap yang Kategori 0 dan
+ * Kategori 1-nya cocok (SUB_DATA di bawah), dengan kolom yang terisi saja. Lembar acuan di luar data model (daftar
+ * jenis, daftar kelompok binaan, rencana RBM) menjadi "data pendukung" di bawah induknya. Lembar survei metode teknis
+ * (bahan Kalkulator Teknis) tidak ditawarkan: induknya ada di Pengaturan UNDUH_INDUK_TANPA.
  *
  * Hanya pegawai yang sudah masuk lewat gerbang hub yang bisa mengunduh: token sesi diperiksa ke aplikasi web Tanya Data
  * (Pengaturan URL_TANYA_DATA, aksi "siapa"). Kolom data pribadi (Pengaturan UNDUH_KOLOM_ADMIN dan kolom_admin di
- * Katalog) hanya ikut terunduh untuk akun berperan admin.
+ * Katalog) hanya ikut terunduh untuk akun berperan admin. Sumber yang akses_unduh-nya "admin" di lembar Sumber (misalnya
+ * rekap laporan kejadian) tidak punya tab sendiri: barisnya di tab rekap (kolom Sumber) hanya terlihat oleh admin.
  *
  * Lembar "Katalog": satu baris per tab data. Kolom judul, tema, keterangan, akses (pegawai, admin, tidak), kolom_admin,
  * dan tampil boleh diubah; kolom lain dihitung ulang skrip setiap data berubah (kolom sub berisi ringkasan tiap sub data).
@@ -41,49 +43,45 @@ var SEL_PER_HALAMAN = 120000;
 var HALAMAN_MIN = 300, HALAMAN_MAKS = 5000;
 
 var KETERANGAN_PENGHUBUNG = {
-  gangguan: 'Temuan gangguan kawasan dari patroli: perambahan, perburuan, penebangan, pemukiman, dan aktivitas ilegal lain.',
-  tindakan: 'Tindakan di lapangan dan tindak lanjut temuan patroli.',
-  tenurial: 'Pengumpulan bahan keterangan penggunaan lahan dan konflik tenurial per bidang.',
-  karhut: 'Kejadian kebakaran hutan dan lahan yang dicatat saat patroli.',
-  satwa: 'Perjumpaan, tanda, dan kematian satwa dari patroli SMART, LPK teknis PEH, dan rekap SMART.',
-  tumbuhan: 'Temuan tumbuhan dari patroli SMART, LPK teknis PEH, dan rekap SMART.',
-  invasif: 'Temuan jenis tumbuhan asing invasif.',
+  gangguan: 'Temuan gangguan kawasan: kategori Aktivitas Manusia (termasuk pulbaket penggunaan lahan sebagai Penggunaan ' +
+    'Kawasan dan Pelaku), konflik manusia dan satwa, serta perdagangan dan penyitaan TSL, dari patroli SMART, laporan ' +
+    'kejadian, dan data sebelum 2027 yang diseragamkan ke data model 2027.',
+  karhut: 'Kejadian kebakaran hutan dan lahan: temuan patroli, titik panas (hotspot), dan areal terbakar hasil delineasi.',
+  satwa: 'Temuan satwa: kategori Satwa Liar dan Survey Kehati, pelepasliaran, Sanctuary Rusa Timor, ditambah jenis satwa ' +
+    'dari kategori lain (seperti query atribut SMART: hanya kolom jenis, jumlah, dan koordinat).',
+  tumbuhan: 'Temuan tumbuhan: kategori Tumbuhan, plot vegetasi, fenologi, koleksi, rehabilitasi, dan pembinaan habitat, ' +
+    'ditambah jenis tumbuhan dari kategori lain (seperti query atribut SMART).',
+  invasif: 'Temuan jenis asing invasif.',
   ekosistem: 'Ground check tipe ekosistem dan tutupan lahan.',
-  sanctuary: 'Kegiatan dan temuan di Sanctuary Rusa Timor.',
-  pemulihan: 'Koleksi benih, persemaian, dan pemulihan ekosistem.',
-  penyuluhan: 'Kegiatan penyuluhan dan pemberdayaan masyarakat sejak 2020.',
-  kelompok: 'Kondisi kelompok binaan per tahun.',
+  penyuluhan: 'Kegiatan penyuluhan dan pemberdayaan masyarakat sejak 2020, termasuk monev kelompok binaan.',
   kunjungan: 'Kunjungan wisata dan pendakian.',
   sampah: 'Sampah pengunjung.',
   sarpras: 'Sarana prasarana, pal batas, dan media informasi.',
   potensi: 'Fitur alami dan potensi kawasan.',
-  upaya: 'Titik posisi patroli.',
-  rbm: 'Laporan kegiatan resor dari form RBM dan kegiatan RBM yang dicatat saat patroli.',
-  surveikehati: 'Data survei kehati metode teknis (satu tab per tabel isian).'
+  upaya: 'Titik posisi patroli dan kegiatan RBM (1 kegiatan RBM = 1 patroli).',
+  surveikehati: 'Tabel survei kehati metode teknis (bahan Kalkulator Teknis, bukan rekap).'
 };
 
 /* =========================== susunan sub data =========================== */
 
 /** Naikkan bila SUB_DATA atau aturan hitungnya berubah: katalog lama lalu dihitung ulang otomatis. */
-var SUB_VERSI = '2027-11-27';
+var SUB_VERSI = '2026-11-27.12rekap';
 /** Induk yang ditampilkan di bawah induk lain (Garis Besar peta konsep memakai 7 induk). */
-var INDUK_GABUNG_UNDUH = { survei: 'kehati' };
-var KATEGORI_SURVEI_UNDUH = 'Survei Kehati Metode Teknis';
-/** Penanda kategori survei sebelum tabel surveinya ada (bukan sub data sungguhan). */
-var ID_SURVEI_KOSONG = 'kehati.survei-metode-teknis';
+var INDUK_GABUNG_UNDUH = {};
+/** Induk yang tidak ditawarkan di Unduh Data bila Pengaturan UNDUH_INDUK_TANPA kosong. */
+var UNDUH_INDUK_TANPA_BAWAAN = 'survei';
 
 /**
- * Induk > kategori > sub data, berurutan seperti di halaman Unduh Data.
+ * Induk > kategori > sub data, berurutan seperti di halaman Unduh Data. Hanya 12 rekap peta konsep 2027.
  * [induk, kategori, sub data, tab, Kategori 0, Kategori 1]
- *   tab: kode penghubung di lembar Rute (gangguan, satwa, ...), '@upaya' (TAB_UPAYA), '@perresor' (TAB_PER_RESOR),
- *        atau '=Nama tab'.
+ *   tab: kode penghubung di lembar Rute (gangguan, satwa, ...), '@upaya' (TAB_UPAYA), atau '=Nama tab'.
  *   Kategori 0 dan Kategori 1: label yang diterima, dipisah '|', tidak peka huruf besar-kecil; kosong = semua;
- *        awalan '!' = semua kecuali label itu. Label laporan lama ditulis di sini sebagai padanan.
+ *        awalan '!' = semua kecuali label itu.
  * Satu sub data boleh mengambil dari beberapa tab: tulis barisnya lagi dengan induk, kategori, dan nama yang sama.
- * Tab survei metode teknis (penghubung surveikehati di Rute) otomatis menjadi sub data di kategori Survei Kehati
- * Metode Teknis. Baris tab rekap yang tidak cocok dengan sub data mana pun masuk sub data "Lainnya" di tab itu.
+ * Baris tab rekap yang tidak cocok dengan sub data mana pun masuk sub data "Lainnya" di tab itu.
  */
 var SUB_DATA = [
+  // Rekap Temuan Gangguan Kawasan (pulbaket tenurial = Penggunaan Kawasan dan Pelaku)
   ['pp', 'Aktivitas Manusia', 'Pelaku', 'gangguan', 'Aktivitas Manusia', 'Pelaku'],
   ['pp', 'Aktivitas Manusia', 'Penggunaan Kawasan', 'gangguan', 'Aktivitas Manusia', 'Penggunaan Kawasan'],
   ['pp', 'Aktivitas Manusia', 'Pembalakan', 'gangguan', 'Aktivitas Manusia', 'Pembalakan'],
@@ -94,16 +92,18 @@ var SUB_DATA = [
   ['pp', 'Aktivitas Manusia', 'Pengambilan HHBK', 'gangguan', 'Aktivitas Manusia', 'Pengambilan HHBK'],
   ['pp', 'Aktivitas Manusia', 'Pembuatan Akses Jalan', 'gangguan', 'Aktivitas Manusia', 'Pembuatan Akses Jalan'],
   ['pp', 'Aktivitas Manusia', 'Penggembalaan Ternak', 'gangguan', 'Aktivitas Manusia', 'Penggembalaan Ternak'],
-  ['pp', 'Aktivitas Manusia', 'Pulbaket Penggunaan Lahan (Tenurial)', 'tenurial', 'Aktivitas Manusia', 'Pulbaket Penggunaan Lahan (Tenurial)'],
   ['pp', 'Konflik Manusia dan Satwa', 'Informasi dan Respon Konflik', 'gangguan', 'Konflik Manusia dan Satwa', 'Informasi dan Respon Konflik'],
   ['pp', 'Konflik Manusia dan Satwa', 'Dampak Konflik', 'gangguan', 'Konflik Manusia dan Satwa', 'Dampak Konflik'],
-  ['pp', 'Perdagangan dan Kepemilikan TSL', 'Perdagangan dan Kepemilikan TSL', 'tindakan', 'Perdagangan dan Kepemilikan TSL', ''],
-  ['pp', 'Pengelolaan', 'Penyitaan dan Penyerahan TSL', 'tindakan', 'Pengelolaan', 'Penyitaan dan Penyerahan TSL'],
-  ['pp', 'Tindakan dan Tindak Lanjut', 'Tindakan dan Tindak Lanjut', 'tindakan', '!Perdagangan dan Kepemilikan TSL', '!Penyitaan dan Penyerahan TSL'],
+  ['pp', 'Perdagangan dan Kepemilikan TSL', 'Perdagangan dan Kepemilikan TSL', 'gangguan', 'Perdagangan dan Kepemilikan TSL', ''],
+  ['pp', 'Pengelolaan', 'Penyitaan dan Penyerahan TSL', 'gangguan', 'Pengelolaan', 'Penyitaan dan Penyerahan TSL'],
 
+  // Rekap Kejadian Kebakaran Hutan (termasuk titik panas dan delineasi areal terbakar)
   ['karhut', 'Aktivitas Manusia', 'Kebakaran Hutan dan Lahan', 'karhut', 'Aktivitas Manusia', 'Kebakaran Hutan dan Lahan'],
   ['karhut', 'Pengelolaan', 'Penanggulangan Kebakaran', 'karhut', 'Pengelolaan', 'Penanggulangan Kebakaran'],
 
+  // Keanekaragaman Hayati: Rekap Temuan Satwa, Rekap Temuan Tumbuhan, Rekap Spesies Invasif, Rekap Tipe Ekosistem dan
+  // Tutupan Lahan. Urutan kategori mengikuti peta konsep; satu kategori boleh berisi sub data dari beberapa rekap.
+  // Rekap satwa dan tumbuhan juga memuat jenis dari kategori lain (query atribut jenis, seperti di SMART).
   ['kehati', 'Satwa Liar', 'Perjumpaan Satwa', 'satwa', 'Satwa Liar', 'Perjumpaan Satwa'],
   ['kehati', 'Satwa Liar', 'Tanda Satwa', 'satwa', 'Satwa Liar', 'Tanda Satwa'],
   ['kehati', 'Satwa Liar', 'Satwa Mati', 'satwa', 'Satwa Liar', 'Satwa Mati'],
@@ -112,36 +112,43 @@ var SUB_DATA = [
   ['kehati', 'Ground Check', 'Tipe Ekosistem', 'ekosistem', 'Ground Check', 'Tipe Ekosistem'],
   ['kehati', 'Ground Check', 'Tutupan Lahan', 'ekosistem', 'Ground Check', 'Tutupan Lahan'],
   ['kehati', 'Survey Kehati', 'Burung Metode Titik Hitung', 'satwa', 'Survey Kehati', 'Burung Metode Titik Hitung'],
+  ['kehati', 'Survey Kehati', 'Burung Metode Jala Kabut', 'satwa', 'Survey Kehati', 'Burung Metode Jala Kabut'],
   ['kehati', 'Survey Kehati', 'Transek Satwa', 'satwa', 'Survey Kehati', 'Transek Satwa'],
   ['kehati', 'Survey Kehati', 'Survey Herpetofauna', 'satwa', 'Survey Kehati', 'Survey Herpetofauna'],
   ['kehati', 'Survey Kehati', 'Camera Trapping', 'satwa', 'Survey Kehati', 'Camera Trapping'],
-  ['kehati', 'Survey Kehati', 'Fenologi', 'tumbuhan', 'Survey Kehati', 'Fenologi'],
-  ['kehati', 'Survey Kehati', 'Plot Vegetasi', 'tumbuhan', 'Survey Kehati', 'Plot Vegetasi'],
   ['kehati', 'Survey Kehati', 'Pengamatan Migrasi Burung', 'satwa', 'Survey Kehati', 'Pengamatan Migrasi Burung'],
   ['kehati', 'Survey Kehati', 'Survey Serangga', 'satwa', 'Survey Kehati', 'Survey Serangga'],
+  ['kehati', 'Survey Kehati', 'Plot Vegetasi', 'tumbuhan', 'Survey Kehati', 'Plot Vegetasi'],
+  ['kehati', 'Survey Kehati', 'Fenologi', 'tumbuhan', 'Survey Kehati', 'Fenologi'],
+  ['kehati', 'Survey Kehati', 'Monitoring Rafflesia', 'tumbuhan', 'Survey Kehati', 'Monitoring Rafflesia'],
+  ['kehati', 'Survei Kehati Metode Teknis', 'Jenis Satwa dari Survei Metode Teknis', 'satwa', 'Survei Kehati Metode Teknis', ''],
+  ['kehati', 'Survei Kehati Metode Teknis', 'Jenis Tumbuhan dari Survei Metode Teknis', 'tumbuhan', 'Survei Kehati Metode Teknis', ''],
+  ['kehati', 'Survei Kehati Metode Teknis', 'Penilaian Keinvasifan', 'invasif', 'Survei Kehati Metode Teknis', ''],
   ['kehati', 'Pengelolaan', 'Pelepasliaran dan Translokasi Satwa Liar', 'satwa', 'Pengelolaan', 'Pelepasliaran dan Translokasi Satwa Liar'],
-  ['kehati', 'Pengelolaan', 'Rehabilitasi Hutan dan Lahan', 'pemulihan', 'Pengelolaan', 'Rehabilitasi Hutan dan Lahan'],
-  ['kehati', 'Pengelolaan', 'Pembinaan Habitat', 'pemulihan', 'Pengelolaan', 'Pembinaan Habitat'],
-  ['kehati', 'Pengelolaan', 'Koleksi, Persemaian, dan Demplot', 'pemulihan', 'Pengelolaan', 'Koleksi, Persemaian, dan Demplot'],
-  ['kehati', 'Pengelolaan', 'Pengelolaan Sanctuary Rusa Timor', 'sanctuary', 'Pengelolaan', 'Pengelolaan Sanctuary Rusa Timor'],
+  ['kehati', 'Pengelolaan', 'Pengelolaan Sanctuary Rusa Timor', 'satwa', 'Pengelolaan', 'Pengelolaan Sanctuary Rusa Timor'],
+  ['kehati', 'Pengelolaan', 'Rehabilitasi Hutan dan Lahan', 'tumbuhan', 'Pengelolaan', 'Rehabilitasi Hutan dan Lahan'],
+  ['kehati', 'Pengelolaan', 'Pembinaan Habitat', 'tumbuhan', 'Pengelolaan', 'Pembinaan Habitat'],
+  ['kehati', 'Pengelolaan', 'Koleksi, Persemaian, dan Demplot', 'tumbuhan', 'Pengelolaan', 'Koleksi, Persemaian, dan Demplot'],
+  ['kehati', 'Kategori Lain (query atribut jenis)', 'Jenis Satwa dari Kategori Lain', 'satwa',
+    '!Satwa Liar|!Survey Kehati|!Survei Kehati Metode Teknis', '!Pelepasliaran dan Translokasi Satwa Liar|!Pengelolaan Sanctuary Rusa Timor'],
+  ['kehati', 'Kategori Lain (query atribut jenis)', 'Jenis Tumbuhan dari Kategori Lain', 'tumbuhan',
+    '!Tumbuhan|!Survey Kehati|!Survei Kehati Metode Teknis', '!Rehabilitasi Hutan dan Lahan|!Pembinaan Habitat|!Koleksi, Persemaian, dan Demplot'],
 
-  // Penyuluhan: data SMART 2027 dan laporan lama bisa berada di tab Kegiatan Penyuluhan atau Kondisi Kelompok Binaan.
-  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Sosialisasi', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Sosialisasi|Sosialisasi & lainnya'],
+  // Rekap Kegiatan Penyuluhan (kondisi kelompok binaan = Monev Kelompok Binaan)
+  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Sosialisasi', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Sosialisasi'],
   ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Anjangsana', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Anjangsana'],
-  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Edukasi Konservasi', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Edukasi Konservasi (Tambora Goes To School dan lainnya)|Edukasi Konservasi|Edukasi & kader konservasi'],
+  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Edukasi Konservasi', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Edukasi Konservasi (Tambora Goes To School dan lainnya)|Edukasi Konservasi'],
   ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Identifikasi Potensi Sosial Budaya', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Identifikasi Potensi Sosial Budaya'],
-  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pendampingan Kelompok Binaan', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pendampingan Kelompok Binaan|Pendampingan & monev kelompok'],
-  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pendampingan Kelompok Binaan', 'kelompok', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pendampingan Kelompok Binaan|Pendampingan & monev kelompok'],
-  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Monev Kelompok Binaan', 'kelompok', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Monev Kelompok Binaan'],
+  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pendampingan Kelompok Binaan', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pendampingan Kelompok Binaan'],
   ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Monev Kelompok Binaan', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Monev Kelompok Binaan'],
-  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Kemitraan dan Kesepakatan Konservasi', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Kemitraan dan Kesepakatan Konservasi|Kemitraan & kesepakatan konservasi'],
-  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Kemitraan dan Kesepakatan Konservasi', 'kelompok', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Kemitraan dan Kesepakatan Konservasi|Kemitraan & kesepakatan konservasi'],
-  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pembentukan Kelompok dan Kader Konservasi', 'kelompok', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pembentukan Kelompok dan Kader Konservasi'],
+  ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Kemitraan dan Kesepakatan Konservasi', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Kemitraan dan Kesepakatan Konservasi'],
   ['peny', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pembentukan Kelompok dan Kader Konservasi', 'penyuluhan', 'Penyuluhan dan Pemberdayaan Masyarakat', 'Pembentukan Kelompok dan Kader Konservasi'],
 
+  // Rekap Kunjungan dan Pendakian, Rekap Sampah Pengunjung
   ['wisata', 'Penjagaan Jalur Pendakian dan ODTWA', 'Pelayanan Pengunjung Wisata', 'kunjungan', 'Penjagaan Jalur Pendakian dan ODTWA', 'Pelayanan Pengunjung Wisata'],
   ['wisata', 'Penjagaan Jalur Pendakian dan ODTWA', 'Penanganan Sampah Pengunjung', 'sampah', 'Penjagaan Jalur Pendakian dan ODTWA', 'Penanganan Sampah Pengunjung'],
 
+  // Rekap Fitur Alami dan Potensi Kawasan, Rekap Sarana Prasarana, Pal Batas, dan Media Informasi
   ['fitur', 'Fitur', 'Fitur Alami', 'potensi', 'Fitur', 'Fitur Alami'],
   ['fitur', 'Fitur', 'Infrastruktur/ Sarana dan Prasarana', 'sarpras', 'Fitur', 'Infrastruktur/ Sarana dan Prasarana'],
   ['fitur', 'Fitur', 'Pal Batas', 'sarpras', 'Fitur', 'Pal Batas'],
@@ -155,22 +162,17 @@ var SUB_DATA = [
   ['fitur', 'Pemanfaatan', 'Obyek Wisata', 'potensi', 'Pemanfaatan', 'Obyek Wisata'],
   ['fitur', 'Bencana Alam', 'Bencana Alam', 'potensi', 'Bencana Alam', ''],
 
+  // Rekap Upaya Patroli: per leg, dan per titik (Posisi, Kegiatan RBM). Capaian RBM dihitung dari sini, bukan rekap.
   ['rbm', 'Data Patroli', 'Upaya Patroli per Leg', '@upaya', '', ''],
-  ['rbm', 'Posisi', 'Titik Posisi Patroli', 'upaya', '', ''],
-  ['rbm', 'Kegiatan RBM', 'Kegiatan Resor dan Capaian RBM', 'rbm', '', ''],
-  ['rbm', 'Ringkasan per Resor', 'Potensi dan Ancaman per Resor', '@perresor', '', '']
+  ['rbm', 'Posisi', 'Titik Posisi Patroli', 'upaya', 'Posisi', ''],
+  ['rbm', 'Kegiatan RBM', 'Kegiatan RBM', 'upaya', 'Kegiatan RBM', '']
 ];
 
 /**
  * Baris yang sengaja tidak masuk sub data mana pun (juga tidak ke "Lainnya") karena observasinya sudah ada di tab lain.
  * [tab, Kategori 0, Kategori 1], aturan label sama dengan SUB_DATA.
  */
-var SUB_DATA_ABAIKAN = [
-  ['tenurial', 'Aktivitas Manusia', 'Penggunaan Kawasan'], // sama dengan sub data Penggunaan Kawasan di tab gangguan
-  ['satwa', 'Survei Kehati Metode Teknis', ''],            // salinan baris tab survei metode teknis
-  ['tumbuhan', 'Survei Kehati Metode Teknis', ''],
-  ['invasif', 'Survei Kehati Metode Teknis', '']
-];
+var SUB_DATA_ABAIKAN = [];
 
 function labelNormal_(s) {
   return String(s === null || s === undefined ? '' : s).trim().replace(/\s+/g, ' ').toLowerCase();
@@ -224,7 +226,6 @@ function slugSub_(s) {
 function tabSub_(M, kode) {
   kode = String(kode || '');
   if (kode === '@upaya') return String(M.atur.TAB_UPAYA || 'Rekap Upaya Patroli');
-  if (kode === '@perresor') return String(M.atur.TAB_PER_RESOR || 'Rekap Potensi dan Ancaman per Resor');
   if (kode.charAt(0) === '=') return kode.slice(1);
   for (var i = 0; i < M.rute.length; i++) if (String(M.rute[i].penghubung) === kode) return String(M.rute[i].tab);
   return '';
@@ -254,15 +255,8 @@ function pembuatIdSub_() {
   return idUntuk;
 }
 
-/** Tab survei metode teknis tampil tepat setelah kategori Survey Kehati: urutannya di antara dua baris SUB_DATA. */
-function urutSurvei_() {
-  var setelah = 0;
-  SUB_DATA.forEach(function (s, i) { if (s[0] === 'kehati' && s[1] === 'Survey Kehati') setelah = i; });
-  return setelah;
-}
-
 /**
- * SUB_DATA ditambah tab survei metode teknis dari Rute, dengan nama tab yang sudah diketahui.
+ * SUB_DATA dengan nama tab yang sudah diketahui.
  * Hasil: {daftar: [bagian], perTab: {kunciTab: [bagian]}, abaikan: {kunciTab: [[k0, k1]]}}.
  * Bagian: {id, induk, kategori, judul, urut, k0, k1, tab}. urut = nomor baris SUB_DATA (urutan tampil di hub).
  */
@@ -277,12 +271,6 @@ function susunSubData_(M) {
     (hasil.perTab[kt] = hasil.perTab[kt] || []).push(b);
   };
   SUB_DATA.forEach(function (s, i) { tambah(s[0], s[1], s[2], tabSub_(M, s[3]), s[4], s[5], i); });
-  var setelah = urutSurvei_(), survei = {}, k = 0;
-  M.rute.forEach(function (r) {
-    if (String(r.penghubung) !== 'surveikehati' || survei[r.tab]) return;
-    survei[r.tab] = true;
-    tambah('kehati', KATEGORI_SURVEI_UNDUH, String(r.tab), String(r.tab), '', '', setelah + (++k) / 1000);
-  });
   SUB_DATA_ABAIKAN.forEach(function (a) {
     var t = tabSub_(M, a[0]);
     if (t) (hasil.abaikan[kunciTab_(t)] = hasil.abaikan[kunciTab_(t)] || []).push([String(a[1] || ''), String(a[2] || '')]);
@@ -295,10 +283,12 @@ function teksSub_(daftar) {
   if (!daftar.length) return '';
   var s = JSON.stringify(daftar);
   if (s.length <= 45000) return s;
-  daftar.forEach(function (b) { b.faset = { Tahun: (b.faset || {}).Tahun || {} }; });
+  daftar.forEach(function (b) {
+    [b, b.p].forEach(function (x) { if (x) x.faset = { Tahun: (x.faset || {}).Tahun || {} }; });
+  });
   s = JSON.stringify(daftar);
   if (s.length <= 45000) return s;
-  daftar.forEach(function (b) { b.faset = {}; b.kolom = null; });
+  daftar.forEach(function (b) { [b, b.p].forEach(function (x) { if (x) { x.faset = {}; x.kolom = null; } }); });
   return JSON.stringify(daftar);
 }
 
@@ -320,7 +310,7 @@ function ringkasKatalog_(M) {
     if (r.daftarSub.length) {
       r.daftarSub.forEach(function (b) { sub[b.id] = true; if (Number(b.n) > 0) berisi[b.id] = true; });
       if (r.di_luar_sub) luar.push(r.tab + ': ' + r.di_luar_sub + '.');
-    } else if (Number(r.jumlah_baris) > 0 && bolehLihat_(r)) pendukung++;
+    } else if (Number(r.jumlah_baris) > 0 && bolehLihat_(r, M)) pendukung++;
   });
   return { teks: kat.length + ' tab data, ' + Object.keys(sub).length + ' sub data (' + Object.keys(berisi).length + ' berisi data), ' +
     pendukung + ' data pendukung.', luar: luar };
@@ -379,8 +369,10 @@ function selIsi_(x) {
  * jumlah baris berkoordinat (untuk GeoJSON dan Shapefile), dan ringkasan yang sama per sub data tab ini.
  * spes: bagian sub data dari susunSubData_ untuk tab ini; abaikan: [[k0, k1]] baris yang sengaja dilewati;
  * lainnya: {id, induk, judul} untuk baris yang tidak masuk sub data mana pun.
+ * khusus: {nama sumber: true} yang barisnya khusus admin; sub data yang memuat baris itu mendapat ringkasan p
+ * (tanpa baris itu) untuk akun pegawai.
  */
-function ringkasTab_(sh, zona, spes, abaikan, lainnya) {
+function ringkasTab_(sh, zona, spes, abaikan, lainnya, khusus) {
   var n = Math.max(0, sh.getLastRow() - 1), lc = sh.getLastColumn();
   var ring = { jumlah: n, kolom: [], faset: {}, tahun: ['', ''], titik: 0, sub: [], luar: null };
   if (lc < 1) return ring;
@@ -389,11 +381,18 @@ function ringkasTab_(sh, zona, spes, abaikan, lainnya) {
   var iTh = h.indexOf('Tahun'), iTg = h.indexOf('Tanggal'), iX = h.indexOf('X'), iY = h.indexOf('Y'), idx = {}, hit = {}, hitTahun = {};
   var i0 = h.indexOf('Kategori 0'), i1 = h.indexOf('Kategori 1');
   FASET_UNDUH.forEach(function (f) { var i = h.indexOf(f); if (i >= 0) { idx[f] = i; hit[f] = {}; } });
-  var baru = function (s) { var o = { s: s, n: 0, th: {}, titik: 0, isi: {}, faset: {} }; Object.keys(idx).forEach(function (f) { o.faset[f] = {}; }); return o; };
+  var iSb = h.indexOf('Sumber'), pisah = iSb >= 0 && !!khusus && Object.keys(khusus).length > 0;
+  var baru = function (s, tanpaP) {
+    var o = { s: s, n: 0, th: {}, titik: 0, isi: {}, faset: {} };
+    Object.keys(idx).forEach(function (f) { o.faset[f] = {}; });
+    if (pisah && !tanpaP) o.p = baru(s, true);
+    return o;
+  };
   var bag = (spes || []).map(function (s) { var o = baru(s); o.cocok = pencocokBagian_(s.k0, s.k1); return o; });
   var abai = (abaikan || []).map(function (a) { return pencocokBagian_(a[0], a[1]); });
   var sisa = bag.length && lainnya ? baru(lainnya) : null, luar = { abaikan: 0, sisa: {} };
-  var catat = function (b, r, th, titik) {
+  var catat = function (b, r, th, titik, umum) {
+    if (b.p && umum) catat(b.p, r, th, titik, false);
     b.n++;
     if (th) b.th[th] = (b.th[th] || 0) + 1;
     if (titik) b.titik++;
@@ -417,12 +416,13 @@ function ringkasTab_(sh, zona, spes, abaikan, lainnya) {
     if (titik) ring.titik++;
     if (!bag.length) return;
     var k0 = i0 >= 0 ? r[i0] : '', k1 = i1 >= 0 ? r[i1] : '', kena = false;
-    for (var b = 0; b < bag.length; b++) if (bag[b].cocok(k0, k1)) { kena = true; catat(bag[b], r, th, titik); }
+    var umum = !pisah || !khusus[String(r[iSb] === null || r[iSb] === undefined ? '' : r[iSb]).trim()];
+    for (var b = 0; b < bag.length; b++) if (bag[b].cocok(k0, k1)) { kena = true; catat(bag[b], r, th, titik, umum); }
     if (kena) return;
     for (var a = 0; a < abai.length; a++) if (abai[a](k0, k1)) { luar.abaikan++; return; }
     var label = [k0, k1].map(function (x) { return String(x === null || x === undefined ? '' : x).trim(); }).filter(String).join(' > ') || '(tanpa kategori)';
     luar.sisa[label] = (luar.sisa[label] || 0) + 1;
-    if (sisa) catat(sisa, r, th, titik);
+    if (sisa) catat(sisa, r, th, titik, umum);
   });
   var urutFaset = function (o, batas) {
     var urut = Object.keys(o).sort(function (a, b) { return o[b] - o[a]; }).slice(0, batas), hasil = {};
@@ -440,13 +440,17 @@ function ringkasTab_(sh, zona, spes, abaikan, lainnya) {
     ring.faset.Tahun = hitTahun;
     ring.tahun = [th[0], th[th.length - 1]];
   }
-  var keluar = function (b, tambahan) {
+  var isiBag = function (b) {
     var t = Object.keys(b.th).map(Number).sort(function (x, y) { return x - y; }), f = {};
     Object.keys(b.faset).forEach(function (k) { var o = urutFaset(b.faset[k], 60); if (Object.keys(o).length) f[k] = o; });
     if (t.length) f.Tahun = b.th;
-    var o = { id: b.s.id, induk: b.s.induk, kategori: b.s.kategori, judul: b.s.judul, urut: b.s.urut, k0: b.s.k0 || '', k1: b.s.k1 || '',
-      n: b.n, tahun: t.length ? [t[0], t[t.length - 1]] : ['', ''], titik: b.titik,
+    return { n: b.n, tahun: t.length ? [t[0], t[t.length - 1]] : ['', ''], titik: b.titik,
       kolom: h.filter(function (x, j) { return x && b.isi[j]; }), faset: f };
+  };
+  var keluar = function (b, tambahan) {
+    var u = isiBag(b), o = { id: b.s.id, induk: b.s.induk, kategori: b.s.kategori, judul: b.s.judul, urut: b.s.urut,
+      k0: b.s.k0 || '', k1: b.s.k1 || '', n: u.n, tahun: u.tahun, titik: u.titik, kolom: u.kolom, faset: u.faset };
+    if (b.p && b.p.n !== b.n) o.p = isiBag(b.p);
     for (var k in tambahan) o[k] = tambahan[k];
     return o;
   };
@@ -484,14 +488,14 @@ function perbaruiKatalog_(M, semua) {
   var zona = ss.getSpreadsheetTimeZone(), sekarang = new Date(), diubah = M.diubah || {};
   var sumber = {};
   bacaTabel_(ss, LEMBAR.sumber, true).forEach(function (s) { var t = tabTujuan_(s); if (t && !sumber[t]) sumber[t] = s; });
-  var penghubung = {}, susun = susunSubData_(M);
+  var penghubung = {}, susun = susunSubData_(M), versi = versiSub_(M), khusus = sumberKhususAdmin_(M);
   M.rute.forEach(function (r) { if (!penghubung[r.tab]) penghubung[r.tab] = r.penghubung; });
   var baris = daftarTabData_(M).map(function (d) {
     var r = lama[d.nama] || {}, o = {}, k;
     for (k in r) o[k] = r[k];
     var n = Math.max(0, d.sh.getLastRow() - 1);
     var hitung = semua || !lama[d.nama] || diubah[d.nama] || Number(r.jumlah_baris) !== n || !r.kolom ||
-      r.jumlah_titik === undefined || r.jumlah_titik === '' || String(r.versi_sub || '') !== SUB_VERSI;
+      r.jumlah_titik === undefined || r.jumlah_titik === '' || String(r.versi_sub || '') !== versi;
     o.id = r.id || idKatalog_(d.nama, dipakai);
     o.tab = d.nama;
     o.induk = d.induk || r.induk || '';
@@ -500,17 +504,16 @@ function perbaruiKatalog_(M, semua) {
     if (!o.keterangan) {
       var p = penghubung[d.nama], s = sumber[d.nama];
       o.keterangan = d.nama === String(M.atur.TAB_UPAYA || 'Rekap Upaya Patroli') ?
-        'Ringkasan tiap leg patroli: tanggal, tim, resor, jumlah titik, dan panjang jalur.' :
-        d.nama === String(M.atur.TAB_PER_RESOR || 'Rekap Potensi dan Ancaman per Resor') ?
-          'Jumlah temuan per resor per tahun, dihitung ulang setiap putaran.' :
-          p ? KETERANGAN_PENGHUBUNG[p] || '' : s ? String(s.catatan || s.nama || '') : '';
+        'Ringkasan tiap leg patroli dan kegiatan: tanggal, tim, resor, jumlah titik, dan panjang jalur. Juga register ' +
+          'kegiatan LPK PEH dan penerbangan drone (1 kegiatan = 1 upaya).' :
+        p ? KETERANGAN_PENGHUBUNG[p] || '' : s ? String(s.catatan || s.nama || '') : '';
     }
     if (!o.akses) o.akses = sumber[d.nama] && sumber[d.nama].akses_unduh ? String(sumber[d.nama].akses_unduh) : 'pegawai';
     if (!o.tampil) o.tampil = d.dikenal ? 'ya' : 'tidak';
     if (hitung) {
       var kt = kunciTab_(d.nama), spes = susun.perTab[kt] || [], indukSub = spes.length ? spes[0].induk : '';
       var ring = ringkasTab_(d.sh, zona, spes, susun.abaikan[kt] || [], spes.length ? { id: indukSub + '.lainnya-' + slugSub_(d.nama),
-        induk: indukSub, kategori: 'Lainnya', judul: 'Lainnya dari ' + d.nama, urut: 10000 } : null);
+        induk: indukSub, kategori: 'Lainnya', judul: 'Lainnya dari ' + d.nama, urut: 10000 } : null, khusus);
       o.jumlah_baris = ring.jumlah;
       o.tahun_awal = ring.tahun[0];
       o.tahun_akhir = ring.tahun[1];
@@ -521,7 +524,7 @@ function perbaruiKatalog_(M, semua) {
       o.jumlah_titik = ring.titik;
       o.sub = teksSub_(ring.sub);
       o.di_luar_sub = teksLuarSub_(ring.luar);
-      o.versi_sub = SUB_VERSI;
+      o.versi_sub = versi;
       o.diperbarui = sekarang;
     }
     return kepala.map(function (h) { return o[h] === undefined || o[h] === null ? '' : amanSel_(o[h]); });
@@ -601,7 +604,8 @@ function rentangBaris_(tg, th, bl, zona) {
  * Baris yang lolos saringan (indeks 0 = baris data pertama). Hanya kolom yang dibutuhkan saringan yang dibaca,
  * kecuali bila ada pencarian teks. Saringan untuk kolom yang tidak ada di tab dicatat di "diabaikan".
  * cocok: fungsi (Kategori 0, Kategori 1) -> boolean untuk sub data, atau null untuk seluruh tab.
- * privasi: {lewati: {indeks kolom: true}, iLain, admin} agar kata kunci tidak mencari di kolom yang tidak boleh dilihat.
+ * privasi: {lewati: {indeks kolom: true}, iLain, admin} agar kata kunci tidak mencari di kolom yang tidak boleh dilihat,
+ * dan tolakSumber: {nama sumber: true} untuk baris yang tidak boleh dilihat (sumber khusus admin), atau null.
  * memo: {} yang dipakai bersama dalam satu permintaan agar kolom tab yang sama dibaca sekali untuk banyak sub data.
  */
 function saringTab_(sh, kepala, n, saring, zona, cocok, privasi, memo) {
@@ -627,9 +631,11 @@ function saringTab_(sh, kepala, n, saring, zona, cocok, privasi, memo) {
   var cari = String(saring.cari || '').trim().toLowerCase().slice(0, 100);
   var i0 = kepala.indexOf('Kategori 0'), i1 = kepala.indexOf('Kategori 1');
   if (cocok) [i0, i1].forEach(function (x) { if (x >= 0) perlu[x] = true; });
+  var tolakSb = privasi && privasi.tolakSumber, iSb = tolakSb ? kepala.indexOf('Sumber') : -1;
+  if (iSb >= 0) perlu[iSb] = true;
   var indeks = [];
   if (n <= 0) return { indeks: indeks, diabaikan: diabaikan };
-  if (!pakaiWaktu && !nilai.length && !cari && !cocok) {
+  if (!pakaiWaktu && !nilai.length && !cari && !cocok && iSb < 0) {
     for (i = 0; i < n; i++) indeks.push(i);
     return { indeks: indeks, diabaikan: diabaikan };
   }
@@ -642,6 +648,10 @@ function saringTab_(sh, kepala, n, saring, zona, cocok, privasi, memo) {
   });
   var sel = function (r, j) { return j < 0 ? '' : semua ? semua[r][j] : kol[j][r][0]; };
   for (var r = 0; r < n; r++) {
+    if (iSb >= 0) {
+      var sb = sel(r, iSb);
+      if (tolakSb[String(sb === null || sb === undefined ? '' : sb).trim()]) continue;
+    }
     if (cocok && !cocok(sel(r, i0), sel(r, i1))) continue;
     if (pakaiWaktu) {
       var rg = rentangBaris_(sel(r, iTg), sel(r, iTh), sel(r, iBl), zona);
@@ -714,24 +724,48 @@ function jsonAman_(s, cadangan) {
   try { return s ? JSON.parse(s) : cadangan; } catch (e) { return cadangan; }
 }
 
-function katalogUsang_(daftar) {
-  return !daftar.length || daftar.some(function (r) { return String(r.versi_sub || '') !== SUB_VERSI; });
+function katalogUsang_(daftar, versi) {
+  return !daftar.length || daftar.some(function (r) { return String(r.versi_sub || '') !== versi; });
+}
+
+/**
+ * Nama sumber (isi kolom Sumber di tab rekap) yang barisnya khusus admin: baris lembar Sumber yang akses_unduh-nya
+ * "admin" (atau "tidak"). Sumber yang mengikuti Rute tidak punya tab sendiri, jadi aksesnya berlaku per baris.
+ */
+function sumberKhususAdmin_(M) {
+  if (M.sumberAdmin) return M.sumberAdmin;
+  var t = {};
+  try {
+    bacaTabel_(M.ss, LEMBAR.sumber, true).forEach(function (s) {
+      var a = String(s.akses_unduh || '').trim().toLowerCase(), j = String(s.jenis || '').trim();
+      if (a !== 'admin' && a !== 'tidak') return;
+      var label = j !== 'spreadsheet' && LABEL_SUMBER[j] ? LABEL_SUMBER[j] : String(s.nama || s.kode || '').trim();
+      if (label) t[label] = true;
+    });
+  } catch (e) { /* lembar Sumber tidak terbaca: tanpa pembatasan per sumber */ }
+  return (M.sumberAdmin = t);
+}
+
+/** Versi susunan sub data + sidik sumber khusus admin: katalog dihitung ulang bila salah satunya berubah. */
+function versiSub_(M) {
+  var k = Object.keys(sumberKhususAdmin_(M)).sort();
+  return SUB_VERSI + (k.length ? '+' + md5_(k.join('|')).slice(0, 8) : '');
 }
 
 /**
  * Baris Katalog dengan kolom JSON yang sudah dibaca. Katalog yang kosong, atau yang dihitung dengan susunan sub data
- * lama (versi_sub berbeda dari SUB_VERSI), dihitung ulang sekali. Kunci skrip mencegah dua hitungan berbarengan.
+ * lama (versi_sub berbeda dari versiSub_), dihitung ulang sekali. Kunci skrip mencegah dua hitungan berbarengan.
  */
 function katalogTersimpan_(M) {
   if (M.katalog) return M.katalog;
   var baca = function () { return bacaTabel_(M.ss, LEMBAR.katalog, true).filter(function (r) { return r.id && r.tab; }); };
-  var daftar = baca();
-  if (katalogUsang_(daftar)) {
+  var daftar = baca(), versi = versiSub_(M);
+  if (katalogUsang_(daftar, versi)) {
     var kunci = LockService.getScriptLock();
     if (kunci.tryLock(30000)) {
       try {
         daftar = baca();
-        if (katalogUsang_(daftar)) { perbaruiKatalog_(muatMesin_(), false); daftar = baca(); }
+        if (katalogUsang_(daftar, versi)) { perbaruiKatalog_(muatMesin_(), false); daftar = baca(); }
       } finally { kunci.releaseLock(); }
     }
   }
@@ -739,12 +773,21 @@ function katalogTersimpan_(M) {
     r.id = String(r.id);
     r.daftarKolom = jsonAman_(r.kolom, []);
     r.isiFaset = jsonAman_(r.faset, {});
-    r.daftarSub = String(r.versi_sub || '') === SUB_VERSI ? jsonAman_(r.sub, []) : [];
+    r.daftarSub = String(r.versi_sub || '') === versi ? jsonAman_(r.sub, []) : [];
   });
   return (M.katalog = daftar);
 }
 
-function bolehLihat_(kat) {
+/** Induk yang datanya tidak ditawarkan di Unduh Data: {kode: true} dari Pengaturan UNDUH_INDUK_TANPA. */
+function indukTanpaUnduh_(M) {
+  if (M.indukTanpa) return M.indukTanpa;
+  var t = {};
+  daftarKoma_(aturUnduh_(M, 'UNDUH_INDUK_TANPA', UNDUH_INDUK_TANPA_BAWAAN)).forEach(function (k) { t[k] = true; });
+  return (M.indukTanpa = t);
+}
+
+function bolehLihat_(kat, M) {
+  if (M && indukTanpaUnduh_(M)[String(kat.induk || '')]) return false;
   return String(kat.tampil).toLowerCase() !== 'tidak' && String(kat.akses).toLowerCase() !== 'tidak';
 }
 
@@ -779,11 +822,11 @@ function cariData_(M, id) {
   if (!id) return null;
   var kat = katalogTersimpan_(M), bagian = [];
   kat.forEach(function (r) {
-    if (!bolehLihat_(r)) return;
+    if (!bolehLihat_(r, M)) return;
     r.daftarSub.forEach(function (b) { if (b.id === id) bagian.push({ r: r, b: b }); });
   });
   if (bagian.length) return dataDariBagian_(id, bagian.sort(urutBagian_));
-  var r = kat.filter(function (x) { return x.id === id && bolehLihat_(x); })[0];
+  var r = kat.filter(function (x) { return x.id === id && bolehLihat_(x, M); })[0];
   return r ? dataDariTab_(r) : null;
 }
 
@@ -801,9 +844,13 @@ function dataDariTab_(r) {
     bagian: [{ r: r, b: null }] };
 }
 
-/** Ringkasan tersimpan satu bagian: dari ringkasan sub data, atau dari baris Katalog untuk tab utuh. */
-function statBagian_(x) {
+/**
+ * Ringkasan tersimpan satu bagian: dari ringkasan sub data, atau dari baris Katalog untuk tab utuh. Akun selain admin
+ * memakai ringkasan p (tanpa baris sumber khusus admin) bila ada.
+ */
+function statBagian_(x, sesi) {
   var r = x.r, b = x.b;
+  if (b && b.p && !(sesi && sesi.peran === 'admin')) b = b.p;
   if (!b) {
     return { n: Number(r.jumlah_baris) || 0, tahun: [Number(r.tahun_awal) || null, Number(r.tahun_akhir) || null],
       titik: r.jumlah_titik === '' || r.jumlah_titik === undefined ? null : Number(r.jumlah_titik) || 0,
@@ -824,7 +871,7 @@ function gabungBagian_(M, sesi, bagian, zona) {
   var o = { jumlah: 0, tahun: [null, null], diperbarui: '', terkunci: !buka.length, asal: [] };
   var kolom = [], ada = {}, faset = {}, admin = {}, titik = 0, titikTahu = true;
   pakai.forEach(function (x) {
-    var s = statBagian_(x), w = waktuTeks_(x.r.diperbarui, zona);
+    var s = statBagian_(x, sesi), w = waktuTeks_(x.r.diperbarui, zona);
     o.jumlah += s.n;
     if (s.tahun[0] && (!o.tahun[0] || s.tahun[0] < o.tahun[0])) o.tahun[0] = s.tahun[0];
     if (s.tahun[1] && (!o.tahun[1] || s.tahun[1] > o.tahun[1])) o.tahun[1] = s.tahun[1];
@@ -874,7 +921,7 @@ function katalogUntuk_(M, sesi, m) {
   var zona = M.ss.getSpreadsheetTimeZone(), versi = Number(m && m.versi) || 1;
   var sub = {}, urutId = [], sembunyi = {}, data = [], akhir = '';
   katalogTersimpan_(M).forEach(function (r) {
-    var boleh = bolehLihat_(r);
+    var boleh = bolehLihat_(r, M);
     if (r.daftarSub.length) {
       r.daftarSub.forEach(function (b) {
         if (!boleh) { sembunyi[b.id] = true; return; }
@@ -892,16 +939,14 @@ function katalogUntuk_(M, sesi, m) {
       sub[id] = [];
       data.push(dataKosong_(id, indukTampil_(s[0]), s[1], s[2], i));
     });
-    // Tabel survei metode teknis baru menjadi tab saat datanya masuk; sebelum itu kategorinya tetap terlihat.
-    if (!data.some(function (d) { return d.kategori === KATEGORI_SURVEI_UNDUH; })) {
-      data.push(dataKosong_(ID_SURVEI_KOSONG, 'kehati', KATEGORI_SURVEI_UNDUH, 'Tabel survei metode teknis', urutSurvei_() + 0.0005));
-    }
   } else data = data.filter(function (d) { return d.jumlah > 0; });
+  data = data.filter(function (d) { return d.jenis !== 'lainnya' || d.jumlah > 0; });
   data.forEach(function (d) {
     d.tema = M.induk[d.induk] ? String(M.induk[d.induk].nama || d.induk) : 'Lainnya';
     if (d.diperbarui > akhir) akhir = d.diperbarui;
   });
-  var tema = M.urutInduk.filter(function (k) { return !INDUK_GABUNG_UNDUH[k]; }).map(function (k) {
+  var tanpa = indukTanpaUnduh_(M);
+  var tema = M.urutInduk.filter(function (k) { return !INDUK_GABUNG_UNDUH[k] && !tanpa[k]; }).map(function (k) {
     return { kode: k, nama: String(M.induk[k].nama || k), warna: String(M.induk[k].warna || '') };
   });
   return { ok: true, versi: 2, nama: sesi.nama, peran: sesi.peran, tema: tema, dataset: data, diperbarui: akhir };
@@ -922,7 +967,9 @@ function saringBagian_(M, sesi, x, saring, zona, memo) {
   var kk = 'kepala|' + x.r.id, kepala = memo[kk] || (memo[kk] = kepalaTab_(sh));
   var tolak = kolomTolak_(M, x.r, kepala, sesi), lewati = {};
   kepala.forEach(function (h, i) { if (tolak[h]) lewati[i] = true; });
-  var privasi = { lewati: lewati, iLain: kepala.indexOf('Atribut lain'), admin: sesi.peran === 'admin' ? null : daftarAdmin_(M, x.r) };
+  var tolakSb = sesi.peran === 'admin' ? null : sumberKhususAdmin_(M);
+  var privasi = { lewati: lewati, iLain: kepala.indexOf('Atribut lain'), admin: sesi.peran === 'admin' ? null : daftarAdmin_(M, x.r),
+    tolakSumber: tolakSb && Object.keys(tolakSb).length ? tolakSb : null };
   var n = Math.max(0, sh.getLastRow() - 1);
   var h = saringTab_(sh, kepala, n, saring, zona, x.b ? pencocokTersimpan_(x.b, x.r.daftarSub) : null, privasi, memo);
   h.sh = sh;
@@ -944,7 +991,7 @@ function hitungUnduh_(M, sesi, m) {
     if (!d) return;
     var bagian = d.bagian.filter(function (x) { return !terkunci_(x.r, sesi); });
     if (!bagian.length) return;
-    var kunci = 'hitung_' + md5_([d.id, saringTeks, sesi.peran, SUB_VERSI].concat(bagian.map(function (x) {
+    var kunci = 'hitung_' + md5_([d.id, saringTeks, sesi.peran, versiSub_(M)].concat(bagian.map(function (x) {
       return x.r.id + ':' + x.r.jumlah_baris + ':' + waktuTeks_(x.r.diperbarui, zona);
     })).join('|'));
     var ada = cache.get(kunci);
@@ -977,7 +1024,7 @@ function ambilUnduh_(M, sesi, m) {
     var h = saringBagian_(M, sesi, x, m.saring, zona, memo);
     if (!h) return;
     // Kolom yang terisi menurut Katalog; bila Katalog belum mencatat isi bagian ini, semua kolom tab.
-    var simpan = statBagian_(x).kolom.filter(function (k) { return h.kepala.indexOf(k) >= 0; });
+    var simpan = statBagian_(x, sesi).kolom.filter(function (k) { return h.kepala.indexOf(k) >= 0; });
     var dasar = simpan.length ? simpan : h.indeks.length ? h.kepala.filter(String) : [];
     dasar.forEach(function (k) {
       if (h.tolak[k] === 'admin') khusus[k] = true;
@@ -1086,7 +1133,7 @@ function doPost(e) {
 function ujiUnduhData() {
   var M = muatRingan_(), sesi = { u: 'uji', nama: 'Uji', peran: 'admin' }, pesan = [];
   var kat = katalogUntuk_(M, sesi, { versi: 2 }), jenis = function (j) { return kat.dataset.filter(function (x) { return x.jenis === j; }); };
-  var sub = jenis('sub').filter(function (x) { return x.id !== ID_SURVEI_KOSONG; }), berisi = sub.filter(function (x) { return x.jumlah > 0; }), lain = jenis('lainnya');
+  var sub = jenis('sub'), berisi = sub.filter(function (x) { return x.jumlah > 0; }), lain = jenis('lainnya');
   pesan.push(sub.length + ' sub data peta konsep (' + berisi.length + ' berisi data), ' + jenis('pendukung').length + ' data pendukung' +
     (lain.length ? ', ' + lain.length + ' kelompok Lainnya (kategori di luar peta konsep)' : '') + '.');
   var d = berisi[0] || kat.dataset.filter(function (x) { return x.jumlah > 0; })[0];
