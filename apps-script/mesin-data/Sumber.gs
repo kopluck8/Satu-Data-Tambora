@@ -26,7 +26,7 @@ var KOLOM_LEMBAR_SUMBER = ['kode', 'nama', 'jenis', 'alamat', 'tab_tujuan', 'ind
   'diperbarui', 'baris', 'status', 'sidik'];
 
 /** Naikkan bila cara olah sumber berubah, agar semua sumber dibaca ulang sekali. */
-var VERSI_PENGIMPOR = '2026-11-27';
+var VERSI_PENGIMPOR = '2026-11-28';
 /** Pengimpor yang selalu dibaca ulang (isinya dari API yang tidak bisa disidik dari alamatnya). */
 var SELALU_BACA = { rbm: true };
 
