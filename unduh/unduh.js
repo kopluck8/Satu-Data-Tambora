@@ -1,10 +1,11 @@
 /* Unduh Data · Satu Data Tambora.
    Daftar data dibaca dari aplikasi web Mesin Data (apps-script/mesin-data), spreadsheet tempat seluruh data
-   Satu Data Tambora berkumpul. Login memakai sesi Tanya Data (assets/gerbang.js); Mesin Data memeriksa token dan
+   Satu Data Tambora berkumpul. Susunannya mengikuti Garis Besar Peta Konsep Satu Data Tambora 2027:
+   induk data > kategori > sub data, dengan data pendukung terlipat di bawah induknya. Login memakai sesi Tanya Data (assets/gerbang.js); Mesin Data memeriksa token dan
    peran pemakai ke Tanya Data, jadi kolom data pribadi hanya ikut terunduh oleh akun admin.
    Berkas Excel, CSV, GeoJSON, dan Shapefile disusun di browser (SheetJS dimuat hanya saat dibutuhkan).
    Alamat aplikasi web: window.SUMBER.UNDUH_DATA, atau baris berkunci "unduh_data" di tab Pengaturan Sheet konten.
-   Tautan langsung: #tema=<kode induk> (mis. #tema=kehati), #data=<id>[,<id>], #peta. */
+   Tautan langsung: #tema=<kode induk> (mis. #tema=kehati), #data=<id sub data atau id tab lama>[,<id>], #peta. */
 (function () {
   'use strict';
 
@@ -16,15 +17,14 @@
   var TAMPIL_AWAL = 10;
   var PAGES = 'https://kopluck8.github.io/';
   // Kolom pilihan saring: [kolom di Mesin Data, judul di halaman]. Tahun ditangani sendiri.
+  // Jenis data sudah dipilih lewat induk dan sub data, jadi kategori dan sumber tidak lagi menjadi saringan.
   var FASET = [
     ['Jenis kegiatan', 'Jenis kegiatan'],
     ['Resor', 'Resor'],
     ['SPTN', 'SPTN'],
-    ['Kategori 0', 'Kategori temuan'],
-    ['Kategori 1', 'Subkategori temuan'],
-    ['Kelompok jenis', 'Kelompok jenis'],
-    ['Sumber', 'Sumber data']
+    ['Kelompok jenis', 'Kelompok jenis']
   ];
+  var KATEGORI_SURVEI = 'Survei Kehati Metode Teknis';
   var LAPISAN = [
     { judul: 'Batas Kawasan TN Tambora', url: PAGES + 'SMART_Report_generator/data/batas_tambora.geojson', berkas: 'batas_kawasan_tn_tambora.geojson', ket: 'Batas kawasan dengan luas SK dan fungsi kawasan.' },
     { judul: 'Batas Resor 2026', url: '../data/resor/batas_resor_2026.geojson', berkas: 'batas_resor_2026.geojson', ket: 'Tujuh resor hasil Kajian Wilayah Kerja Resor 2026, dengan SPTN dan luas.' },
@@ -36,7 +36,8 @@
   var IKON = {
     unduh: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M4 16.5v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>',
     cari: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>',
-    kunci: '<svg class="data-ikon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg>'
+    kunci: '<svg class="data-ikon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8.5 10.5V7.5a3.5 3.5 0 0 1 7 0v3"/></svg>',
+    panah: '<svg class="panah" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg>'
   };
   var PUTAR = '<span class="memuat-cincin kecil" aria-hidden="true"></span>';
   var POLA_TGL = /^(\d{4})-(\d{2})-(\d{2})(?: (\d{2}):(\d{2})(?::(\d{2}))?)?$/;
@@ -44,7 +45,7 @@
   var FORMAT_PETA = { geojson: 'GeoJSON', shp: 'Shapefile' };
 
   var S = {
-    api: '', kat: null, byId: {}, pilih: {}, format: 'xlsx',
+    api: '', kat: null, byId: {}, pilih: {}, format: 'xlsx', pohon: [], buka: {}, bukaPendukung: {}, tuju: '',
     saring: { dari: '', sampai: '', tahun: [], nilai: {}, cari: '' },
     hitung: {}, nomor: 0, tunda: null, galatHitung: '', lagi: {}, cariData: '', sibuk: false, memuat: false
   };
@@ -173,7 +174,7 @@
     cariApi().then(function (url) {
       if (!url) { tampilBelumAtur(); return null; }
       S.api = url;
-      return panggil({ aksi: 'katalog' }, 90000).then(function (j) {
+      return panggil({ aksi: 'katalog', versi: 2 }, 90000).then(function (j) {
         S.kat = j;
         siapkan();
       });
@@ -201,8 +202,13 @@
   function siapkan() {
     var k = S.kat;
     k.dataset = (k.dataset || []).filter(function (d) { return d && d.id; });
+    if (!k.versi) {
+      // Mesin Data yang belum diperbarui: satu data per tab, tanpa kategori.
+      k.dataset.forEach(function (d, i) { d.jenis = 'sub'; d.kategori = ''; d.urut = i; d.asal = [d.id]; });
+    }
     S.byId = {};
     k.dataset.forEach(function (d) { S.byId[d.id] = d; });
+    S.pohon = susunPohon();
     S.pilih = {};
     bacaSimpanan();
     terapkanAlamat(true);
@@ -213,58 +219,101 @@
     gambarHalaman();
     S.hitung = {};
     jadwalHitung();
-    var baris = k.dataset.reduce(function (a, d) { return a + (Number(d.jumlah) || 0); }, 0);
-    $('kakiData').textContent = 'Katalog: ' + k.dataset.length + ' data, ' + angka(baris) + ' baris' + (k.diperbarui ? ', diperbarui ' + tglId(k.diperbarui) + ' WITA.' : '.');
+    gulirKeTuju(false);
+    var berisi = k.dataset.filter(function (d) { return Number(d.jumlah) > 0; });
+    var sub = k.dataset.filter(function (d) { return d.jenis === 'sub'; }), subIsi = sub.filter(function (d) { return Number(d.jumlah) > 0; });
+    var baris = berisi.reduce(function (a, d) { return a + (Number(d.jumlah) || 0); }, 0);
+    $('kakiData').textContent = 'Katalog: ' + (k.versi ? subIsi.length + ' dari ' + sub.length + ' sub data berisi data, ' + (berisi.length - subIsi.length) + ' data pendukung' : berisi.length + ' data') +
+      ', ' + angka(baris) + ' baris' + (k.diperbarui ? ', diperbarui ' + tglId(k.diperbarui) + ' WITA.' : '.');
   }
+
+  /** Induk (urutan Garis Besar peta konsep) > kategori (urutan sub data pertamanya) > sub data; data pendukung terpisah. */
+  function susunPohon() {
+    var k = S.kat, peta = {}, urut = [];
+    var grup = function (kode, nama, warna) {
+      if (!peta[kode]) { peta[kode] = { kode: kode, nama: nama || 'Lainnya', warna: warna || '', kategori: [], petaKat: {}, pendukung: [] }; urut.push(peta[kode]); }
+      return peta[kode];
+    };
+    (k.tema || []).forEach(function (t) { grup(String(t.kode), t.nama, t.warna); });
+    k.dataset.map(function (d, i) { return { d: d, i: i }; }).sort(function (a, b) {
+      return (Number(a.d.urut) || 0) - (Number(b.d.urut) || 0) || a.i - b.i;
+    }).forEach(function (x) {
+      var d = x.d, g = grup(String(d.induk || ''), d.tema, '');
+      if (d.jenis === 'pendukung' || d.jenis === 'lainnya') { g.pendukung.push(d); return; }
+      var nama = String(d.kategori || ''), kat = g.petaKat[nama];
+      if (!kat) { kat = g.petaKat[nama] = { nama: nama, data: [] }; g.kategori.push(kat); }
+      kat.data.push(d);
+    });
+    return urut.filter(function (g) { return g.kategori.length || g.pendukung.length; });
+  }
+  function grupInduk(kode) {
+    for (var i = 0; i < S.pohon.length; i++) if (S.pohon[i].kode === kode) return S.pohon[i];
+    return null;
+  }
+  function namaInduk(d) { var g = grupInduk(String(d.induk || '')); return g ? g.nama : d.tema || ''; }
+  function bisaDipilih(d) { return !d.terkunci && Number(d.jumlah) > 0; }
 
   /* ---------- simpanan pilihan (hanya di perangkat ini) ---------- */
   function bacaSimpanan() {
     try {
       var o = JSON.parse(localStorage.getItem(KUNCI_SIMPAN) || 'null');
       if (!o) return;
-      (o.pilih || []).forEach(function (id) { if (S.byId[id] && !S.byId[id].terkunci) S.pilih[id] = true; });
+      (o.pilih || []).forEach(function (id) { if (S.byId[id] && bisaDipilih(S.byId[id])) S.pilih[id] = true; });
+      (o.buka || []).forEach(function (kode) { S.buka[kode] = true; });
       if (['xlsx', 'csv', 'geojson', 'shp'].indexOf(o.format) >= 0) S.format = o.format;
     } catch (e) { /* penyimpanan tidak tersedia */ }
   }
   function simpan() {
-    try { localStorage.setItem(KUNCI_SIMPAN, JSON.stringify({ pilih: Object.keys(S.pilih), format: S.format })); } catch (e) { /* biarkan */ }
+    try {
+      localStorage.setItem(KUNCI_SIMPAN, JSON.stringify({ pilih: Object.keys(S.pilih), format: S.format,
+        buka: Object.keys(S.buka).filter(function (k) { return S.buka[k]; }) }));
+    } catch (e) { /* biarkan */ }
   }
 
-  /** #tema=kehati, #data=id1,id2 memilih data; #peta menggulir ke lapisan peta. */
+  /**
+   * #tema=kehati membuka induk itu dan memilih sub datanya yang berisi (#tema=survei: Survei Kehati Metode Teknis);
+   * #data=id1,id2 memilih data (id tab lama memilih sub data dari tab itu); #peta menggulir ke lapisan peta.
+   */
   function terapkanAlamat(awal) {
     var h = '';
     try { h = decodeURIComponent(location.hash.replace(/^#\/?/, '')); } catch (e) { h = ''; }
     if (h === 'peta') { setTimeout(function () { var p = $('peta'); p.scrollIntoView({ block: 'start' }); p.focus({ preventScroll: true }); }, awal ? 300 : 0); return; }
     var m = /^(tema|data)=(.+)$/.exec(h);
     if (!m || !S.kat) return;
-    var nilai = m[2].split(',').map(function (s) { return s.trim(); }).filter(String), pilih = {};
+    var nilai = m[2].split(',').map(function (s) { return s.trim(); }).filter(String), pilih = {}, buka = [];
+    var survei = m[1] === 'tema' && nilai.indexOf('survei') >= 0;
+    if (m[1] === 'tema') nilai.forEach(function (v) { var g = grupInduk(v === 'survei' && !grupInduk('survei') ? 'kehati' : v); if (g) buka.push(g.kode); });
     S.kat.dataset.forEach(function (d) {
-      if (d.terkunci) return;
-      if (m[1] === 'data' ? nilai.indexOf(d.id) >= 0 : nilai.indexOf(d.induk) >= 0 || nilai.indexOf(d.tema) >= 0) pilih[d.id] = true;
+      if (!bisaDipilih(d)) return;
+      var kena = m[1] === 'data' ? nilai.some(function (v) { return v === d.id || (!S.byId[v] && (d.asal || []).indexOf(v) >= 0); }) :
+        d.jenis === 'sub' && (nilai.indexOf(d.induk) >= 0 || nilai.indexOf(d.tema) >= 0 || (survei && d.kategori === KATEGORI_SURVEI));
+      if (!kena) return;
+      pilih[d.id] = true;
+      if (buka.indexOf(String(d.induk || '')) < 0) buka.push(String(d.induk || ''));
+      if (d.jenis !== 'sub') S.bukaPendukung[String(d.induk || '')] = true;
     });
-    if (!Object.keys(pilih).length) return;
-    S.pilih = pilih;
-    if (!awal) { gambarDaftar(); pilihanBerubah(); }
+    buka.forEach(function (kode) { S.buka[kode] = true; });
+    if (buka.length) S.tuju = buka[0];
+    if (Object.keys(pilih).length) S.pilih = pilih;
+    if (!awal) { gambarDaftar(); pilihanBerubah(); gulirKeTuju(true); }
+  }
+  /** Gulir ke induk dari tautan #tema= atau #data= tepat setelah digambar, sebelum pengguna sempat menggulir sendiri. */
+  function gulirKeTuju(halus) {
+    var kode = S.tuju;
+    S.tuju = '';
+    if (!kode) return;
+    requestAnimationFrame(function () {
+      var el = document.querySelector('[data-induk="' + cssEsc(kode) + '"]');
+      if (el) el.scrollIntoView({ block: 'start', behavior: halus && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
+    });
   }
 
   /* ---------- kerangka halaman ---------- */
-  function kelompok() {
-    var urut = {}, grup = {}, hasil = [];
-    (S.kat.tema || []).forEach(function (t, i) { urut[t.kode] = { i: i, warna: t.warna, nama: t.nama }; });
-    S.kat.dataset.forEach(function (d) {
-      var t = urut[d.induk], nama = d.tema || (t && t.nama) || 'Lainnya';
-      if (!grup[nama]) { grup[nama] = { nama: nama, i: t ? t.i : 999, warna: t ? t.warna : '', data: [] }; hasil.push(grup[nama]); }
-      grup[nama].i = Math.min(grup[nama].i, t ? t.i : 999);
-      grup[nama].data.push(d);
-    });
-    return hasil.sort(function (a, b) { return a.i - b.i || (a.nama < b.nama ? -1 : 1); });
-  }
-
   function gambarHalaman() {
     var k = S.kat, admin = k.peran === 'admin';
     main.innerHTML =
       '<section class="pembuka">' +
-        '<div><h1>Unduh Data</h1><p>Semua data yang terkumpul di Mesin Data Satu Data Tambora: patroli SMART, temuan kehati, kebakaran hutan, penyuluhan, RBM, dan lainnya. Pilih data, saring bila perlu, lalu unduh sebagai Excel, CSV, atau GeoJSON. Lapisan peta ada di bagian bawah halaman.</p></div>' +
+        '<div><h1>Unduh Data</h1><p>Data Satu Data Tambora disusun mengikuti peta konsep: induk data, kategori, lalu sub data. Buka induknya, pilih sub data, saring bila perlu, lalu unduh sebagai Excel, CSV, GeoJSON, atau Shapefile. Lapisan peta ada di bagian bawah halaman.</p></div>' +
         '<div class="pembuka-meta">' +
           (k.diperbarui ? '<span class="lencana">Diperbarui <b>' + esc(tglId(k.diperbarui)) + '</b></span>' : '') +
           '<span class="lencana' + (admin ? ' lencana--admin' : '') + '">' + esc(k.nama || 'Pegawai') + ' · ' + (admin ? 'Admin' : 'Pegawai') + '</span>' +
@@ -274,7 +323,8 @@
         '<div class="tata-utama">' +
           '<section class="kotak" id="bagData" aria-labelledby="judulData">' +
             '<div class="kotak-kepala"><h2 id="judulData"><span class="langkah" aria-hidden="true">1</span>Pilih data</h2>' +
-              '<label class="isian cari-data">' + IKON.cari + '<span class="sr">Cari nama data</span><input type="search" id="cariData" placeholder="Cari nama data" autocomplete="off"></label></div>' +
+              '<div class="alat-data"><label class="isian cari-data">' + IKON.cari + '<span class="sr">Cari sub data</span><input type="search" id="cariData" placeholder="Cari sub data, mis. perburuan" autocomplete="off"></label>' +
+              '<button type="button" class="teks-tombol" id="bukaSemua"></button></div></div>' +
             '<div id="daftarData"></div>' +
           '</section>' +
           '<section class="kotak" id="bagSaring" aria-labelledby="judulSaring">' +
@@ -313,7 +363,7 @@
   }
 
   var KET_FORMAT = {
-    xlsx: 'Satu berkas .xlsx: satu lembar per data, ditambah lembar Keterangan berisi saringan dan sumber.',
+    xlsx: 'Satu berkas .xlsx: satu lembar per sub data, ditambah lembar Keterangan berisi induk, kategori, dan saringan.',
     csv: 'Satu berkas per data, zip bila lebih dari satu. Pemisah koma, untuk QGIS, R, atau Python. Untuk dibuka di Excel, pilih format Excel.',
     geojson: 'Titik dari data berkoordinat X dan Y (WGS 84), untuk QGIS dan peta web. Zip bila lebih dari satu data.',
     shp: 'Zip berisi .shp, .shx, .dbf, .prj, dan .cpg (WGS 84) untuk ArcGIS, QGIS, atau Google Earth Pro. Hanya baris berkoordinat; nama kolom dipendekkan menjadi 10 huruf dan padanannya ikut di zip.'
@@ -322,25 +372,79 @@
     return '<label><input type="radio" name="format" value="' + nilai + '"' + (S.format === nilai ? ' checked' : '') + '><span>' + esc(judul) + '</span></label>';
   }
 
-  /* ---------- 1. daftar data ---------- */
+  /* ---------- 1. daftar data: induk > kategori > sub data ---------- */
   function idTerpilih() {
-    return S.kat ? S.kat.dataset.filter(function (d) { return S.pilih[d.id] && !d.terkunci; }).map(function (d) { return d.id; }) : [];
+    return S.kat ? S.kat.dataset.filter(function (d) { return S.pilih[d.id] && bisaDipilih(d); }).map(function (d) { return d.id; }) : [];
+  }
+
+  function cocokCari(q, g) {
+    return function (d) { return !q || normal(d.judul + ' ' + (d.kategori || '') + ' ' + (d.keterangan || '') + ' ' + g.nama).indexOf(q) >= 0; };
+  }
+
+  function tombolGrup(nama, data) {
+    var ids = data.filter(bisaDipilih).map(function (d) { return d.id; });
+    return ids.length > 1 ? '<button type="button" class="teks-tombol" data-grup="' + esc(nama) + '" data-isi="' + esc(ids.join(',')) + '"></button>' : '';
+  }
+
+  function ringkasInduk(g) {
+    var sub = [], baris = 0;
+    g.kategori.forEach(function (c) { sub = sub.concat(c.data); });
+    sub.concat(g.pendukung).forEach(function (d) { baris += Number(d.jumlah) || 0; });
+    var isi = sub.filter(function (d) { return Number(d.jumlah) > 0; }).length;
+    var teks = S.kat.versi ? isi + ' dari ' + sub.length + ' sub data berisi' : isi + ' data';
+    if (g.pendukung.length) teks += ' · ' + g.pendukung.length + ' data pendukung';
+    return teks + ' · ' + angka(baris) + ' baris';
   }
 
   function gambarDaftar() {
     var q = normal(S.cariData).trim(), html = '';
-    kelompok().forEach(function (g) {
-      var isi = g.data.filter(function (d) { return !q || normal(d.judul + ' ' + d.keterangan + ' ' + g.nama).indexOf(q) >= 0; });
-      if (!isi.length) return;
-      var bisa = isi.filter(function (d) { return !d.terkunci; });
-      html += '<section class="grup" aria-label="' + esc(g.nama) + '">' +
-        '<div class="grup-kepala"><span class="grup-titik" style="background:' + esc(/^#[0-9a-f]{3,8}$/i.test(g.warna) ? g.warna : '#8a93a6') + '" aria-hidden="true"></span><h3>' + esc(g.nama) + '</h3>' +
-        (bisa.length > 1 ? '<button type="button" class="teks-tombol" data-grup="' + esc(g.nama) + '" data-isi="' + esc(bisa.map(function (d) { return d.id; }).join(',')) + '"></button>' : '') + '</div>' +
-        '<div class="data-deret">' + isi.map(kartuData).join('') + '</div></section>';
+    S.pohon.forEach(function (g) {
+      var cocok = cocokCari(q, g);
+      var kat = g.kategori.map(function (c) { return { nama: c.nama, data: c.data.filter(cocok) }; }).filter(function (c) { return c.data.length; });
+      var pend = g.pendukung.filter(cocok);
+      if (!kat.length && !pend.length) return;
+      var kode = g.kode, id = 'induk-' + slug(kode || 'lainnya'), buka = !!q || !!S.buka[kode], semuaSub = [];
+      kat.forEach(function (c) { semuaSub = semuaSub.concat(c.data); });
+      var warna = /^#[0-9a-f]{3,8}$/i.test(g.warna) ? g.warna : '#8a93a6';
+      html += '<section class="induk" data-induk="' + esc(kode) + '" style="--warna:' + esc(warna) + '">' +
+        '<div class="induk-kepala">' +
+          '<h3 class="induk-judul"><button type="button" class="induk-buka" id="buka-' + esc(id) + '" data-buka="' + esc(kode) + '" aria-expanded="' + buka + '" aria-controls="' + esc(id) + '">' +
+            IKON.panah + '<span class="induk-tanda" aria-hidden="true"></span>' +
+            '<span class="induk-teks"><span class="induk-nama">' + esc(g.nama) + '</span><span class="induk-ringkas">' + esc(ringkasInduk(g)) + '</span></span>' +
+            '<span class="induk-dipilih" data-dipilih="' + esc(kode) + '"></span>' +
+          '</button></h3>' +
+          tombolGrup(g.nama, semuaSub) +
+        '</div>' +
+        '<div class="induk-isi" id="' + esc(id) + '" role="region" aria-labelledby="buka-' + esc(id) + '"' + (buka ? '' : ' hidden') + '>' +
+          kat.map(function (c) { return kategoriHtml(c, g); }).join('') +
+          (pend.length ? pendukungHtml(g, pend, !!q || !!S.bukaPendukung[kode]) : '') +
+        '</div></section>';
     });
-    $('daftarData').innerHTML = html || '<p class="kosong">Tidak ada data yang cocok dengan "' + esc(S.cariData) + '".</p>';
+    $('daftarData').innerHTML = html || '<p class="kosong">Tidak ada sub data yang cocok dengan "' + esc(S.cariData) + '".</p>';
     perbaruiTombolGrup();
     perbaruiMeta();
+    perbaruiTombolBuka();
+  }
+
+  /** Satu kategori: kartu sub data yang berisi, lalu satu baris nama sub data yang belum berisi data. */
+  function kategoriHtml(c, g) {
+    var isi = c.data.filter(function (d) { return Number(d.jumlah) > 0 || d.terkunci; });
+    var kosong = c.data.filter(function (d) { return !(Number(d.jumlah) > 0) && !d.terkunci; });
+    var judul = c.nama && c.nama !== g.nama;
+    return '<div class="kategori">' +
+      (judul ? '<div class="kategori-kepala"><h4>' + esc(c.nama) + '</h4>' + tombolGrup(c.nama, isi) + '</div>' : '') +
+      (isi.length ? '<div class="data-deret">' + isi.map(kartuData).join('') + '</div>' : '') +
+      (kosong.length ? '<p class="belum"><b>Belum ada data:</b> ' + kosong.map(function (d) { return '<span>' + esc(d.judul) + '</span>'; }).join(', ') + '</p>' : '') +
+      '</div>';
+  }
+
+  function pendukungHtml(g, data, buka) {
+    var lain = data.filter(function (d) { return d.jenis === 'lainnya'; }).length;
+    return '<details class="pendukung" data-pendukung="' + esc(g.kode) + '"' + (buka ? ' open' : '') + '>' +
+      '<summary>' + IKON.panah + '<span>Data pendukung</span><small>' + data.length + ' data</small></summary>' +
+      '<p class="pendukung-ket">Data pelengkap di luar sub data peta konsep' + (lain ? ', termasuk baris yang kategorinya belum ada di peta konsep' : '') + '.</p>' +
+      '<div class="pendukung-alat">' + tombolGrup('data pendukung ' + g.nama, data) + '</div>' +
+      '<div class="data-deret">' + data.map(kartuData).join('') + '</div></details>';
   }
 
   function kartuData(d) {
@@ -363,6 +467,10 @@
   function perbaruiMeta() {
     var el = main.querySelectorAll('[data-meta]');
     for (var i = 0; i < el.length; i++) { var d = S.byId[el[i].getAttribute('data-meta')]; if (d) el[i].innerHTML = metaHtml(d); }
+    var dipilih = {};
+    idTerpilih().forEach(function (id) { var k = String(S.byId[id].induk || ''); dipilih[k] = (dipilih[k] || 0) + 1; });
+    el = main.querySelectorAll('[data-dipilih]');
+    for (var j = 0; j < el.length; j++) { var n = dipilih[el[j].getAttribute('data-dipilih')] || 0; el[j].textContent = n ? n + ' dipilih' : ''; }
   }
 
   function perbaruiTombolGrup() {
@@ -370,8 +478,22 @@
     for (var i = 0; i < el.length; i++) {
       var ids = el[i].getAttribute('data-isi').split(','), semua = ids.every(function (id) { return S.pilih[id]; });
       el[i].textContent = semua ? 'Lepas semua' : 'Pilih semua';
-      el[i].setAttribute('aria-label', (semua ? 'Lepas semua data ' : 'Pilih semua data ') + el[i].getAttribute('data-grup'));
+      el[i].setAttribute('aria-label', (semua ? 'Lepas semua ' : 'Pilih semua ') + el[i].getAttribute('data-grup'));
     }
+  }
+
+  function perbaruiTombolBuka() {
+    var b = $('bukaSemua'), el = main.querySelectorAll('[data-buka]'), terbuka = 0;
+    for (var i = 0; i < el.length; i++) if (el[i].getAttribute('aria-expanded') === 'true') terbuka++;
+    b.hidden = !el.length;
+    b.textContent = el.length && terbuka === el.length ? 'Tutup semua' : 'Buka semua';
+  }
+
+  function bukaInduk(tombol, buka) {
+    var kode = tombol.getAttribute('data-buka'), panel = $(tombol.getAttribute('aria-controls'));
+    tombol.setAttribute('aria-expanded', buka ? 'true' : 'false');
+    if (panel) panel.hidden = !buka;
+    S.buka[kode] = buka;
   }
 
   /* ---------- 2. saring ---------- */
@@ -520,7 +642,7 @@
       var catatan = '';
       if (h && h.diabaikan && h.diabaikan.length) catatan += '<span class="lewat">Saringan ' + esc(daftarTeks(h.diabaikan.map(namaFaset))) + ' tidak berlaku untuk data ini.</span>';
       if (!ikut) catatan += '<span class="lewat">Tanpa koordinat, tidak ikut ' + geo + '.</span>';
-      html += '<li><span class="nm">' + esc(d.judul) + '</span><span class="nl">' + (h ? angka(h.jumlah) : PUTAR + '<span class="sr">menghitung</span>') + '</span>' + catatan + '</li>';
+      html += '<li><span class="nm">' + esc(d.judul) + '<small>' + esc(namaInduk(d)) + '</small></span><span class="nl">' + (h ? angka(h.jumlah) : PUTAR + '<span class="sr">menghitung</span>') + '</span>' + catatan + '</li>';
     });
     $('rincian').innerHTML = html;
     var ket = !ids.length ? 'Belum ada data dipilih' : ids.length + ' data dipilih' + (tunggu ? ', menghitung…' : '');
@@ -608,6 +730,15 @@
       } else if (t.hasAttribute('data-lagi')) {
         S.lagi[t.getAttribute('data-lagi')] = true;
         gambarSaring();
+      } else if (t.hasAttribute('data-buka')) {
+        bukaInduk(t, t.getAttribute('aria-expanded') !== 'true');
+        perbaruiTombolBuka();
+        simpan();
+      } else if (t.id === 'bukaSemua') {
+        var semuaTombol = main.querySelectorAll('[data-buka]'), bukaKah = t.textContent !== 'Tutup semua';
+        for (var b = 0; b < semuaTombol.length; b++) bukaInduk(semuaTombol[b], bukaKah);
+        perbaruiTombolBuka();
+        simpan();
       } else if (t.hasAttribute('data-grup')) {
         var ids = t.getAttribute('data-isi').split(','), semua = ids.every(function (id) { return S.pilih[id]; });
         ids.forEach(function (id) { if (semua) delete S.pilih[id]; else S.pilih[id] = true; });
@@ -624,6 +755,8 @@
         S.pilih = {};
         S.saring = { dari: '', sampai: '', tahun: [], nilai: {}, cari: '' };
         S.cariData = '';
+        S.buka = {};
+        S.bukaPendukung = {};
         $('cariData').value = '';
         simpan();
         gambarDaftar();
@@ -635,6 +768,10 @@
         unduh();
       }
     });
+    main.addEventListener('toggle', function (e) {
+      var d = e.target;
+      if (d.hasAttribute && d.hasAttribute('data-pendukung') && !S.cariData.trim()) S.bukaPendukung[d.getAttribute('data-pendukung')] = d.open;
+    }, true);
     $('bilahTombol').addEventListener('click', function () {
       var b = $('bagUnduh');
       b.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
@@ -742,7 +879,8 @@
   /* ---------- susun berkas ---------- */
   function slug(s) { return String(s || 'data').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '_').slice(0, 80) || 'data'; }
   function namaBerkas(hasil, ext) {
-    return (hasil.length === 1 ? slug(hasil[0].judul) : 'Satu_Data_Tambora') + '_' + hariIni() + '.' + ext;
+    var induk = hasil.map(function (r) { return namaInduk(r.d); }).filter(function (n, i, a) { return a.indexOf(n) === i; });
+    return (hasil.length === 1 ? slug(hasil[0].judul) : induk.length === 1 && induk[0] ? slug(induk[0]) : 'Satu_Data_Tambora') + '_' + hariIni() + '.' + ext;
   }
 
   function susunBerkas(hasil, format, saring) {
@@ -781,13 +919,15 @@
       ['Diunduh', waktu + ' (waktu perangkat)'],
       ['Oleh', (k.nama || '') + ' (' + (k.peran === 'admin' ? 'admin' : 'pegawai') + ')'],
       ['Saringan', teksSaring(saring)],
+      ['Susunan', 'Peta Konsep Satu Data Tambora: induk data > kategori > sub data'],
       ['Sumber', 'Mesin Data Satu Data Tambora, katalog diperbarui ' + tglId(k.diperbarui || '') + ' WITA'],
       ['Alamat', location.href.split('#')[0]]
     ];
-    var tabel = [['Data', 'Baris', 'Saringan tidak berlaku', 'Kolom khusus admin yang tidak ikut', 'Keterangan']];
+    var tabel = [['Induk', 'Kategori', 'Sub data', 'Baris', 'Saringan tidak berlaku', 'Kolom khusus admin yang tidak ikut', 'Keterangan']];
     hasil.forEach(function (r) {
       var cat = FORMAT_PETA[format] ? r.titikAda + ' titik berkoordinat' : '';
-      tabel.push([r.judul, r.baris.length, r.diabaikan.map(namaFaset).join(', '), r.khususAdmin.join(', '), [r.d.keterangan || '', cat].filter(String).join(' ')]);
+      tabel.push([namaInduk(r.d), r.d.jenis === 'sub' ? r.d.kategori || '' : 'Data pendukung', r.judul, r.baris.length, r.diabaikan.map(namaFaset).join(', '),
+        r.khususAdmin.join(', '), [r.d.keterangan || '', cat].filter(String).join(' ')]);
     });
     var teks = umum.map(function (b) { return b.join(': '); }).concat([''], tabel.map(function (b) { return b.join(' | '); }));
     return { umum: umum, tabel: tabel, teks: teks };
@@ -830,7 +970,7 @@
     var X = window.XLSX, wb = X.utils.book_new(), dipakai = {};
     hasil.forEach(function (r) { X.utils.book_append_sheet(wb, lembarData(r.kolom, r.baris), namaLembar(r.judul, dipakai)); });
     var ket = X.utils.aoa_to_sheet(info.umum.concat([[]], info.tabel));
-    ket['!cols'] = [{ wch: 44 }, { wch: 10 }, { wch: 24 }, { wch: 36 }, { wch: 80 }];
+    ket['!cols'] = [{ wch: 34 }, { wch: 30 }, { wch: 40 }, { wch: 10 }, { wch: 24 }, { wch: 36 }, { wch: 70 }];
     X.utils.book_append_sheet(wb, ket, namaLembar('Keterangan', dipakai));
     wb.Props = { Title: 'Unduhan Satu Data Tambora', Author: 'Satu Data Tambora', CreatedDate: new Date() };
     var isi = X.write(wb, { bookType: 'xlsx', type: 'array', compression: true });
