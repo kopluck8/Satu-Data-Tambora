@@ -393,6 +393,19 @@ var KOLOM_EKSPOR_INTI = ['Source', 'Waypoint ID', 'Waypoint Date', 'Waypoint Tim
   'Resor', 'Resort', 'Nama Resor', 'SPTN', 'Station', 'ST', 'Foto', 'Patrol ID', 'Patrol Leg ID', 'Mandate', 'Mandat',
   'Patrol Mandate'];
 
+/**
+ * Judul kolom ekspor dengan garis bawah atau ejaan lain (Waypoint_Date, Observation_Category_0) disamakan dengan judul
+ * ekspor SMART biasa. Atribut tidak perlu, karena atributEkspor_ sudah mencocokkan tanpa tanda baca.
+ */
+function bakuKepalaEkspor_(h) {
+  if (!bakuKepalaEkspor_.peta) {
+    bakuKepalaEkspor_.peta = {};
+    KOLOM_EKSPOR_INTI.forEach(function (k) { bakuKepalaEkspor_.peta[kunci_(k)] = k; });
+  }
+  h = String(h == null ? '' : h).trim();
+  return bakuKepalaEkspor_.peta[kunci_(h)] || h;
+}
+
 /** Kunci kategori dari nama kategori ekspor (2027, kantor 2026, atau kunci mentah bila label belum ada). */
 function hkeyEkspor_(M, k0, k1, k2) {
   var bagian = [k0, k1, k2].map(function (x) { return String(x || '').trim(); });
@@ -607,7 +620,9 @@ var PENGIMPOR = {
       if (terbaca) return;
       try {
         if (/^https?:/i.test(a) && !/\/spreadsheets\/d\/[A-Za-z0-9_-]{20,}\/edit/.test(a)) {
-          bacaCsv_(ambil_(a)).forEach(function (r) {
+          bacaCsv_(ambil_(a)).forEach(function (r0) {
+            var r = {};
+            Object.keys(r0).forEach(function (k) { r[bakuKepalaEkspor_(k)] = r0[k]; });
             hasil = hasil.concat(olahBarisEkspor_(M, r, { sumber: label, awalan: 'rks-', berkas: 'Rekap SMART (CSV)' }, sekarang));
           });
         } else {
@@ -615,7 +630,7 @@ var PENGIMPOR = {
           var ss = bukaSpreadsheet_(id), zona = ss.getSpreadsheetTimeZone();
           ss.getSheets().forEach(function (sh) {
             if (sh.getLastRow() < 2) return;
-            var v = sh.getDataRange().getValues(), h = v[0].map(function (x) { return String(x).trim(); });
+            var v = sh.getDataRange().getValues(), h = v[0].map(bakuKepalaEkspor_);
             var i0 = h.indexOf('Observation Category 0');
             var dariNama = sh.getName().split('/');
             if (h.indexOf('Waypoint Date') < 0 || (i0 < 0 && dariNama.length < 1)) return;
