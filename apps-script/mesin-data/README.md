@@ -43,9 +43,11 @@ Hub mengirim `POST` berisi JSON (teks biasa, tanpa preflight CORS):
 
 | `aksi` | Isi permintaan | Jawaban |
 |---|---|---|
-| `katalog` | `token` | Daftar data yang boleh dilihat, pilihan saring (`faset`), kolom, rentang tahun, dan data mana yang terkunci |
+| `katalog` | `token`, `versi: 2` | Daftar induk (`tema`) dan data yang boleh dilihat: sub data (`jenis: sub`, dengan `induk`, `kategori`, `urut`), data pendukung, dan Lainnya, masing-masing dengan pilihan saring (`faset`), kolom terisi, rentang tahun, tanda berkoordinat, dan tanda terkunci. Tanpa `versi` (hub lama) hanya data yang berisi yang dikirim |
 | `hitung` | `token`, `dataset: [id]`, `saring` | Jumlah baris yang lolos saringan per data (disimpan 10 menit) |
 | `unduh` | `token`, `id`, `saring`, `awal` | Satu halaman baris (300 sampai 5.000 baris tergantung jumlah kolom); halaman berikutnya diminta dengan `awal = berikut` |
+
+`id` adalah id sub data (`induk.nama-sub-data`, mis. `pp.perburuan-satwa`) atau id tab di Katalog (data pendukung, atau satu tab utuh untuk tautan lama). Sub data yang barisnya ada di beberapa tab (mis. Pendampingan Kelompok Binaan dari tab penyuluhan dan tab kelompok binaan) diunduh sebagai satu tabel.
 
 `saring` = `{ dari, sampai, tahun: [..], nilai: { "Resor": [..], "Jenis kegiatan": [..] }, cari }`. Saringan yang tidak berlaku untuk suatu data (misalnya Resor pada Daftar Jenis Kehati) dilewati dan disebut di `diabaikan`.
 
@@ -56,6 +58,19 @@ Hub mengirim `POST` berisi JSON (teks biasa, tanpa preflight CORS):
 - Katalog `akses` = `pegawai`, `admin` (seluruh data khusus admin), atau `tidak`; `tampil` = `tidak` menyembunyikan data. Lembar kendali tidak pernah bisa diunduh.
 - Setiap unduhan dicatat di lembar **Log Unduhan** (waktu, akun, data, saringan, jumlah baris).
 
+## Susunan sub data
+
+Unduh Data mengikuti Garis Besar Peta Konsep Satu Data Tambora 2027: **induk data > kategori > sub data**. Daftarnya ada di `SUB_DATA` (awal `Unduh.gs`), satu baris per bagian: `[induk, kategori, sub data, tab, Kategori 0, Kategori 1]`.
+
+- `tab`: kode penghubung di lembar Rute (`gangguan`, `satwa`, ...), `@upaya`, `@perresor`, atau `=Nama tab`.
+- Kategori 0 dan Kategori 1: label yang diterima, dipisah `|`, tidak peka huruf besar-kecil. Kosong berarti semua, awalan `!` berarti selain label itu. Label laporan lama (mis. `Pendampingan & monev kelompok`) ditulis sebagai padanan.
+- Satu sub data boleh mengambil dari beberapa tab: tulis barisnya lagi dengan induk, kategori, dan nama yang sama.
+- Tab survei metode teknis (penghubung `surveikehati`) otomatis menjadi sub data di kategori Survei Kehati Metode Teknis di bawah Keanekaragaman Hayati, begitu tabnya terbentuk.
+- Baris tab rekap yang Kategori 0 dan 1-nya tidak cocok dengan sub data mana pun masuk "Lainnya dari <tab>" (terlipat bersama data pendukung) dan disebut di kolom `di_luar_sub` Katalog. `SUB_DATA_ABAIKAN` berisi baris yang sengaja dilewati karena observasinya sudah ada di tab lain (mis. Penggunaan Kawasan di tab tenurial sama dengan sub data Penggunaan Kawasan di tab gangguan).
+- Tab di luar data model menjadi **data pendukung** di bawah induknya.
+
+Setelah `SUB_DATA` diubah, naikkan `SUB_VERSI`: katalog lama dihitung ulang otomatis. Menu **Perbarui katalog Unduh Data** menampilkan jumlah sub data, data pendukung, dan baris yang masuk Lainnya.
+
 ## Lembar Katalog
 
-Satu baris per tab data. Kolom `judul`, `tema`, `keterangan`, `akses`, `kolom_admin`, dan `tampil` boleh diubah dan dipertahankan. Kolom `jumlah_baris`, `tahun_awal`, `tahun_akhir`, `kolom`, `faset`, `diperbarui`, dan `jumlah_titik` (baris yang punya koordinat X dan Y; data tanpa titik tidak ditawarkan sebagai GeoJSON atau Shapefile) dihitung ulang setiap kali data berubah (setelah proses file patroli dan pembaruan sumber), atau lewat menu **Perbarui katalog Unduh Data**.
+Satu baris per tab data. Kolom `judul`, `tema`, `keterangan`, `akses`, `kolom_admin`, dan `tampil` boleh diubah dan dipertahankan. Kolom `jumlah_baris`, `tahun_awal`, `tahun_akhir`, `kolom` (kolom yang terisi), `faset`, `diperbarui`, `jumlah_titik` (baris yang punya koordinat X dan Y; data tanpa titik tidak ditawarkan sebagai GeoJSON atau Shapefile), `sub` (ringkasan tiap sub data di tab itu), `di_luar_sub`, dan `versi_sub` dihitung ulang setiap kali data berubah (setelah proses file patroli dan pembaruan sumber), atau lewat menu **Perbarui katalog Unduh Data**. `akses` dan `tampil` sebuah tab berlaku untuk semua sub data dari tab itu.
