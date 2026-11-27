@@ -884,7 +884,10 @@ function siapkanSpreadsheetInduk() {
   var catatan = [], ssAktif = SpreadsheetApp.getActive(), naik = false;
   // Lembar kendali bawaan (berkas Kendali.gs) dipasang dulu bila versinya lebih baru. Tab rekap lalu dikosongkan dan
   // diisi ulang dengan susunan baru: menu 3 (sumber lain) dan menu 2 (semua file patroli dibaca lagi).
-  if (typeof kendaliPerluDiperbarui_ === 'function' && kendaliPerluDiperbarui_(ssAktif)) {
+  if (typeof kendaliPerluDiperbarui_ !== 'function') {
+    catatan.push('Berkas Kendali belum ada di proyek Apps Script, jadi lembar kendali tidak diperbarui ke peta konsep ' +
+      'terbaru. Buat berkas skrip Kendali, tempel Kendali.gs, lalu jalankan menu 1 lagi');
+  } else if (kendaliPerluDiperbarui_(ssAktif)) {
     try {
       var ui = SpreadsheetApp.getUi();
       if (ui.alert('Perbarui Mesin Data ke peta konsep ' + VERSI_KENDALI + '?', 'Lembar Rute, Induk, Petunjuk, Pengaturan, dan ' +
