@@ -11,7 +11,7 @@
  *   - Label Data Model: label kategori dan atribut yang dihapus dari data model ikut dihapus.
  */
 
-var VERSI_KENDALI = "2026-11-27";
+var VERSI_KENDALI = "2026-11-28";
 
 var KENDALI = {
   Rute: [
@@ -162,7 +162,7 @@ var KENDALI = {
     ["Mesin Data Satu Data Tambora"],
     [""],
     ["Satu spreadsheet tempat seluruh data Satu Data Tambora berkumpul, tersusun dalam 12 rekap mengikuti peta konsep 2027: Upaya Patroli, Temuan Gangguan Kawasan, Kejadian Kebakaran Hutan, Spesies Invasif, Tipe Ekosistem dan Tutupan Lahan, Temuan Satwa, Temuan Tumbuhan, Sarana Prasarana/Pal Batas/Media Informasi, Fitur Alami dan Potensi Kawasan, Kegiatan Penyuluhan, Sampah Pengunjung, serta Kunjungan dan Pendakian. Rekap berisi data mentah, bukan hasil analisis."],
-    ["Data sebelum 2027 diseragamkan ke kategori dan atribut data model 2027 lalu masuk ke rekap yang sama dengan data patroli: patroli SMART 2026, temuan kehati LPK teknis PEH dan SMART 2025, laporan penyuluhan dan kondisi kelompok binaan (Monev Kelompok Binaan), pulbaket tenurial (Penggunaan Kawasan dan Pelaku), titik panas dan delineasi (Kebakaran Hutan dan Lahan), laporan form RBM (Kegiatan RBM), register LPK PEH dan penerbangan drone (upaya). Lembar acuan: Daftar Jenis Kehati, Daftar Kelompok Binaan, Rencana RBM 2026. Tabel Survei Kehati Metode Teknis lengkap dengan parameter metode ada di lembar survei (bahan Kalkulator Teknis); ke Rekap Temuan Satwa/Tumbuhan hanya ikut jenis dan jumlahnya."],
+    ["Data sebelum 2027 diseragamkan ke kategori dan atribut data model 2027 lalu masuk ke rekap yang sama dengan data patroli: patroli SMART 2026, temuan kehati LPK teknis PEH dan SMART 2025, laporan penyuluhan dan kondisi kelompok binaan (Monev Kelompok Binaan), pulbaket tenurial (Penggunaan Kawasan dan Pelaku), titik panas dan delineasi (Kebakaran Hutan dan Lahan), arsip laporan kejadian 2016 sampai 2025 yang sudah dikurasi (temuan gangguan, kebakaran, dan Pelaku), laporan form RBM (Kegiatan RBM), register LPK PEH dan penerbangan drone (upaya). Lembar acuan: Daftar Jenis Kehati, Daftar Kelompok Binaan, Rencana RBM 2026. Tabel Survei Kehati Metode Teknis lengkap dengan parameter metode ada di lembar survei (bahan Kalkulator Teknis); ke Rekap Temuan Satwa/Tumbuhan hanya ikut jenis dan jumlahnya."],
     ["Setelah dipasang, file patroli SMART baru cukup dimasukkan ke folder Drive. Skrip memecah setiap observasi ke tab tema yang sesuai mengikuti peta konsep 2027 (lembar Rute), dan tab Unduh Data di hub membaca semua tab data dari sini."],
     [""],
     ["MEMPERBARUI SPREADSHEET YANG SUDAH TERPASANG: tempel ulang Code.gs, Sumber.gs, Unduh.gs, dan Kendali.gs (berkas baru bernama Kendali), muat ulang spreadsheet, jalankan menu 1 (lembar kendali diperbarui, tab rekap dikosongkan), lalu menu 3 dan menu 2 untuk mengisi ulang rekap. Terakhir Terapkan > Kelola deployment > ikon pensil > Versi baru > Terapkan."],
@@ -184,7 +184,8 @@ var KENDALI = {
     ["• Data sebelum 2027 dan data tab lain dibaca dari alamat di lembar Sumber dan masuk ke tab yang sama lewat penghubung yang sama (alur \"Sumber sebelum 2027\" di peta konsep). Alamat {HUB} dan {PAGES} diganti dengan URL_HUB dan URL_PAGES."],
     ["• Kolom Sumber di tiap tab mencatat asal baris. Setiap sumber mengganti baris miliknya sendiri saat diperbarui, jadi baris sumber lain tidak tersentuh. Titik patroli yang sama dari dua sumber hanya dicatat sekali (kolom Kunci titik: tanggal, jam, dan koordinat)."],
     ["• Lembar Katalog adalah daftar data untuk tab Unduh Data. Kolom judul, tema, keterangan, akses (pegawai, admin, tidak), kolom_admin, dan tampil boleh diubah; kolom lain dihitung skrip setiap data berubah."],
-    ["• Kolom data pribadi (nama pelaku, nama pengguna lahan, dan sejenisnya; lihat UNDUH_KOLOM_ADMIN di Pengaturan) hanya ikut terunduh oleh akun Tanya Data berperan admin. Sumber yang akses_unduh-nya admin di lembar Sumber (rekap laporan kejadian 2026) barisnya hanya terlihat oleh admin, walau satu tab rekap dengan data lain. Setiap unduhan dicatat di Log Unduhan."],
+    ["• Kolom data pribadi (nama pelaku, nama pengguna lahan, dan sejenisnya; lihat UNDUH_KOLOM_ADMIN di Pengaturan) hanya ikut terunduh oleh akun Tanya Data berperan admin. Sumber yang akses_unduh-nya admin di lembar Sumber (rekap laporan kejadian 2026 dan arsip laporan kejadian) barisnya hanya terlihat oleh admin, walau satu tab rekap dengan data lain. Grafik temuan aktivitas manusia di hub hanya memakai jumlahnya. Setiap unduhan dicatat di Log Unduhan."],
+    ["• Arsip laporan kejadian 2016 sampai 2025: unggah LK_Terkurasi_2016_2025.xlsx ke Drive, buka, File > Simpan sebagai Google Spreadsheet, salin ID-nya (bagian alamat di antara /d/ dan /edit) ke kolom alamat baris lk_arsip di lembar Sumber, lalu jalankan menu 3. Perbaikan isi cukup di spreadsheet itu; menu 3 berikutnya memuat ulang."],
     [""],
     ["BILA ADA YANG PERLU DILENGKAPI"],
     ["• Jenis Belum di Kamus: jenis dari file patroli yang belum ada di Kamus Jenis. Tambahkan barisnya ke Kamus Jenis, lalu jalankan \"Rapikan nama di semua rekap\"."],
@@ -192,7 +193,7 @@ var KENDALI = {
     ["• Sumber berstatus GAGAL: baca pesannya di kolom status. Spreadsheet berformat .xlsx perlu dibuka lalu File > Simpan sebagai Google Spreadsheet, dan ID barunya ditempel di kolom alamat."],
     ["• Data besar: isi kolom id_spreadsheet di lembar Induk dengan \"baru\" lalu jalankan menu 1. Tab induk itu dipindah ke spreadsheet tersendiri dan ID-nya dicatat otomatis."],
     [""],
-    ["Data awal di file ini disusun 27/11/2026 dari salinan data yang dipakai hub Satu Data Tambora."]
+    ["Data awal di file ini disusun 28/11/2026 dari salinan data yang dipakai hub Satu Data Tambora."]
   ],
   Pengaturan: [
     ["kunci", "nilai", "keterangan"],
@@ -209,7 +210,8 @@ var KENDALI = {
     ["UNDUH_KOLOM_ADMIN", "Nama pelaku, ID Pelaku, Identitas pelaku, Alamat, Tersangka, Nama informan, Nama pemilik, Nama pengepul, Nama kapten, Nama masyarakat, Nama pewaris, Nama guide, Nama pengguna lahan, Riwayat perolehan lahan, Pihak berpengaruh, NIK, Nomor HP, Telepon", "Kolom yang hanya ikut terunduh oleh akun admin. Nama kolom yang sama atau diawali nama ini (misalnya \"Alamat\" juga menutup \"Alamat pengguna lahan\"). Isi \"-\" untuk mematikan."],
     ["UNDUH_INDUK_TANPA", "survei", "Kode induk yang tidak tampil di Unduh Data: lembar survei metode teknis (bahan Kalkulator Teknis, bukan rekap)."],
     ["UNDUH_KOLOM_SEMBUNYI", "Kunci titik", "Kolom bantu yang tidak ikut diunduh siapa pun."],
-    ["VERSI_KENDALI", "2026-11-27", "Versi lembar kendali (Rute, Induk, Petunjuk, Pengaturan, Sumber). Menu 1 memperbarui lembar kendali bila versi di berkas skrip Kendali lebih baru, lalu tab rekap diisi ulang lewat menu 3 dan menu 2."]
+    ["GRAFIK_SUMBER_MATI", "Titik panas (hotspot), Delineasi areal terbakar, Pulbaket tenurial", "Sumber (isi kolom Sumber) yang bawaannya tidak dihitung di grafik temuan aktivitas manusia tab Perlindungan Kawasan hub: pantauan citra dan pendataan bidang, bukan temuan kejadian. Pengunjung hub tetap bisa menyalakannya."],
+    ["VERSI_KENDALI", "2026-11-28", "Versi lembar kendali (Rute, Induk, Petunjuk, Pengaturan, Sumber). Menu 1 memperbarui lembar kendali bila versi di berkas skrip Kendali lebih baru, lalu tab rekap diisi ulang lewat menu 3 dan menu 2."]
   ],
   Sumber: [
     ["kode", "nama", "jenis", "alamat", "tab_tujuan", "induk", "aktif", "akses_unduh", "catatan", "diperbarui", "baris", "status", "sidik"],
@@ -229,6 +231,7 @@ var KENDALI = {
     ["drone", "Penerbangan drone (Flight SMART)", "drone", "{PAGES}Flight_SMART/flights/index.json", "Rekap Upaya Patroli", "rbm", "ya", "", "Satu penerbangan = satu upaya (Rekap Upaya Patroli).", "", "", "", ""],
     ["lk_2026", "Rekap laporan kejadian 2026", "spreadsheet", "18qc30ZrKAgXeiqRzeqXh2Vqqhscq1kqVKEL_6mBA6Wc", "(mengikuti Rute)", "", "ya", "admin", "kategori=aktivitasmanusia. Kategori tiap baris dari sel yang sama dengan nama kategori (Pembalakan, Perburuan Satwa, ...) atau dari kata laporan lama di kolom kejadian (perambahan = Penggunaan Kawasan, perburuan = Perburuan Satwa, ...). Memuat identitas pelaku: akses_unduh admin = barisnya di Rekap Temuan Gangguan Kawasan hanya untuk admin. Pilih tab lain dengan menambah \"#Nama tab\" di alamat.", "", "", "", ""],
     ["rekap_karhut", "Rekap kejadian kebakaran hutan", "spreadsheet", "1J0Ys2ccDlIkI8PgLmeTgkfBcpHWz8bWX77mBEXyCCr4", "(mengikuti Rute)", "", "ya", "", "kategori=aktivitasmanusia.kebakaranhutandanlahan.", "", "", "", ""],
+    ["lk_arsip", "Arsip laporan kejadian 2016 sampai 2025 (terkurasi)", "lk_arsip", "", "(mengikuti Rute)", "", "ya", "admin", "Alamat: ID Google Spreadsheet hasil \"Simpan sebagai Google Spreadsheet\" dari LK_Terkurasi_2016_2025.xlsx (lembar LK terkurasi dan Pelaku). Kejadian masuk ke rekap kategorinya (gangguan, kebakaran, satwa mati), pelaku menjadi Aktivitas Manusia > Pelaku. Kebakaran tahun yang sudah dimuat rekap karhut dilewati agar tidak ganda; untuk tetap memuatnya, awali catatan ini dengan kebakaran=semua. Komentar dan Keterangan memuat uraian laporan yang bisa berisi nama orang, jadi akses_unduh tetap admin. Taruh baris ini sesudah rekap_karhut.", "", "", "", ""],
     ["kunjungan", "Rekap kunjungan wisata", "spreadsheet", "1EqteU7YyVOZeuMxgtCksg5EgNqoQbRukg4sUGJQgmPs", "(mengikuti Rute)", "", "ya", "", "kategori=penjagaanjalurpendakiandanodtwa.pelayananpengunjungwisata.", "", "", "", ""],
     ["dapoltam", "Database Polhut (DaPolTam)", "spreadsheet", "17O0M1sCb8oUHnNcCWMiPc1gNNSRthOfDw6zhjAP21KA", "(mengikuti Rute)", "", "tidak", "admin", "kategori=aktivitasmanusia. Tidak aktif; aktifkan hanya bila memang perlu ada di sini.", "", "", "", ""]
   ],
@@ -245,6 +248,45 @@ function versiKendaliTerpasang_(ss) {
 
 function kendaliPerluDiperbarui_(ss) {
   return versiKendaliTerpasang_(ss) !== VERSI_KENDALI;
+}
+
+/** Isi lembar sama dengan isi bawaan: teks tiap sel, tanpa sel dan baris kosong di ujung. */
+function isiLembarSama_(ss, nama, isi) {
+  var sh = ss.getSheetByName(nama);
+  if (!sh) return false;
+  var teks = function (v) {
+    var rows = v.map(function (r) {
+      var x = Array.prototype.map.call(r, function (c) { return String(c === null || c === undefined ? '' : c).trim(); });
+      while (x.length && x[x.length - 1] === '') x.pop();
+      return x.join('\t');
+    });
+    while (rows.length && rows[rows.length - 1] === '') rows.pop();
+    return rows.join('\n');
+  };
+  return teks(sh.getDataRange().getValues()) === teks(isi);
+}
+
+/**
+ * Pembaruan ringan: Rute dan Induk terpasang sama dengan isi bawaan dan tidak ada label data model yang perlu dihapus,
+ * jadi susunan rekap tidak berubah. Tab rekap tidak perlu dikosongkan; cukup menu 3 agar sumber baru terbaca.
+ */
+function kendaliRingan_(ss) {
+  var shL = ss.getSheetByName('Label Data Model');
+  if (KENDALI.hapusLabel.length && shL && shL.getLastRow() > 1) {
+    var hapus = {};
+    KENDALI.hapusLabel.forEach(function (h) { hapus[h.join('|')] = true; });
+    var ada = shL.getDataRange().getValues().some(function (r) { return hapus[[r[0], r[1], r[2]].map(String).join('|')]; });
+    if (ada) return false;
+  }
+  var idInduk = {};
+  bacaLembarMentah_(ss, 'Induk').forEach(function (r) { if (r.kode && r.id_spreadsheet) idInduk[r.kode] = r.id_spreadsheet; });
+  var iId = KENDALI.Induk[0].indexOf('id_spreadsheet');
+  var induk = KENDALI.Induk.map(function (r, i) {
+    var x = r.slice();
+    if (i && iId >= 0 && idInduk[r[0]]) x[iId] = idInduk[r[0]];
+    return x;
+  });
+  return isiLembarSama_(ss, 'Rute', KENDALI.Rute) && isiLembarSama_(ss, 'Induk', induk);
 }
 
 /**

@@ -26,7 +26,7 @@ var KOLOM_LEMBAR_SUMBER = ['kode', 'nama', 'jenis', 'alamat', 'tab_tujuan', 'ind
   'diperbarui', 'baris', 'status', 'sidik'];
 
 /** Naikkan bila cara olah sumber berubah, agar semua sumber dibaca ulang sekali. */
-var VERSI_PENGIMPOR = '2026-11-28';
+var VERSI_PENGIMPOR = '2026-11-28.2';
 /** Pengimpor yang selalu dibaca ulang (isinya dari API yang tidak bisa disidik dari alamatnya). */
 var SELALU_BACA = { rbm: true };
 
@@ -42,7 +42,8 @@ var LABEL_SUMBER = {
   areal_terbakar: 'Delineasi areal terbakar',
   drone: 'Flight SMART',
   register_lpk: 'Register kegiatan LPK PEH',
-  smart_kehati: 'Temuan kehati SMART (Data Masuk Kehati)'
+  smart_kehati: 'Temuan kehati SMART (Data Masuk Kehati)',
+  lk_arsip: 'Laporan kejadian (arsip terkurasi)'
 };
 
 var KAT_KEHATI = {
@@ -100,10 +101,12 @@ function jalankanSumber_(M, opsi) {
     }
     try {
       if (!f) throw new Error('jenis "' + s.jenis + '" tidak dikenal');
-      n = f(M, s);
+      // pengimpor mengembalikan jumlah baris, atau {n, catatan} bila ada yang perlu diketahui admin di kolom status
+      var keluar = f(M, s), catatan = keluar && typeof keluar === 'object' ? keluar.catatan : '';
+      n = keluar && typeof keluar === 'object' ? keluar.n : keluar;
       hasil.ok++;
       hasil.baris += Number(n) || 0;
-      tandaiSumber_(sh, h, i + 1, { diperbarui: new Date(), baris: n, status: 'OK', sidik: sidik });
+      tandaiSumber_(sh, h, i + 1, { diperbarui: new Date(), baris: n, status: 'OK' + (catatan ? ' (' + catatan + ')' : ''), sidik: sidik });
     } catch (e) {
       hasil.gagal++;
       tandaiSumber_(sh, h, i + 1, { diperbarui: new Date(), baris: '', status: 'GAGAL: ' + String(e && e.message || e).slice(0, 300), sidik: '' });
@@ -150,6 +153,8 @@ function sidikSumber_(M, s) {
       }
     } catch (e) { bagian.push('?'); }
   });
+  // arsip laporan kejadian melewati tahun kebakaran yang sudah dimuat sumber kebakaran lain: ikut berubah bila tahun itu berubah
+  if (s.jenis === 'lk_arsip') { try { bagian.push(JSON.stringify(tahunKarhutLain_(M, s))); } catch (e) { bagian.push('?'); } }
   return md5_(bagian.join('|'));
 }
 
@@ -188,7 +193,10 @@ var BULAN_INGGRIS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, au
   mei: 5, agu: 8, agt: 8, okt: 10, des: 12 };
 function dua_(n) { return (n < 10 ? '0' : '') + n; }
 
-/** Tanggal ekspor SMART ("2026-07-23", "Jul 23, 2026", "23/07/2026", objek Date) -> "YYYY-MM-DD". */
+/**
+ * Tanggal ekspor SMART ("2026-07-23", "Jul 23, 2026", "23/07/2026", objek Date) atau teks laporan ("Senin, 23 Juli 2026",
+ * "23 s.d 28 Juli 2021") -> "YYYY-MM-DD".
+ */
 function tanggalIso_(v, zona) {
   if (v instanceof Date) return Utilities.formatDate(v, zona || ZONA, 'yyyy-MM-dd');
   var s = String(v || '').trim(), m;
@@ -197,17 +205,177 @@ function tanggalIso_(v, zona) {
     return m[3] + '-' + dua_(BULAN_INGGRIS[m[1].toLowerCase()]) + '-' + dua_(+m[2]);
   }
   if ((m = /^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})/.exec(s))) return m[3] + '-' + dua_(+m[2]) + '-' + dua_(+m[1]);
-  return '';
+  return tanggalTeks_(s);
 }
 
-/** Jam ekspor SMART ("5:17:01 PM", "17:17:01", objek Date jam) -> "HH:MM:SS". */
+/** Jam ekspor SMART ("5:17:01 PM", "17:17:01", objek Date jam) atau teks laporan ("pukul 13.00 WITA") -> "HH:MM:SS". */
 function jamIso_(v, zona) {
   if (v instanceof Date) return Utilities.formatDate(v, zona || ZONA, 'HH:mm:ss');
-  var m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?/.exec(String(v || '').trim());
-  if (!m) return '';
+  var s = String(v || '').trim(), m = /^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*([AaPp][Mm])?/.exec(s);
+  if (!m) {
+    // teks laporan lama: tanggal di teks dibuang dulu agar "23.07.2026" tidak terbaca sebagai jam
+    var t = s.replace(/\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}/g, ' ').replace(/\d{1,2}\s+[A-Za-z]+\.?\s+\d{4}/g, ' ');
+    var mj = /(?:^|[^\d.,])(\d{1,2})\s*[.:]\s*(\d{2})(?![\d.,])/.exec(t);
+    return mj && +mj[1] <= 23 && +mj[2] <= 59 ? dua_(+mj[1]) + ':' + mj[2] + ':00' : '';
+  }
   var j = +m[1];
   if (m[4]) { var pm = /p/i.test(m[4]); if (j === 12) j = pm ? 12 : 0; else if (pm) j += 12; }
   return dua_(j) + ':' + m[2] + ':' + (m[3] || '00');
+}
+
+/* ---------- tanggal dan koordinat di teks laporan lama (rekap laporan kejadian, rekap karhut) ---------- */
+
+var BULAN_ID = { januari: 1, january: 1, jan: 1, februari: 2, pebruari: 2, february: 2, feb: 2, maret: 3, march: 3, mar: 3,
+  april: 4, apr: 4, mei: 5, may: 5, juni: 6, june: 6, jun: 6, juli: 7, july: 7, jul: 7, agustus: 8, august: 8, agus: 8,
+  agu: 8, agt: 8, ags: 8, aug: 8, september: 9, sept: 9, sep: 9, oktober: 10, october: 10, okt: 10, oct: 10,
+  november: 11, nopember: 11, nov: 11, desember: 12, december: 12, des: 12, dec: 12 };
+
+/**
+ * Tanggal pertama di teks laporan -> "YYYY-MM-DD", kosong bila tidak ada. Mengenali "Senin, 09 januari 2023 s.d Rabu,
+ * 11 Januari 2023", "23 s.d 28 Juli 2021" dan "Jum'at, 23 pukul 13.00 WITA s/d Rabu 28 Juli 2021" (hari tanpa bulan
+ * di depan: bulan dan tahun dari tanggal sesudahnya), serta "Senin, 23/07/2026".
+ */
+function tanggalTeks_(teks) {
+  var t = String(teks || '').replace(/ /g, ' ').replace(/\n/g, ' '), tgl = [], m;
+  if (!tanggalTeks_.nama) tanggalTeks_.nama = Object.keys(BULAN_ID).sort(function (a, b) { return b.length - a.length; }).join('|');
+  var re = new RegExp('(\\d{1,2})[\\s-]+(' + tanggalTeks_.nama + ')\\b\\.?[\\s,-]*(\\d{4})?', 'gi');
+  while ((m = re.exec(t))) tgl.push([+m[1], BULAN_ID[m[2].toLowerCase()], m[3] ? +m[3] : 0]);
+  if (!tgl.length) {
+    m = /(?:^|\D)(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})(?!\d)/.exec(t);
+    if (m) tgl.push([+m[1], +m[2], +m[3]]);
+  }
+  if (!tgl.length) return '';
+  var d = tgl[0][0], b = tgl[0][1], th = tgl[0][2];
+  for (var i = 1; !th && i < tgl.length; i++) th = tgl[i][2];
+  var m0 = /^\D*?(\d{1,2})\s*(?:pukul|jam|-|–|s\.?\s?d\.?|s\/d|sampai|hingga)\s/i.exec(t + ' ');
+  if (m0 && +m0[1] >= 1 && +m0[1] < d) d = +m0[1];
+  if (!th || th < 1990 || th > 2100 || b < 1 || b > 12 || d < 1 || d > 31) return '';
+  return th + '-' + dua_(b) + '-' + dua_(d);
+}
+
+/** Batas wajar titik di sekitar TN Tambora (derajat): untuk memilih angka yang memang lintang atau bujur. */
+var LINTANG_WAJAR = [7.95, 8.75], BUJUR_WAJAR = [117.6, 118.5];
+
+/** Rapikan tulisan koordinat laporan lama: tanda petik, simbol derajat, koma desimal, spasi atau angka yang hilang. */
+function normalKoordinat_(teks) {
+  var t = String(teks === null || teks === undefined ? '' : teks).replace(/ /g, ' ').replace(/\n/g, ' ')
+    .replace(/[’‘′`´]/g, "'").replace(/[”“″]/g, '"').replace(/[º˚]/g, '°')
+    .replace(/(\d)\s*o(?=\s*\d)/g, '$1°')                                   // 08o 23' -> 08° 23'
+    .replace(/(\d)(11[78])\s*°/g, '$1 $2°')                                 // 48,81503118°6' -> 48,81503 118°6'
+    .replace(/(°\s*\d{1,2})\s*'\s*(\d{3,})\s*"/g, "$1.$2'")                 // 118°07'257" -> 118°07.257' (titik menit hilang)
+    .replace(/(\bE\W{0,3})17\s*°/g, function (x, a) { return a + '117°'; }); // E: 17°53' -> E: 117°53' (angka 1 hilang)
+  if (t.indexOf('°') < 0) t = t.replace(/(?<!\d)(0?8|11[78])\s*'\s*(?=\d)/g, '$1°'); // S .08'21.022 (petik = derajat)
+  return t.replace(/(?<![\d.,])(-?\d{1,3}),\s+(\d{4,})/g, '$1.$2')           // -8, 301573 -> -8.301573
+    .replace(/(\d)\.\s+(\d{3,})/g, '$1.$2');                                // 118. 066531 -> 118.066531
+}
+
+function polaDms_() { return /(-?\d{1,3})\s*°\s*(\d{1,2}(?:[.,]\d+)?)?\s*(?:['"]\s*(\d{1,2}(?:[.,]\d+)?)\s*['"]?)?/g; }
+function angkaKoma_(s) { return Number(String(s).replace(/,/g, '.').replace(/ /g, '')); }
+
+function nilaiDms_(m) {
+  var v = Math.abs(Number(m[1])) + (m[2] ? angkaKoma_(m[2]) : 0) / 60 + (m[3] ? angkaKoma_(m[3]) : 0) / 3600;
+  return m[1].charAt(0) === '-' ? -v : v;
+}
+
+function jenisAngka_(v) {
+  var a = Math.abs(v);
+  if (a >= LINTANG_WAJAR[0] && a <= LINTANG_WAJAR[1]) return 'lat';
+  if (a >= BUJUR_WAJAR[0] && a <= BUJUR_WAJAR[1]) return 'lon';
+  return '';
+}
+
+/** Angka berurutan -> pasangan [bujur, lintang]; lintang selalu selatan (negatif). */
+function pasangkanKoordinat_(nilai) {
+  var hasil = [], lat = null, lon = null;
+  nilai.forEach(function (v) {
+    var j = jenisAngka_(v);
+    if (j === 'lat') lat = v;
+    else if (j === 'lon') lon = v;
+    if (lat !== null && lon !== null) { hasil.push([lon, -Math.abs(lat)]); lat = lon = null; }
+  });
+  return hasil;
+}
+
+/** UTM WGS 84 (bawaan zona 50 selatan) -> [bujur, lintang] 6 desimal. */
+function utmKeGeo_(e, n, zona, utara) {
+  zona = zona || 50;
+  var a = 6378137, f = 1 / 298.257223563, k0 = 0.9996, e2 = f * (2 - f), ep2 = e2 / (1 - e2);
+  var x = e - 500000, y = n - (utara ? 0 : 10000000), mu = y / k0 / (a * (1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * Math.pow(e2, 3) / 256));
+  var e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+  var p = mu + (3 * e1 / 2 - 27 * Math.pow(e1, 3) / 32) * Math.sin(2 * mu) + (21 * e1 * e1 / 16 - 55 * Math.pow(e1, 4) / 32) * Math.sin(4 * mu) +
+    (151 * Math.pow(e1, 3) / 96) * Math.sin(6 * mu) + (1097 * Math.pow(e1, 4) / 512) * Math.sin(8 * mu);
+  var c1 = ep2 * Math.pow(Math.cos(p), 2), t1 = Math.pow(Math.tan(p), 2);
+  var n1 = a / Math.sqrt(1 - e2 * Math.pow(Math.sin(p), 2)), r1 = a * (1 - e2) / Math.pow(1 - e2 * Math.pow(Math.sin(p), 2), 1.5);
+  var d = x / (n1 * k0);
+  var lat = p - (n1 * Math.tan(p) / r1) * (d * d / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1 * c1 - 9 * ep2) * Math.pow(d, 4) / 24 +
+    (61 + 90 * t1 + 298 * c1 + 45 * t1 * t1 - 252 * ep2 - 3 * c1 * c1) * Math.pow(d, 6) / 720);
+  var lon = (d - (1 + 2 * t1 + c1) * Math.pow(d, 3) / 6 + (5 - 2 * c1 + 28 * t1 - 3 * c1 * c1 + 8 * ep2 + 24 * t1 * t1) * Math.pow(d, 5) / 120) / Math.cos(p);
+  var bulat = function (v) { return Math.round(v * 1e6) / 1e6; };
+  return [bulat((zona - 1) * 6 - 180 + 3 + lon * 180 / Math.PI), bulat(lat * 180 / Math.PI)];
+}
+
+/**
+ * Teks koordinat bebas laporan lama -> {titik: [[bujur, lintang], ...], catatan: [...]}. Mengenali derajat-menit-detik,
+ * derajat-menit desimal, desimal (koma atau titik, minus lintang hilang), titik desimal lintang yang hilang (-81631),
+ * dan UTM zona 50S. Angka dipilih menurut batas wajar sekitar TN Tambora.
+ */
+function bacaKoordinat_(teks) {
+  var t = normalKoordinat_(teks), cat = [], titik = [], sisa = t, dms = [], m, re = polaDms_();
+  if (!t.trim()) return { titik: titik, catatan: cat };
+  while ((m = re.exec(t))) dms.push(m);
+  if (dms.length) {
+    titik = pasangkanKoordinat_(dms.map(nilaiDms_));
+    if (titik.length) cat.push('derajat-menit' + (dms.some(function (x) { return x[3]; }) ? '-detik' : '') + ' dikonversi ke desimal');
+    sisa = t.replace(polaDms_(), ' ');
+  }
+  if (!titik.length) {
+    var ang = sisa.match(/-?\d+(?:[.,]\d+)?/g) || [], nilai = [];
+    var besar = ang.filter(function (x) { return /^\d{6,7}(?:[.,]\d+)?$/.test(x); });
+    ang.forEach(function (x) {
+      var v = angkaKoma_(x);
+      if (/^-?8\d{4,}$/.test(x)) {
+        v = Number(x.replace('8', '8.'));
+        cat.push('titik desimal lintang hilang (' + x + ' dibaca ' + v + ')');
+      } else if (/^(?:0?8|11[78])$/.test(x.replace(/^-+/, ''))) return;   // derajat bulat tanpa desimal: bukan titik
+      nilai.push(v);
+    });
+    titik = pasangkanKoordinat_(nilai);
+    if (titik.length && ang.some(function (x) { return x.indexOf(',') >= 0; })) cat.push('koma desimal dibaca sebagai titik');
+    if (!titik.length && besar.length >= 2) {
+      var en = [angkaKoma_(besar[0]), angkaKoma_(besar[1])].sort(function (p, q) { return p - q; });
+      if (en[0] >= 500000 && en[0] <= 700000 && en[1] >= 9000000 && en[1] <= 9200000) {
+        titik = [utmKeGeo_(en[0], en[1])];
+        cat.push('UTM zona 50S dikonversi ke derajat');
+      }
+    }
+  }
+  return { titik: titik, catatan: cat };
+}
+
+/**
+ * Titik satu baris laporan lama -> {x, y, catatan}. Kolom X dan Y dipakai bila berisi angka bujur dan lintang (tertukar
+ * dibetulkan, lintang tanpa minus dibuat selatan, UTM 50S dikonversi); selebihnya dibaca dari teks (X, Y, dan kolom
+ * koordinat). Angka X dan Y yang tidak terbaca sebagai titik tetap dipakai apa adanya.
+ */
+function titikBaris_(vx, vy, kor) {
+  var x = typeof vx === 'number' ? vx : angkaAtauKosong_(vx), y = typeof vy === 'number' ? vy : angkaAtauKosong_(vy), cat = [];
+  if (x !== '' && y !== '') {
+    if (x >= 500000 && x <= 700000 && y >= 9000000 && y <= 9200000) {
+      var g = utmKeGeo_(x, y);
+      return { x: g[0], y: g[1], catatan: ['UTM zona 50S dikonversi ke derajat'] };
+    }
+    if (jenisAngka_(x) === 'lat' && jenisAngka_(y) === 'lon') { var tk = x; x = y; y = tk; cat.push('kolom X dan Y tertukar'); }
+    if (jenisAngka_(x) === 'lon' && jenisAngka_(y) === 'lat') {
+      if (y > 0) { y = -y; cat.push('lintang dibuat negatif (selatan)'); }
+      return { x: x, y: y, catatan: cat };
+    }
+  }
+  var k = bacaKoordinat_([vx, vy, kor].filter(function (v) { return v !== '' && v !== null && v !== undefined; }).join(' '));
+  if (k.titik.length) {
+    if (k.titik.length > 1) k.catatan.push(k.titik.length + ' titik di teks, dipakai titik pertama');
+    return { x: k.titik[0][0], y: k.titik[0][1], catatan: k.catatan };
+  }
+  return x !== '' && y !== '' ? { x: x, y: y, catatan: [] } : { x: '', y: '', catatan: [] };
 }
 
 function angkaAtauKosong_(v) {
@@ -435,11 +603,13 @@ function atributEkspor_(M, judul) {
 /**
  * Satu baris ekspor SMART -> baris per tab mengikuti Rute. info: {sumber, awalan, berkas, mandat, st, leg}.
  * Nama kolom atribut diseragamkan ke label 2027 bila dikenali; nama jenis lewat Kamus Jenis (label).
+ * Sumber lain yang barisnya sudah berkategori data model (arsip laporan kejadian) memberi info.hkey (kunci kategori),
+ * info.id (ID Observasi), info.jenis (Jenis kegiatan), dan info.atribut ({judul kolom: kunci atribut}).
  */
 function olahBarisEkspor_(M, r, info, sekarang, zona) {
-  var hkey = hkeyEkspor_(M, r['Observation Category 0'], r['Observation Category 1'], r['Observation Category 2']);
+  var hkey = info.hkey || hkeyEkspor_(M, r['Observation Category 0'], r['Observation Category 1'], r['Observation Category 2']);
   var mandat = info.mandat || r['Mandate'] || r['Mandat'] || r['Patrol Mandate'] || '';
-  var jenis = mandat ? jenisKegiatan_(M, mandat) : JENIS_TANPA_MANDAT;
+  var jenis = info.jenis || (mandat ? jenisKegiatan_(M, mandat) : JENIS_TANPA_MANDAT);
   var berkas = info.berkas || '';
   if (!hkey) { catatTanpaRute_(M, '(label) ' + [r['Observation Category 0'], r['Observation Category 1']].filter(String).join(' > '), '', berkas); return []; }
   var kat = labelKategori_(M, hkey);
@@ -448,7 +618,7 @@ function olahBarisEkspor_(M, r, info, sekarang, zona) {
   var isi = {};
   Object.keys(r).sort().forEach(function (k) { if (k !== 'Last Modified' && k !== 'Last Modified By') isi[k] = r[k] instanceof Date ? r[k].getTime() : r[k]; });
   var dasar = {
-    'ID Observasi': info.awalan + md5_(JSON.stringify(isi)).slice(0, 16), 'Sumber': info.sumber, 'Waktu': waktu,
+    'ID Observasi': info.id || info.awalan + md5_(JSON.stringify(isi)).slice(0, 16), 'Sumber': info.sumber, 'Waktu': waktu,
     'Jenis kegiatan': jenis, 'Mandat': mandat, 'ST': info.st || r['ST'] || '', 'Leg': info.leg || '',
     'Kategori 0': kat[0] || '', 'Kategori 1': kat[1] || '', 'Kategori 2': kat.slice(2).join(' > '),
     'Komentar': r['Comment'] || '', 'X': x, 'Y': y, 'Foto': r['Foto'] === undefined ? '' : r['Foto'], 'Kode kategori': hkey,
@@ -461,7 +631,7 @@ function olahBarisEkspor_(M, r, info, sekarang, zona) {
   Object.keys(r).forEach(function (h) {
     var v = r[h];
     if (KOLOM_EKSPOR_INTI.indexOf(h) >= 0 || h.indexOf('__') === 0 || v === '' || v === null || v === undefined) return;
-    var ak = atributEkspor_(M, h), judul = ak ? judulAtribut_(M, ak) : baku_(M, h);
+    var ak = (info.atribut && info.atribut[h]) || atributEkspor_(M, h), judul = ak ? judulAtribut_(M, ak) : baku_(M, h);
     if (KOLOM_TETAP.indexOf(judul) >= 0) judul += ' (isian patroli)';
     atr[judul] = typeof v === 'string' ? baku_(M, v) : v;
     atrKunci[judul] = ak;
@@ -532,6 +702,23 @@ function tahunSumber_(M, kode, nama, label) {
   if (iS < 0 || iT < 0) return hasil;
   var n = sh.getLastRow() - 1, s = sh.getRange(2, iS + 1, n, 1).getValues(), t = sh.getRange(2, iT + 1, n, 1).getValues();
   for (var i = 0; i < n; i++) if (String(s[i][0]) === label && t[i][0]) hasil[Number(t[i][0])] = true;
+  return hasil;
+}
+
+/**
+ * Tahun kebakaran yang sudah dimuat sumber kebakaran lain di tab rekap kebakaran: sumber spreadsheet aktif yang
+ * catatannya "kategori=aktivitasmanusia.kebakaranhutandanlahan." (rekap karhut). -> {tahun: label sumber}. Kosong bila
+ * catatan sumber s diawali "kebakaran=semua". Dipakai arsip laporan kejadian (lk_arsip) dan grafik hub.
+ */
+function tahunKarhutLain_(M, s) {
+  if (/^\s*kebakaran\s*=\s*semua\b/i.test(String(s.catatan || ''))) return {};
+  var tab = penghubung_(M, 'karhut'), hasil = {};
+  bacaTabel_(M.ss, LEMBAR.sumber, true).forEach(function (x) {
+    if (x.kode === s.kode || x.jenis !== 'spreadsheet' || String(x.aktif).toLowerCase() !== 'ya') return;
+    if (!/kategori\s*=\s*aktivitasmanusia\.kebakaranhutandanlahan/i.test(String(x.catatan || ''))) return;
+    var label = String(x.nama || x.kode), t = tahunSumber_(M, tab.induk, tab.tab, label);
+    for (var k in t) if (!hasil[k]) hasil[k] = label;
+  });
   return hasil;
 }
 
@@ -982,9 +1169,19 @@ var PENGIMPOR = {
     var sinonim = SINONIM_KATEGORI.filter(function (x) { return x[1].indexOf(hkInduk) === 0 && x[1] !== hkInduk && M.label['k|' + x[1]]; });
     var kolSinonim = h.map(function (x, j) { return /kejadian|jenis|kategori|gangguan|kasus|pelanggaran|temuan|aktivitas/i.test(x) ? j : -1; })
       .filter(function (j) { return j >= 0; });
-    var iTgl = cari(/^(tanggal|tgl|date|waypoint date)/i), iJam = cari(/^(waktu|jam|time)/i), iRes = cari(/^(resor|resort)/i),
-      iX = cari(/^(x|bujur|longitude|lon|lng)$/i), iY = cari(/^(y|lintang|latitude|lat)$/i), iKor = cari(/koordinat/i);
+    var iTgl = cari(/^(tanggal|tgl|date|waypoint date)/i), iJam = cari(/^(waktu|jam|time|pukul)/i), iRes = cari(/^(resor|resort)/i),
+      iX = cari(/^(x|bujur|longitude|lon|lng)$/i), iY = cari(/^(y|lintang|latitude|lat)$/i), iKor = cari(/koordinat/i),
+      iHari = cari(/^hari/i);
     var label = s.nama || s.kode, sekarang = new Date(), dipakai = [iTgl, iJam, iRes, iX, iY, iKor];
+    // tanggal: kolom tanggal, lalu teks "Hari/Tanggal" atau "Waktu kejadian" ("Senin, 09 Januari 2023 pukul 13.00")
+    var tanggalBaris = function (r) {
+      var hasilTgl = '';
+      [iTgl, iHari, iJam].forEach(function (j) {
+        if (hasilTgl || j < 0 || (r[j] instanceof Date && r[j].getFullYear() < 1950)) return;
+        hasilTgl = tanggalIso_(r[j], zona);
+      });
+      return hasilTgl;
+    };
     var baris = [];
     v.slice(iH + 1).forEach(function (r, ib) {
       if (!r.some(function (c) { return c !== '' && c !== null; })) return;
@@ -994,15 +1191,9 @@ var PENGIMPOR = {
         var teks = String(r[kolSinonim[js]] === null || r[kolSinonim[js]] === undefined ? '' : r[kolSinonim[js]]);
         for (var q = 0; teks && q < sinonim.length; q++) if (sinonim[q][0].test(teks)) { hk = sinonim[q][1]; break; }
       }
-      var tglIso = iTgl >= 0 ? tanggalIso_(r[iTgl], zona) : '', x = iX >= 0 ? angkaAtauKosong_(r[iX]) : '',
-        y = iY >= 0 ? angkaAtauKosong_(r[iY]) : '';
-      if (iKor >= 0 && (x === '' || y === '')) {
-        var ang = String(r[iKor]).match(/-?\d+(?:[.,]\d+)?/g) || [];
-        if (ang.length >= 2) {
-          var p1 = Number(ang[0].replace(',', '.')), p2 = Number(ang[1].replace(',', '.'));
-          if (Math.abs(p1) < 20) { y = p1; x = p2; } else { x = p1; y = p2; }
-        }
-      }
+      // titik: kolom X/Y, atau teks koordinat laporan (DMS, derajat-menit, desimal koma, UTM 50S; lihat bacaKoordinat_)
+      var tglIso = tanggalBaris(r), tt = titikBaris_(iX >= 0 ? r[iX] : '', iY >= 0 ? r[iY] : '', iKor >= 0 ? r[iKor] : '');
+      var x = tt.x, y = tt.y;
       var b = { 'ID Observasi': s.kode + '-' + md5_(JSON.stringify(r.map(String))).slice(0, 12), 'Sumber': label };
       waktuBaku_(b, tglIso);
       if (iJam >= 0) b['Waktu'] = jamIso_(r[iJam], zona);
@@ -1018,14 +1209,187 @@ var PENGIMPOR = {
         if (ak) b[judulAtribut_(M, ak)] = typeof isi === 'string' ? baku_(M, isi) : isi;
         else if (!anak[kunci_(String(c))]) lain.push(judul + ': ' + isi);
       });
+      if (tt.catatan.length) {
+        var asli = [iX, iY, iKor].filter(function (j) { return j >= 0 && r[j] !== '' && r[j] !== null; }).map(function (j) { return r[j]; });
+        lain.push('Koordinat asli: ' + asli.join(' ') + ' (' + tt.catatan.join(', ') + ')');
+      }
       if (lain.length) b['Atribut lain'] = lain.join('; ');
       b['X'] = x; b['Y'] = y; b['Kunci titik'] = tglIso && x !== '' ? kunciTitik_(tglIso, b['Waktu'] || '', x, y) : '';
       b['Berkas'] = ss.getName() + ' / ' + sh.getName() + ' / baris ' + (iH + ib + 2); b['Diproses'] = sekarang;
       baris.push(b);
     });
     return tulisDM_(M, label, baris);
+  },
+
+  /**
+   * Arsip laporan kejadian (LK) 2016 sampai 2025 yang sudah dikurasi: berkas LK_Terkurasi_2016_2025 yang disimpan sebagai
+   * Google Spreadsheet (alamat: ID atau URL-nya). Lembar "LK terkurasi" (satu baris = satu kejadian, sudah berkategori dan
+   * beratribut data model 2027) masuk ke rekap kategorinya lewat Rute seperti observasi file patroli: gangguan ke Rekap
+   * Temuan Gangguan Kawasan, kebakaran ke Rekap Kejadian Kebakaran Hutan, jenis tumbuhan dan satwa juga ke Rekap Temuan
+   * Tumbuhan dan Satwa (query atribut). Lembar "Pelaku" menjadi Aktivitas Manusia > Pelaku, satu baris per pelaku. Isian
+   * yang tidak punya atribut di kategorinya (ATRIBUT_KAT_LK) masuk Keterangan. Kebakaran tahun yang sudah dimuat sumber
+   * kebakaran lain (rekap karhut) dilewati agar satu kejadian tidak tercatat dua kali; awali catatan dengan
+   * "kebakaran=semua" untuk tetap memuatnya. Memuat nama pelaku: akses_unduh admin.
+   */
+  lk_arsip: function (M, s) {
+    var a = alamat_(M, s)[0] || '';
+    if (!a) throw new Error('alamat masih kosong. Unggah LK_Terkurasi_2016_2025.xlsx ke Drive, buka, pilih File > Simpan ' +
+      'sebagai Google Spreadsheet, lalu tempel ID spreadsheet barunya di kolom alamat');
+    var id = (/\/d\/([A-Za-z0-9_-]+)/.exec(a) || /[?&]id=([A-Za-z0-9_-]+)/.exec(a) || [null, a.split('#')[0].trim()])[1];
+    var ss = bukaSpreadsheet_(id), zona = ss.getSpreadsheetTimeZone(), label = LABEL_SUMBER.lk_arsip, sekarang = new Date();
+    var nama = ss.getName(), lewat = tahunKarhutLain_(M, s), dilewati = {}, hasil = [], kejadian = {};
+    var teks = function (v) { return v instanceof Date ? Utilities.formatDate(v, zona, 'dd/MM/yyyy') : String(v); };
+    var kosong = function (v) { return v === '' || v === null || v === undefined; };
+    var info = function (idObs, hk, berkas, kunci) {
+      return { sumber: label, id: idObs, hkey: hk, jenis: 'Laporan kejadian', mandat: '', berkas: berkas, atribut: kunci };
+    };
+    var dasar = function (r) {
+      return { 'Waypoint Date': r['Tanggal'], 'Waypoint Time': kosong(r['Jam']) ? '' : r['Jam'], 'X': r['X'], 'Y': r['Y'],
+        'Resor': r['Resor'] || '', 'SPTN': r['SPTN'] || '' };
+    };
+    bacaLembarLk_(ss, 'LK terkurasi').forEach(function (r) {
+      var hk = String(r['Kode kategori'] || '').trim(), idLk = String(r['ID LK'] || '').trim();
+      if (!idLk) return;
+      var berkas = nama + ' / LK terkurasi / baris ' + r.__baris + (r['Sumber berkas'] ? ' (asal: ' + r['Sumber berkas'] + ')' : '');
+      if (!hk || !M.label['k|' + hk]) { catatTanpaRute_(M, '(LK) ' + (hk || r['Kategori'] || idLk), String(r['Kategori'] || ''), berkas); return; }
+      kejadian[idLk] = r;
+      var th = Number(r['Tahun']) || (r['Tanggal'] instanceof Date ? r['Tanggal'].getFullYear() : 0);
+      if (hk === 'aktivitasmanusia.kebakaranhutandanlahan.' && lewat[th]) { dilewati[th] = lewat[th]; return; }
+      var boleh = ' ' + (ATRIBUT_KAT_LK[hk] || ATRIBUT_LK_BAWAAN) + ' ', rr = dasar(r), kunci = {}, ket = [], lebih = [];
+      var pasang = function (ak, v, judulAsal) {
+        if (kosong(v)) return;
+        if (boleh.indexOf(' ' + ak + ' ') < 0) { lebih.push((judulAsal || labelAtribut_(M, ak)) + ': ' + teks(v)); return; }
+        var j = labelAtribut_(M, ak);
+        rr[j] = v; kunci[j] = ak;
+      };
+      KOLOM_LK_ATRIBUT.forEach(function (p) { pasang(p[1], r[p[0]], p[0]); });
+      [['Jenis tumbuhan', ['jenistumbuhan', 'tmbjenistumbuhan']], ['Jenis satwa', ['jenissatwa', 'tmbjenissatwa']]].forEach(function (p) {
+        if (kosong(r[p[0]])) return;
+        var j = jenisLk_(M, String(r[p[0]]), p[1]);
+        pasang(j.atribut, j.label, p[0]);
+      });
+      KOLOM_LK_KETERANGAN.forEach(function (p) { if (!kosong(r[p[0]])) ket.push(p[1] + ': ' + teks(r[p[0]])); });
+      if (r['Posisi titik'] && !/^di dalam kawasan$/i.test(String(r['Posisi titik']))) ket.push('Posisi titik: ' + r['Posisi titik']);
+      pasang('keterangan', ket.concat(lebih).join('; '));
+      rr['Comment'] = r['Uraian singkat kejadian'] || '';
+      hasil = hasil.concat(olahBarisEkspor_(M, rr, info('lka-' + idLk, hk, berkas, kunci), sekarang, zona));
+    });
+    // pelaku: satu baris per orang (nama, umur, asal hanya untuk admin), titik dan waktu mengikuti kejadiannya
+    bacaLembarLk_(ss, 'Pelaku').forEach(function (p, i) {
+      var idLk = String(p['ID LK'] || '').trim(), r = kejadian[idLk];
+      if (!r) return;
+      var hk = String(r['Kode kategori']), rr = dasar(r), kunci = {}, ket = [];
+      var pasang = function (ak, v) { if (kosong(v)) return; var j = labelAtribut_(M, ak); rr[j] = v; kunci[j] = ak; };
+      pasang('nolk', r['No. LK']);
+      pasang('namapelaku', p['Nama']);
+      pasang('umur', p['Umur']);
+      pasang('asal', p['Asal']);
+      pasang('jeniskelamin', p['Jenis kelamin']);
+      pasang('jumlahpelaku', kosong(p['Jumlah']) ? 1 : p['Jumlah']);
+      pasang('pelakumelarikandiri', /^ya$/i.test(String(p['Melarikan diri'] || '')) ? 'Ya' : '');
+      pasang('pelanggaran', labelNilai_(M, 'pelanggaran', 'pelanggaran'));
+      pasang('tipetemuan', tipePelakuLk_(M, hk, r['Tipe temuan']));
+      pasang('tindakan', tindakanPelakuLk_(M, r));
+      pasang('statustindaklanjut', r['Status tindak lanjut']);
+      ket.push('Pelaku ' + String(labelKategori_(M, hk).pop() || '').toLowerCase() + ', laporan ' + idLk);
+      if (!kosong(p['Peran'])) ket.push('Peran: ' + p['Peran']);
+      if (!kosong(r['Status pelaku'])) ket.push('Status pelaku di laporan: ' + r['Status pelaku']);
+      pasang('keterangan', ket.join('; '));
+      rr['Comment'] = '';
+      var berkas = nama + ' / Pelaku / baris ' + p.__baris;
+      hasil = hasil.concat(olahBarisEkspor_(M, rr, info('lka-' + idLk + '-p' + (p['Urutan'] || i + 1), 'aktivitasmanusia.pelaku.',
+        berkas, kunci), sekarang, zona));
+    });
+    // laporan kejadian bukan titik patroli: tidak ikut menyaring titik sumber lain lewat Kunci titik
+    hasil.forEach(function (h) { h.baris['Kunci titik'] = ''; });
+    var n = tulisPerTab_(M, hasil, label), th = Object.keys(dilewati).sort();
+    if (!th.length) return n;
+    var oleh = {};
+    th.forEach(function (t) { oleh[dilewati[t]] = true; });
+    return { n: n, catatan: 'kebakaran tahun ' + th.join(', ') + ' dilewati karena sudah dimuat ' + Object.keys(oleh).join(', ') };
   }
 };
+
+/** Kolom berkas LK terkurasi -> atribut data model 2027 (jenis tumbuhan dan satwa lewat Kamus Jenis, jenisLk_). */
+var KOLOM_LK_ATRIBUT = [['No. LK', 'nolk'], ['Pelanggaran', 'pelanggaran'], ['Tipe temuan', 'tipetemuan'], ['Jumlah', 'jumlah'],
+  ['Satuan', 'satuan'], ['Luas terbakar (ha)', 'tmbluasterbakarha'], ['Penyebab Kebakaran', 'penyebabkebakaran'],
+  ['Status api', 'tmbstatusapi'], ['Sumber informasi kebakaran', 'tmbsumberinfokebakaran'], ['Vegetasi Terdampak', 'vegetasiterdampak'],
+  ['Modus penggunaan kawasan', 'moduspenggunaankawasan'], ['Tindakan', 'tindakan'], ['Status tindak lanjut', 'statustindaklanjut']];
+/** Kolom berkas LK terkurasi yang tidak punya atribut data model -> awalan di Keterangan (nama orang tidak di sini). */
+var KOLOM_LK_KETERANGAN = [['Lokasi', 'Lokasi'], ['Zona', 'Zona'], ['Grid', 'Grid'], ['Barang bukti', 'Barang bukti'],
+  ['Tindakan lain', 'Tindakan lain'], ['Tindak lanjut', 'Tindak lanjut'], ['Keterangan (laporan)', 'Keterangan laporan'],
+  ['Status pelaku', 'Status pelaku'], ['Jumlah pelaku', 'Jumlah pelaku'], ['Tanggal selesai', 'Tanggal selesai'],
+  ['Jenis lain', 'Jenis lain'], ['Titik lain', 'Titik lain'], ['Jenis gangguan (laporan)', 'Jenis kejadian di laporan']];
+
+/** Atribut aktif tiap kategori data model 2027 yang dipakai arsip laporan kejadian (dari Label/peta konsep 2027). */
+var ATRIBUT_KAT_LK = {
+  'aktivitasmanusia.pelaku.': 'nolk pelakumelarikandiri namapelaku asal jeniskelamin umur jumlahpelaku pelanggaran tipetemuan jumlah satuan tindakan perlutindaklanjut keterangan statustindaklanjut tanggaltindaklanjut',
+  'aktivitasmanusia.penggunaankawasan.': 'nolk pelanggaran namakelompok tipetemuan jumlah satuan jenissatwa usiatemuan keaktifan moduspenggunaankawasan tindakan perlutindaklanjut keterangan statustindaklanjut tanggaltindaklanjut',
+  'aktivitasmanusia.pembalakan.': 'nolk pelanggaran tipetemuan jenistumbuhan jumlah satuan usiatemuan keaktifan tindakan perlutindaklanjut keterangan statustindaklanjut tanggaltindaklanjut tmbjenistumbuhan',
+  'aktivitasmanusia.perburuansatwa.': 'nolk pelanggaran tipetemuan jumlah satuan usiatemuan keaktifan tindakan namapelakuindikatif jenissatwa perlutindaklanjut keterangan statustindaklanjut tanggaltindaklanjut tmbjenissatwa',
+  'aktivitasmanusia.pertambangandanpengeboran.': 'nolk pelanggaran tipetemuan metodepenambangan jumlah satuan usiatemuan keaktifan tindakan perlutindaklanjut keterangan statustindaklanjut tanggaltindaklanjut',
+  'aktivitasmanusia.alatkerjadantransportasi.': 'nolk pelanggaran tipetemuan jumlah satuan usiatemuan keaktifan tindakan perlutindaklanjut keterangan statustindaklanjut tanggaltindaklanjut',
+  'aktivitasmanusia.pencemaran.': 'nolk pelanggaran tipetemuan jumlah satuan usiatemuan tindakan perlutindaklanjut keterangan statustindaklanjut tanggaltindaklanjut',
+  'aktivitasmanusia.kebakaranhutandanlahan.': 'pelanggaran tipetemuan jumlah satuan penyebabkebakaran vegetasiterdampak tmbluasterbakarha tmbstatusapi tmbsumberinfokebakaran tindakan perlutindaklanjut keterangan',
+  'aktivitasmanusia.pengambilanhhbk.': 'pelanggaran tipetemuan tmbjenishhbk jumlah satuan usiatemuan keaktifan tindakan perlutindaklanjut keterangan',
+  'aktivitasmanusia.pembuatanaksesjalan.': 'pelanggaran tipetemuan jumlah satuan tandaaktifitas usiatemuan keaktifan tindakan perlutindaklanjut keterangan',
+  'aktivitasmanusia.pengembalaanternak.': 'pelanggaran namakelompok tmbjenisternak jumlah satuan jeniskelamin asal alamat lokasi kodetandaternak tindakan perlutindaklanjut keterangan',
+  'satwaliar.satwamati.': 'jenissatwa jeniskelaminsatwa jumlah kondisisatwamati tandapadasatwamati keutuhanbangkai indikasipenyebabkematian keterangan tmbjenissatwa',
+  'perdagangandankepemilikantsl.': 'nolk namapelaku idpelaku pelanggaran lokasi tipetemuan jenissatwa jenistumbuhan jumlah satuan kondisisatwa tindakan perlutindaklanjut keterangan statustindaklanjut tanggaltindaklanjut tmbjenistumbuhan tmbjenissatwa'
+};
+var ATRIBUT_LK_BAWAAN = 'pelanggaran tipetemuan jumlah satuan tindakan keterangan';
+/** Tipe temuan baris Pelaku menurut kategori kejadiannya. */
+var TIPE_PELAKU_LK = { 'aktivitasmanusia.pembalakan.': 'pembalakan.pembalak.', 'aktivitasmanusia.perburuansatwa.': 'perburuansatwa.pemburu.',
+  'aktivitasmanusia.pengambilanhhbk.': 'pengambilanhhbk.pengambilhhbk.', 'aktivitasmanusia.penggunaankawasan.': 'penggunaankawasan.pelakupembukaanlahan.' };
+
+function tipePelakuLk_(M, hk, tipeKejadian) {
+  var k = TIPE_PELAKU_LK[hk] || '';
+  if (hk === 'aktivitasmanusia.penggunaankawasan.') {
+    if (/ladang/i.test(tipeKejadian || '')) k = 'penggunaankawasan.pelakuperladanganliar.';
+    else if (/kebun/i.test(tipeKejadian || '')) k = 'penggunaankawasan.pelakuperkebunanliar.';
+  }
+  return k ? labelNilai_(M, 'tipetemuan', k) : '';
+}
+
+/** Tindakan terhadap pelaku (Ditangkap, Diperiksa, Proses penyelidikan, ...) pertama dari Tindakan dan Tindakan lain. */
+function tindakanPelakuLk_(M, r) {
+  if (!M.tindakanPelaku) {
+    M.tindakanPelaku = {};
+    Object.keys(M.label).forEach(function (k) {
+      var m = /^n\|tindakan\|tindakanterhadappelaku\.([a-z0-9]+)\.$/.exec(k);
+      if (m && m[1] !== 'lainnya') M.tindakanPelaku[kunci_(M.label[k])] = M.label[k];
+    });
+  }
+  var calon = [r['Tindakan']].concat(String(r['Tindakan lain'] || '').split(/\s*,\s*/));
+  for (var i = 0; i < calon.length; i++) {
+    var t = M.tindakanPelaku[kunci_(calon[i])];
+    if (t) return t;
+  }
+  return '';
+}
+
+/** Jenis di berkas LK terkurasi (label Kamus Jenis) -> {atribut, label}: atribut nasional atau Tambora sesuai Kamus. */
+function jenisLk_(M, teks, daftar) {
+  var k = M.kamusLabel[kunci_(teks)];
+  if (k && daftar.indexOf(k.atribut) >= 0) return { atribut: k.atribut, label: teks };
+  var ilm = (/ - ([A-Z][a-z]+(?: [a-z.-]+)+)\s*$/.exec(teks) || [])[1], kj = ilm ? jenisDM_(M, ilm, daftar) : null;
+  if (kj) return { atribut: kj.atribut, label: kj.label_smart || (kj.nama_umum ? kj.nama_umum + ' - ' : '') + kj.nama_ilmiah_baku };
+  return { atribut: daftar[0], label: teks };
+}
+
+/** Baris satu lembar (judul di baris 1) sebagai objek {judul kolom: isi}, dengan nomor barisnya di __baris. */
+function bacaLembarLk_(ss, nama) {
+  var sh = ss.getSheetByName(nama);
+  if (!sh) throw new Error('lembar "' + nama + '" tidak ada di spreadsheet LK terkurasi');
+  var v = sh.getDataRange().getValues(), h = v[0].map(function (x) { return String(x).trim(); }), hasil = [];
+  for (var i = 1; i < v.length; i++) {
+    if (!v[i].some(function (c) { return c !== '' && c !== null; })) continue;
+    var o = { __baris: i + 1 };
+    h.forEach(function (k, j) { if (k) o[k] = typeof v[i][j] === 'string' ? v[i][j].trim() : v[i][j]; });
+    hasil.push(o);
+  }
+  return hasil;
+}
 
 /**
  * Kata yang biasa dipakai laporan lama (rekap laporan kejadian, DaPolTam) -> kategori data model 2027. Urutan penting:

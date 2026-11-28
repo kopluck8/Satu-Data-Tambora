@@ -8,7 +8,8 @@ File patroli SMART (zip/xml per ST) di folder Drive ─┐
 Sumber sebelum 2027 (lembar Sumber), diseragamkan ───┘        │             └─► lembar survei metode teknis (Kalkulator Teknis)
    ke kategori dan atribut data model 2027:                   ▼
    LPK teknis PEH, rekap SMART, penyuluhan, pulbaket,      lembar Katalog ─► aplikasi web (Unduh.gs) ─► hub: Unduh Data
-   titik panas, areal terbakar, RBM, drone, laporan kejadian
+   titik panas, areal terbakar, RBM, drone, laporan kejadian                          └─► hub: grafik temuan aktivitas manusia
+   2026 dan arsip laporan kejadian 2016 sampai 2025
 ```
 
 Alurnya mengikuti Peta Konsep Satu Data Tambora 2027 (perbaikan 27-11-2026): **rekap berisi data mentah, terpisah dari hasil analisis**. Kategori observasi SMART dicocokkan ke rekap lewat lembar **Rute**, dan data sebelum 2027 dari lembar **Sumber** diseragamkan dulu ke kategori dan atribut data model 2027 lalu masuk ke rekap yang sama, jadi file patroli 2027 dan data lama berada di satu tabel. Kartu dan tab hub hanya menyajikan data dari rekap ini. Kolom **Sumber** di setiap rekap mencatat asal baris. Setiap sumber hanya mengganti baris miliknya sendiri, dan titik patroli yang sama dari dua sumber dicatat sekali (kolom **Kunci titik**: tanggal, jam, dan koordinat).
@@ -22,8 +23,8 @@ Alurnya mengikuti Peta Konsep Satu Data Tambora 2027 (perbaikan 27-11-2026): **r
 | Berkas | Isi |
 |---|---|
 | `Code.gs` | Menu, pembaca file patroli SMART, Rute (kategori dan atribut), Mandat, Kamus Jenis, Ejaan, rekap upaya patroli, pemicu otomatis |
-| `Sumber.gs` | Pembaca lembar Sumber (CSV, JSON, GeoJSON, spreadsheet Google, ekspor SMART) yang menyeragamkan data lama ke data model 2027. Sumber yang isinya tidak berubah dilewati (kolom `sidik`) |
-| `Unduh.gs` | Lembar Katalog dan aplikasi web untuk hub (`doPost`: `katalog`, `hitung`, `unduh`) |
+| `Sumber.gs` | Pembaca lembar Sumber (CSV, JSON, GeoJSON, spreadsheet Google, ekspor SMART, arsip laporan kejadian) yang menyeragamkan data lama ke data model 2027, termasuk pembaca koordinat dan tanggal yang ditulis bermacam-macam. Sumber yang isinya tidak berubah dilewati (kolom `sidik`) |
+| `Unduh.gs` | Lembar Katalog dan aplikasi web untuk hub (`doPost`: `katalog`, `hitung`, `unduh`, `grafik`) |
 | `Kendali.gs` | Isi lembar kendali versi terbaru (Rute, Induk, Petunjuk, Pengaturan, Sumber). Menu 1 memakainya untuk memperbarui spreadsheet yang sudah terpasang. Dibuat ulang oleh `buat_kendali.py`, jangan disunting tangan |
 | `appsscript.json` | Zona waktu Asia/Makassar, izin, dan setelan aplikasi web |
 
@@ -54,6 +55,8 @@ Bila susunan rekap berubah (seperti perbaikan peta konsep 27-11-2026), spreadshe
 
 Menu 1 berikutnya tidak bertanya lagi selama versinya sama.
 
+**Pembaruan ringan.** Bila Rute dan Induk di `Kendali.gs` sama dengan yang terpasang (misalnya pembaruan 28-11-2026 yang hanya menambah baris `lk_arsip` di lembar Sumber dan `GRAFIK_SUMBER_MATI` di Pengaturan), menu 1 tetap memperbarui lembar kendali tetapi **tidak mengosongkan tab rekap**. Langkah 3 cukup menu 3 saja; menu 2 tidak perlu diulang.
+
 ## Aplikasi web untuk Unduh Data
 
 Hub mengirim `POST` berisi JSON (teks biasa, tanpa preflight CORS):
@@ -63,6 +66,7 @@ Hub mengirim `POST` berisi JSON (teks biasa, tanpa preflight CORS):
 | `katalog` | `token`, `versi: 2` | Daftar induk (`tema`) dan data yang boleh dilihat: sub data (`jenis: sub`, dengan `induk`, `kategori`, `urut`), data pendukung, dan Lainnya, masing-masing dengan pilihan saring (`faset`), kolom terisi, rentang tahun, tanda berkoordinat, dan tanda terkunci. Tanpa `versi` (hub lama) hanya data yang berisi yang dikirim |
 | `hitung` | `token`, `dataset: [id]`, `saring` | Jumlah baris yang lolos saringan per data (disimpan 10 menit) |
 | `unduh` | `token`, `id`, `saring`, `awal` | Satu halaman baris (300 sampai 5.000 baris tergantung jumlah kolom); halaman berikutnya diminta dengan `awal = berikut` |
+| `grafik` | `token` | Ringkasan untuk halaman grafik temuan aktivitas manusia di hub (`perlindungan/`): jumlah baris Rekap Temuan Gangguan Kawasan dan Rekap Kejadian Kebakaran Hutan per tahun, kategori (Kategori 1 Aktivitas Manusia, serta Perdagangan dan Kepemilikan TSL), sumber, dan resor: `{kategori, sumber: [{label, n, mati}], resor, baris: [[tahun, kategori, sumber, resor, temuan, pelaku]], karhutLain}`. Baris Pelaku tidak dihitung sebagai temuan; kolom Jumlah pelaku (bawaan 1) dijumlahkan terpisah. Hanya angka, jadi akun pegawai juga boleh. Disimpan 30 menit dan dihapus setiap kali katalog diperbarui |
 
 `id` adalah id sub data (`induk.nama-sub-data`, mis. `pp.perburuan-satwa`) atau id tab di Katalog (data pendukung, atau satu tab utuh untuk tautan lama). Sub data yang barisnya ada di beberapa tab diunduh sebagai satu tabel.
 
@@ -76,6 +80,21 @@ Hub mengirim `POST` berisi JSON (teks biasa, tanpa preflight CORS):
 - Sumber di lembar Sumber yang `akses_unduh`-nya `admin` (atau `tidak`) dan mengikuti Rute tidak punya tab sendiri, jadi aksesnya berlaku per baris: baris dengan kolom Sumber bernama sumber itu (mis. rekap laporan kejadian 2026 di Rekap Temuan Gangguan Kawasan) hanya terlihat, terhitung, dan bisa dicari oleh akun admin. Katalog menyimpan ringkasan terpisah untuk akun pegawai, dan dihitung ulang otomatis bila daftar sumber khusus admin berubah.
 - `UNDUH_INDUK_TANPA` (bawaan: `survei`) berisi induk yang tidak ditawarkan di Unduh Data: lembar survei metode teknis adalah bahan Kalkulator Teknis, bukan rekap.
 - Setiap unduhan dicatat di lembar **Log Unduhan** (waktu, akun, data, saringan, jumlah baris).
+
+Sumber yang bawaannya tidak dihitung di grafik (`mati`) diatur di Pengaturan `GRAFIK_SUMBER_MATI`, dipisah koma (bawaan: titik panas, delineasi areal terbakar, dan pulbaket tenurial, karena berupa pantauan citra atau pendataan bidang garapan). Di hub sumber itu tetap bisa dinyalakan.
+
+## Arsip laporan kejadian 2016 sampai 2025
+
+Baris `lk_arsip` di lembar Sumber membaca `LK_Terkurasi_2016_2025.xlsx` (hasil kurasi enam rekap laporan kejadian tahunan: tanggal, jam, koordinat, kategori, resor batas 2026, dan pelaku diseragamkan). File itu memuat nama pelaku, jadi **tidak disimpan di repo** dan `akses_unduh` baris ini `admin`.
+
+1. Unggah file ke Drive, buka, lalu **File > Simpan sebagai Google Spreadsheet**.
+2. Salin ID spreadsheet baru (bagian alamat di antara `/d/` dan `/edit`) ke kolom `alamat` baris `lk_arsip`, lalu jalankan menu 3.
+
+Lembar **LK terkurasi** (satu baris per kejadian) masuk ke rekap mengikuti Rute dengan Jenis kegiatan "Laporan kejadian"; jenis satwa dan tumbuhan ikut ke Rekap Temuan Satwa dan Tumbuhan. Lembar **Pelaku** masuk sebagai baris Aktivitas Manusia > Pelaku dengan nomor LK, umur, asal, peran, tindakan, dan Jumlah pelaku. Kolom yang tidak punya atribut di kategorinya ditulis ke Keterangan. Baris arsip tidak memakai Kunci titik, jadi tidak menyembunyikan titik patroli SMART.
+
+Kebakaran dari arsip dilewati untuk tahun yang sudah dimuat sumber spreadsheet lain yang aktif dengan catatan `kategori=aktivitasmanusia.kebakaranhutandanlahan` (rekap kejadian kebakaran hutan), agar satu kejadian tidak terhitung dua kali; tahunnya tertulis di kolom status. Awali catatan `lk_arsip` dengan `kebakaran=semua` untuk tetap memuat semuanya.
+
+**Pembaca koordinat dan tanggal** (berlaku juga untuk sumber `spreadsheet`): derajat-menit-detik (`S 8°20'01" E 118°01'02"`), derajat-menit desimal, koma atau spasi sebagai pemisah desimal (`-8, 301573 118. 066531`), lintang tanpa titik desimal (`-81631`), X dan Y tertukar, lintang positif, dan UTM zona 50S dibaca ke derajat desimal dalam batas kawasan; teks aslinya disimpan di Atribut lain (`Koordinat asli: ...`). Tanggal bernama bulan (`Selasa, 10 Agustus 2021`, `10 Agt 2021`), tanggal angka di tengah teks, dan rentang (`10-12 Agustus 2021`) dibaca; jam diambil dari teks seperti `pukul 13.30 WITA`. Kolom `Hari/Tanggal` dan `Waktu` dikenali sebagai tanggal dan jam.
 
 ## Susunan sub data
 

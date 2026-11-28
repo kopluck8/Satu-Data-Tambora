@@ -23,6 +23,7 @@
  *   {aksi: 'katalog', token, versi: 2}
  *   {aksi: 'hitung', token, dataset: [id], saring}
  *   {aksi: 'unduh', token, id, saring, awal, kolom, format}
+ *   {aksi: 'grafik', token}  -> ringkasan angka grafik temuan aktivitas manusia (tab Perlindungan Kawasan hub)
  * id: id sub data (mis. "pp.pembalakan") atau id tab di Katalog (data pendukung, atau satu tab utuh).
  * saring: {dari: 'YYYY-MM-DD', sampai: 'YYYY-MM-DD', tahun: [2025], nilai: {'Resor': ['Resor Piong']}, cari: 'teks'}
  */
@@ -534,6 +535,8 @@ function perbaruiKatalog_(M, semua) {
   sh.setFrozenRows(1);
   if (baris.length) sh.getRange(2, 1, baris.length, kepala.length).setValues(baris);
   M.diubah = {};
+  // data berubah: ringkasan grafik hub dihitung ulang pada permintaan berikutnya
+  try { CacheService.getScriptCache().remove(KUNCI_CACHE_GRAFIK); } catch (e) { /* tanpa cache */ }
   return baris.length;
 }
 
@@ -1122,11 +1125,85 @@ function doPost(e) {
     if (m.aksi === 'katalog') return json_(katalogUntuk_(M, sesi, m));
     if (m.aksi === 'hitung') return json_(hitungUnduh_(M, sesi, m));
     if (m.aksi === 'unduh') return json_(ambilUnduh_(M, sesi, m));
+    if (m.aksi === 'grafik') return json_(grafikTemuan_(M));
     return json_({ ok: false, galat: 'Aksi tidak dikenal.' });
   } catch (err) {
     console.error(err && err.stack || err);
     return json_({ ok: false, galat: 'Terjadi galat di server: ' + (err && err.message || err) });
   }
+}
+
+/* =========================== grafik temuan aktivitas manusia (hub) =========================== */
+
+/**
+ * Sumber yang bawaannya tidak dihitung di grafik (Pengaturan GRAFIK_SUMBER_MATI, dipisah koma, mengganti daftar ini):
+ * titik panas dan delineasi adalah pantauan citra, pulbaket adalah pendataan bidang garapan, bukan temuan kejadian.
+ * Di hub sumber ini tetap bisa dinyalakan.
+ */
+var GRAFIK_SUMBER_MATI_BAWAAN = 'Titik panas (hotspot), Delineasi areal terbakar, Pulbaket tenurial';
+var KUNCI_CACHE_GRAFIK = 'grafik_temuan_v1';
+
+/**
+ * Ringkasan grafik "Temuan aktivitas manusia" di tab Perlindungan Kawasan hub: jumlah baris temuan di Rekap Temuan
+ * Gangguan Kawasan dan Rekap Kejadian Kebakaran Hutan per tahun, kategori (Kategori 1 Aktivitas Manusia, serta
+ * Perdagangan dan Kepemilikan TSL), sumber, dan resor. Baris Pelaku tidak dihitung sebagai temuan: kolom Jumlah pelaku
+ * (bawaan 1 per baris) dijumlahkan terpisah. Hanya angka tanpa isi baris, jadi juga untuk pegawai. Data file patroli
+ * 2027 dan seterusnya ikut terhitung dengan sendirinya karena masuk ke tab yang sama (menu 2 atau pemicu).
+ * -> {ok, diperbarui, kategori: [{k, label}], sumber: [{label, n, mati}], resor: [nama], baris: [[tahun, k, s, r, n, p]],
+ *     karhutLain: {tahun: sumber}} (karhutLain: tahun kebakaran yang tidak diambil dari arsip laporan kejadian)
+ */
+function grafikTemuan_(M) {
+  var cache = null, ada = null;
+  try { cache = CacheService.getScriptCache(); ada = cache.get(KUNCI_CACHE_GRAFIK); } catch (e) { ada = null; }
+  if (ada) return JSON.parse(ada);
+  if (!M.rute || !M.rute.length) {
+    M.rute = bacaTabel_(M.ss, LEMBAR.rute, true).filter(function (r) { return r.penghubung && r.tab_tujuan; })
+      .map(function (r) { return { penghubung: String(r.penghubung), tab: String(r.tab_tujuan), induk: String(r.induk || '') }; });
+  }
+  var kat = [], iKat = {}, sumber = [], iSb = {}, resor = [], iRs = {}, agr = {}, dibaca = {}, tabDibaca = [];
+  var nomor = function (daftar, peta, v) { if (peta[v] === undefined) { peta[v] = daftar.length; daftar.push(v); } return peta[v]; };
+  ['gangguan', 'karhut'].forEach(function (pg) {
+    var p, sh = null;
+    try { p = penghubung_(M, pg); } catch (e) { return; }
+    if (dibaca[p.induk + '|' + p.tab]) return;
+    dibaca[p.induk + '|' + p.tab] = true;
+    try { sh = cariLembar_(bukaInduk_(M, p.induk), p.tab); } catch (e) { sh = null; }
+    if (!sh || sh.getLastRow() < 2) return;
+    tabDibaca.push(p.tab);
+    var v = sh.getDataRange().getValues(), h = v[0].map(function (x) { return String(x).trim(); });
+    var iS = h.indexOf('Sumber'), iT = h.indexOf('Tahun'), iTg = h.indexOf('Tanggal'), iR = h.indexOf('Resor'),
+      iK = h.indexOf('Kode kategori'), i0 = h.indexOf('Kategori 0'), i1 = h.indexOf('Kategori 1'), iP = h.indexOf('Jumlah pelaku');
+    for (var b = 1; b < v.length; b++) {
+      var r = v[b], hk = iK >= 0 ? String(r[iK] || '') : '', k0 = i0 >= 0 ? String(r[i0] || '') : '', k1 = i1 >= 0 ? String(r[i1] || '') : '';
+      var kk = '', lab = '', seg = hk.split('.');
+      if (seg[0] === 'aktivitasmanusia' && seg[1]) { kk = seg[1]; lab = k1 || seg[1]; }
+      else if (seg[0] === 'perdagangandankepemilikantsl') { kk = seg[0]; lab = k0 || 'Perdagangan dan Kepemilikan TSL'; }
+      else if (!hk && /^aktivitas manusia$/i.test(k0) && k1) { kk = kunci_(k1); lab = k1; }
+      else if (!hk && /^perdagangan dan kepemilikan/i.test(k0)) { kk = 'perdagangandankepemilikantsl'; lab = k0; }
+      if (!kk) continue;
+      var th = Number(iT >= 0 ? r[iT] : '') || (iTg >= 0 && r[iTg] instanceof Date ? r[iTg].getFullYear() : 0);
+      if (!th) continue;
+      if (iKat[kk] === undefined) { iKat[kk] = kat.length; kat.push({ k: kk, label: lab }); }
+      var si = nomor(sumber, iSb, String(iS >= 0 && r[iS] ? r[iS] : '(tanpa sumber)'));
+      var ri = nomor(resor, iRs, String(iR >= 0 && r[iR] ? r[iR] : ''));
+      var key = th + '|' + iKat[kk] + '|' + si + '|' + ri, a = agr[key] || (agr[key] = [th, iKat[kk], si, ri, 0, 0]);
+      if (kk === 'pelaku') a[5] += Number(iP >= 0 ? r[iP] : '') || 1;
+      else a[4]++;
+    }
+  });
+  var mati = {}, nSb = sumber.map(function () { return 0; });
+  daftarKoma_(aturUnduh_(M, 'GRAFIK_SUMBER_MATI', GRAFIK_SUMBER_MATI_BAWAAN)).forEach(function (l) { mati[l.toLowerCase()] = true; });
+  var baris = Object.keys(agr).map(function (k) { return agr[k]; }).sort(function (a, b) { return a[0] - b[0] || a[1] - b[1] || a[2] - b[2] || a[3] - b[3]; });
+  baris.forEach(function (a) { nSb[a[2]] += a[4]; });
+  var arsip = bacaTabel_(M.ss, LEMBAR.sumber, true).filter(function (x) { return x.jenis === 'lk_arsip'; })[0] || { kode: 'lk_arsip', catatan: '' };
+  var karhutLain = {};
+  try { karhutLain = tahunKarhutLain_(M, arsip); } catch (e) { karhutLain = {}; }
+  var hasil = { ok: true, diperbarui: new Date().toISOString(), tab: tabDibaca, kategori: kat,
+    sumber: sumber.map(function (l, i) { return { label: l, n: nSb[i], mati: !!mati[l.toLowerCase()] }; }),
+    resor: resor, baris: baris, karhutLain: karhutLain, arsip: LABEL_SUMBER.lk_arsip };
+  var teks = JSON.stringify(hasil);
+  if (cache && teks.length < 90000) { try { cache.put(KUNCI_CACHE_GRAFIK, teks, 1800); } catch (e) { /* cache penuh */ } }
+  return hasil;
 }
 
 /** Menu "Uji Unduh Data": katalog, satu halaman data, sambungan ke Tanya Data, dan alamat aplikasi web. */
