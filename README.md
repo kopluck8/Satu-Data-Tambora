@@ -171,6 +171,16 @@ Tab **Perlindungan Kawasan** memuat kartu *Penanganan Konflik Tenurial Karya Sar
 - **Nama pengguna lahan dan pihak yang menyewakan/menjual** disimpan di `bidang.geojson` (properti `orang`: nama, alamat, riwayat, yang menyewakan, tahun aktif, keterangan; `pengaruh`: pihak berpengaruh; `tutupan` dan `catatan`) atas permintaan Balai, dari seluruh kolom `join_rambah.xlsx`. Nilai transaksi tidak ada di file itu. Ingat: file ini bisa dibuka siapa saja yang tahu alamatnya, karena repo dan GitHub Pages publik.
 - **Pembaruan**: setelah pulbaket lanjutan, olah ulang isian pulbaket dan SHP bidang, lalu ganti keempat file di `data/tenurial/`. Halaman langsung memakai angka baru tanpa perubahan kode.
 
+## Temuan Aktivitas Manusia
+
+Tab **Perlindungan Kawasan** memuat kartu *Grafik Temuan Aktivitas Manusia 2016 sampai Sekarang* yang membuka halaman [`perlindungan/`](perlindungan/index.html): jumlah temuan aktivitas manusia per tahun dari data paling awal sampai sekarang, menurut kategori (pembalakan, kebakaran hutan dan lahan, penggunaan kawasan, perburuan satwa, penggembalaan ternak, pengambilan HHBK, alat kerja dan transportasi, lainnya) atau menurut sumber, beserta pelaku tercatat per tahun dan temuan per resor. Saringan tahun, resor, kategori, dan sumber berlaku untuk semua grafik; setiap grafik punya tabel.
+
+- **Data** dibaca langsung dari Mesin Data lewat aksi `grafik` (lihat [`apps-script/mesin-data/README.md`](apps-script/mesin-data/README.md)): Rekap Temuan Gangguan Kawasan dan Rekap Kejadian Kebakaran Hutan, berisi arsip laporan kejadian 2016–2025 yang sudah dikurasi, rekap laporan kejadian tahun berjalan, dan temuan patroli SMART. File patroli 2027 dan seterusnya yang masuk Mesin Data ikut terhitung tanpa mengubah halaman. Hanya angka yang dikirim, tanpa nama pelaku atau isi laporan.
+- **Cadangan**: bila arsip belum dimuat di Mesin Data, ringkasannya diambil dari `data/perlindungan/temuan_lk.json` (angka per tahun, kategori, dan resor, tanpa nama). Bila Mesin Data belum tersambung, halaman tetap menampilkan arsip itu. Jawaban terakhir Mesin Data disimpan di browser (`sdt-perlindungan-v1`) agar halaman langsung tampil.
+- **Sumber bawaan mati**: titik panas, delineasi areal terbakar, dan pulbaket tenurial (Pengaturan `GRAFIK_SUMBER_MATI` di Mesin Data); pemakai bisa menyalakannya.
+- **Tautan langsung** untuk kartu di Sheet konten: `perlindungan/index.html#kat=kebakaranhutandanlahan` (satu kategori), `#resor=Resor%20Piong`, `#dari=2020&sampai=2026`, `#warna=sumber`, boleh digabung dengan `&`.
+- **Warna** kategori tetap per kategori (bukan per peringkat) dan sudah diuji buta warna untuk tumpukan bersebelahan di permukaan gelap halaman.
+
 ## Kepegawaian (De-Bora)
 
 Tab **Kepegawaian** membuka halaman [`kepegawaian/`](kepegawaian/index.html), hasil olahan spreadsheet **DE-BORA** yang dikelola dan diperbarui sendiri oleh bagian Kepegawaian. Bagian Kepegawaian tetap bekerja di spreadsheet seperti biasa; halaman ini tidak menampilkan spreadsheet, melainkan ringkasannya:
@@ -191,7 +201,7 @@ Pengingat berlaku umum untuk semua pegawai, tidak per akun. Browser membaca DE-B
 
 ## Login
 
-Situs ini, termasuk halaman `resor/`, `kehati/`, `penyuluhan/`, `tenurial/`, `kepegawaian/`, dan `unduh/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
+Situs ini, termasuk halaman `resor/`, `kehati/`, `penyuluhan/`, `tenurial/`, `perlindungan/`, `kepegawaian/`, dan `unduh/`, baru tampil setelah pegawai masuk dengan akun di lembar **Akun** Apps Script Tanya Data (lihat [`apps-script/README.md`](apps-script/README.md)). Sekali masuk berlaku untuk seluruh situs dan panel Tanya Data selama 6 jam (`LAMA_SESI_JAM`). Tombol berinisial nama di kanan atas berisi menu **Keluar**. Gerbangnya ada di [`assets/gerbang.js`](assets/gerbang.js) dan hanya aktif bila `TANYA_DATA` di `data/sumber.js` terisi.
 
 > Gerbang ini menutup tampilan, bukan file. Selama repo dan GitHub Pages publik, file data (misalnya `data/resor/*.json`, `data/tenurial/*.geojson`) dan aplikasi lain di `kopluck8.github.io` tetap bisa dibuka langsung oleh siapa pun yang tahu alamatnya, dan isi repo terlihat di GitHub. Data yang benar-benar rahasia jangan disimpan di repo publik; sajikan lewat Apps Script yang memeriksa login. Halaman diberi `noindex` dan `robots.txt` agar tidak muncul di mesin pencari.
 
@@ -252,7 +262,9 @@ penyuluhan/                        halaman Penyuluhan dan Pemberdayaan Masyaraka
 data/penyuluhan/                   data kurasi laporan penyuluhan dan pemberdayaan (JSON dan CSV)
 kepegawaian/                       halaman Kepegawaian De-Bora (DE-BORA dibaca langsung oleh browser, tidak disimpan di repo)
 unduh/                             halaman Unduh Data (data dari aplikasi web Mesin Data, lapisan peta publik)
+perlindungan/                      halaman grafik Temuan Aktivitas Manusia (aksi grafik Mesin Data, cadangan arsip LK)
 data/tenurial/                     rangkuman pulbaket ST.1452, peta bidang beserta nama pengguna, areal terbakar, zonasi
+data/perlindungan/                 ringkasan arsip laporan kejadian 2016–2025 (angka saja) untuk cadangan grafik
 apps-script/                       backend Tanya Data (Google Apps Script) dan panduan pemasangannya
 apps-script/mesin-data/            Mesin Data: Apps Script spreadsheet tempat seluruh data berkumpul (file patroli, sumber lain, Unduh Data)
 .github/workflows/resor.yml        pembaruan analisis resor harian

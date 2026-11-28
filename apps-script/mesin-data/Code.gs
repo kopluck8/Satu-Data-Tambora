@@ -888,16 +888,22 @@ function siapkanSpreadsheetInduk() {
     catatan.push('Berkas Kendali belum ada di proyek Apps Script, jadi lembar kendali tidak diperbarui ke peta konsep ' +
       'terbaru. Buat berkas skrip Kendali, tempel Kendali.gs, lalu jalankan menu 1 lagi');
   } else if (kendaliPerluDiperbarui_(ssAktif)) {
+    // Rute dan Induk tidak berubah (hanya Sumber, Pengaturan, atau Petunjuk): tab rekap tetap, cukup menu 3
+    var ringan = typeof kendaliRingan_ === 'function' && kendaliRingan_(ssAktif);
     try {
       var ui = SpreadsheetApp.getUi();
-      if (ui.alert('Perbarui Mesin Data ke peta konsep ' + VERSI_KENDALI + '?', 'Lembar Rute, Induk, Petunjuk, Pengaturan, dan ' +
-        'Sumber diperbarui (isian folder, alamat, dan status aktif yang sudah ada tetap). Tab rekap dikosongkan lalu diisi ' +
-        'ulang: jalankan menu 3, lalu menu 2. File patroli dan sumber aslinya tidak disentuh.', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
+      if (ui.alert('Perbarui Mesin Data ke peta konsep ' + VERSI_KENDALI + '?', ringan ?
+        'Lembar Pengaturan, Sumber, dan Petunjuk diperbarui (isian folder, alamat, dan status aktif yang sudah ada tetap). ' +
+        'Rute dan Induk tidak berubah, jadi isi tab rekap tetap. Lanjutkan dengan menu 3.' :
+        'Lembar Rute, Induk, Petunjuk, Pengaturan, dan Sumber diperbarui (isian folder, alamat, dan status aktif yang sudah ' +
+        'ada tetap). Tab rekap dikosongkan lalu diisi ulang: jalankan menu 3, lalu menu 2. File patroli dan sumber aslinya ' +
+        'tidak disentuh.', ui.ButtonSet.YES_NO) !== ui.Button.YES) return;
     } catch (e) { /* dijalankan dari editor */ }
-    naik = perbaruiLembarKendali_(ssAktif, catatan);
+    naik = perbaruiLembarKendali_(ssAktif, catatan) ? (ringan ? 'ringan' : 'penuh') : false;
   }
   var M = muatMesin_(), sh = M.ss.getSheetByName(LEMBAR.induk), v = sh.getDataRange().getValues();
-  if (naik) catatan.push(kosongkanRekap_(M) + ' tab rekap dikosongkan dan Log Berkas dikosongkan: jalankan menu 3 lalu menu 2');
+  if (naik === 'ringan') catatan.push('Rute dan Induk tidak berubah, jadi isi tab rekap tetap: jalankan menu 3 agar sumber baru terbaca');
+  else if (naik) catatan.push(kosongkanRekap_(M) + ' tab rekap dikosongkan dan Log Berkas dikosongkan: jalankan menu 3 lalu menu 2');
   samakanZona_(M.ss);
   var kepala = v[0].map(String), iId = kepala.indexOf('id_spreadsheet');
   var folder = M.atur.FOLDER_REKAP ? DriveApp.getFolderById(String(M.atur.FOLDER_REKAP)) : null;
